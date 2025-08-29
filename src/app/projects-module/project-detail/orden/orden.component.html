@@ -1,0 +1,14 @@
+<p>orden works!</p>
+@if(this.order.img){
+    <p>{{order.img.length}}</p>
+    @for(pieza of order.piezas;track pieza){
+        <p>{{pieza.piezas}}</p>
+        <p>{{pieza.title}}</p>
+    }
+    @for(img of order.img;track img){
+        <div>
+            <img width="200px" [src]="img" alt="xd">
+        </div>
+    }
+}
+

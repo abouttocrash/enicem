@@ -1,0 +1,43 @@
+.app{
+    display: grid;
+    height:100%;
+    width: 100%;
+    grid-template-columns: 64px 1fr;
+    background-color: var(--bg);
+}
+
+.app-holder{
+    display: grid;
+    grid-template-rows: 64px 1fr;
+    height:100%;
+    overflow-y: auto;
+}
+.pages-holder{
+    height:100%;
+    overflow-y: scroll;
+}
+
+.toolbar{
+    background-color: var(--main);
+    height:100%;
+    display: grid;
+    align-items: center;
+    justify-content: end;
+}
+.circle{
+    margin-right: 32px;
+    height: 42px;
+    width: 42px;
+    background-color: red;
+    border-radius: 50%;
+    position:relative;
+    cursor: pointer;
+    & span{
+        position:absolute;
+        top:50%;
+        left:50%;
+        font-size: 14px;
+        font-weight: 600;
+        transform: translate(-50%,-50%);
+    }
+}

@@ -1,0 +1,25 @@
+<div class="dialog">
+    <h2>Nuevo proyecto</h2>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre del proyecto</mat-label>
+            
+            <input matInput placeholder="Nombre del proyecto" [(ngModel)]="project.name">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Clave del proyecto</mat-label>
+            <input matInput placeholder="Clave del proyecto" [(ngModel)]="project.noSerie">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Diseñador</mat-label>
+            <mat-select [(ngModel)]="user">
+                @for(u of API.users;track u._id){
+                    <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div>
+        <button class="main-cta" (click)="createProject()">Crear</button>
+    </div>
+</div>

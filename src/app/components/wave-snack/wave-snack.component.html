@@ -1,0 +1,8 @@
+<div #snack class="snack">
+    <mat-icon id="icon-snack" class="ic" fontSet="material-symbols-outlined">{{s.icon$ | async}}</mat-icon>
+    <span> {{ s.toastMessage$ | async }}  </span>
+    <button class="wave-button-icon" (click)="close()">
+        <mat-icon id="loading-snack" class="progress" fontSet="material-symbols-outlined">progress_activity</mat-icon>
+        OK
+    </button>
+</div>

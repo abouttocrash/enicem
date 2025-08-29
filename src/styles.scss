@@ -1,1 +1,99 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+:root{
+    --bg-light:#ededed;
+    --white:#f5f5f5;
+    --contrast-white:#ebebeb;
+    --contrast-black:#1c1d1f;
+    --black:#0f0f10;
+    --black2:#131416;
+    --blue-dark:#1b263b;
+    --gray:#4d4d4d;
+    --gold:#e6b979;
+    --hover-field:#293347;
+}
+html, body { 
+    height: 100%;
+}
+.theme-light{
+    --bg:var(--bg-light);
+    --main:var(--white);
+    --primary:var(--blue-dark);
+    --text:var(--black);
+    --text-inv:var(--white);
+    --gray-text:var(--gray);
+    --gold-text:var(--gold);
+    --contrast:var(--contrast-white);
+}
+
+.theme-dark{
+    --text:var(--white);
+    --text-inv:var(--black)
+    --gold-text:var(--gold);
+    --gray-text:var(--gray);
+    --bg:var(--black);
+    --main:var(--black2);
+    --primary:var(--blue-dark);
+    --contrast:var(--contrast-black);
+     @include mat.table-overrides((
+        background-color:#131416,
+        row-item-label-text-color:var(--white),
+        header-headline-color: var(--white)
+    ));
+    @include mat.menu-overrides((
+        container-color: var(--main),
+        item-hover-state-layer-color:var(--bg)
+    ));
+    @include mat.dialog-overrides((
+        container-color: var(--main)
+    ));
+    @include mat.select-overrides((
+        panel-background-color: var(--main)
+    ));
+    @include mat.sidenav-overrides((
+    container-background-color: var(--main)
+  ));
+}
+body,p { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.mat-mdc-menu-item .mat-icon{
+    color:var(--text)!important;
+}
+
+p,span,button,h1,h2,h3{
+    margin:0;
+}
+.center-ver{
+    display: grid;
+    align-items: center;
+}
+.center-ver-flex{
+   display: flex;
+    align-items: center; 
+}
+.main-cta{
+    background-color: var(--primary);
+    color:var(--white);
+    height:38px;
+    border:none;
+    padding:0 12px 0 12px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;   /* Centra verticalmente */
+    justify-content: center; /* Opcional: centra horizontalmente */
+    gap: 0.5em;  
+    & .mat-icon{
+        color:var(--white);
+    }
+}:disabled{
+    background-color: #5b6370;
+    cursor: default;
+}
+
+.mat-mdc-menu-item-text span{
+    color:var(--text)!important
+    
+}
+
+.mat-mdc-option{
+    color:var(--text)!important
+}
