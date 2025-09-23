@@ -1,0 +1,13 @@
+<div class="dialog">
+    <div>
+        <h2>Confirmar</h2>
+    </div>
+    <div class="confirm-detail">
+        <p>¿Desea confirmar esta acción?</p>
+        <p>{{data.accion}}</p>
+    </div>
+    <div class="dialog-bottom center-ver-flex">
+        <button class="secondary-cta" (click)="close(false)">Cancelar</button>
+        <button class="main-cta" (click)="close(true)">Confirmar</button>
+    </div>
+</div>

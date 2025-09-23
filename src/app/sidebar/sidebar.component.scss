@@ -1,6 +1,13 @@
 .sidebar{
     background-color: var(--main);
     height:100%;
+    display: grid;
+    grid-template-rows: 64px 1fr 64px;
+}
+.user-holder{
+    display: grid;
+    align-items: center;
+    justify-content: center;
 }
 button{
     width: 100%;
@@ -9,4 +16,35 @@ button{
     border: none;
     background-color: transparent;
     cursor: pointer;
+}
+.menu-text{
+    color:var(--text);
+    & mat-icon{
+        color:var(--text);
+    }
+    text-align: center;
+    & span{
+        font-size: 14px;
+        cursor: default;
+    }
+}
+
+.circle{
+    height: 42px;
+    width: 42px;
+    background-color: red;
+    border-radius: 50%;
+    position:relative;
+    cursor: pointer;
+    & span{
+        position:absolute;
+        top:50%;
+        left:50%;
+        font-size: 14px;
+        font-weight: 600;
+        transform: translate(-50%,-50%);
+        width: 100%;
+        text-align: center;
+        letter-spacing: -1.2px;
+    }
 }

@@ -1,0 +1,55 @@
+.dialog{
+    height:100%;
+    padding:16px;
+    display: grid;
+    grid-template-rows: 64px 1fr 58px;
+}
+.dialog-bottom{
+    position:relative;
+    padding:16px 0 0 0;
+    justify-content: end;
+    display: flex;
+    align-items: center; 
+    & button{
+        min-width:100px;
+        margin-left:12px;
+    }
+    & div{
+        display: flex;
+    }
+}
+.dialog-bottom::before{
+    content: "";
+    position: absolute;
+    top:0;
+    right:0;
+    background-color: var(--gray);
+    height: 1px;
+    width: 100%;
+}
+h2{
+    color:var(--text);
+}
+mat-form-field{
+    width: 100%;
+}
+:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input{
+    color:var(--text);
+}
+// :host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) div.mat-mdc-notch-piece{
+//     border-color: var(--gray)
+// }
+:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mat-mdc-notch-piece{
+    border-color:var(--hover-field)
+}
+:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-floating-label{
+    color:var(--hover-field);
+}
+
+:host ::ng-deep .mat-mdc-select-min-line{
+    color:var(--text);
+}
+
+:host ::ng-deep .cdk-overlay-pane.mat-mdc-dialog-panel{
+    max-width: 2000px;
+}

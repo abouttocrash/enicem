@@ -1,11 +1,29 @@
 <div class="sidebar">
-    <button (click)="gotoProjects()">
-        <mat-icon>work</mat-icon>
-    </button>
-    <button (click)="newUser()">
-        <mat-icon>groups</mat-icon>
-    </button>
+    <section class="user-holder">
+        @if(API.currentUser){
+                <div matTooltip="Cambiar usuario"  [matMenuTriggerFor]="menu" class="circle" [ngStyle]="{'backgroundColor':API.currentUser.color}">
+                <span>{{API.currentUser.short}}</span>
+            </div>
+            }
+    </section>
+    <section class="menu-text">
+        <button matTooltip="Proyectos" (click)="gotoProjects()"><mat-icon>work</mat-icon></button>
+        <button matTooltip="Nuevo Usuario" (click)="newUser()"><mat-icon>groups</mat-icon> </button>
+        <button matTooltip="Nuevo Proveedor" (click)="newProveedor()"><mat-icon fontSet="material-symbols-outlined">package_2</mat-icon> </button>
+        
+    </section>
+    <section></section>
+    
    <button (click)="s.changeMode()" >
-        <mat-icon>{{s.currentMode.icon}}</mat-icon>
+        <mat-icon [ngStyle]="{'color':s.currentMode.color}">{{s.currentMode.icon}}</mat-icon>
     </button>
 </div>
+
+<mat-menu #menu="matMenu">
+  @for(user of API.users;track user){
+  <button mat-menu-item (click)="selectUser(user)">
+     <mat-icon fontSet="material-symbols-outlined">face</mat-icon>
+    <span>{{user.name}}</span>
+  </button>
+  }
+</mat-menu>

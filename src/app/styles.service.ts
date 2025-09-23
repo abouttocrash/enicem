@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 type Theme = {
   icon:string,
   tooltip:string,
-  mode: "LIGHT" | "DARK"
+  mode: "LIGHT" | "DARK",
+  color:string
 }
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,14 @@ export class StylesService {
     {
       icon:"light_mode",
       tooltip:"Light mode",
-      mode:"DARK"
+      mode:"DARK",
+      color:"#f6bd60"
     },
     {
       icon:"dark_mode",
       tooltip:"Dark mode",
-      mode:"LIGHT"
+      mode:"LIGHT",
+      color:"#4a4e69"
     },
   ]
   currentMode = this.modes[0]
@@ -28,7 +31,6 @@ export class StylesService {
       this.currentMode = this.modes[1]
     else
       this.currentMode = storageMode
-    
       this.checkDevice()
   }
 

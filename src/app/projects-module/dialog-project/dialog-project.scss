@@ -1,26 +1,5 @@
-.dialog{
-    width:500px;
-    padding:16px;
-    height:600px;
-    display: grid;
-    grid-template-rows:68px 1fr 50px;
-}
-h2{
-    color:var(--text);
-}
+@import '../../../styles/dialog.scss';
+
 mat-form-field{
-    width: 100%;
-    
-}
-:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input{
-    color:var(--text);
-}
-// :host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) div.mat-mdc-notch-piece{
-//     border-color: var(--gray)
-// }
-:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mat-mdc-notch-piece{
-    border-color:var(--hover-field)
-}
-:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-floating-label{
-    color:var(--hover-field);
+    margin-bottom: 16px;
 }

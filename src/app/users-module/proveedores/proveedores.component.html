@@ -1,12 +1,12 @@
 <form class="dialog" [formGroup]="form">
     <div>
-        <h2>Crear Usuario</h2>
+        <h2>Crear Proveedor</h2>
     </div>
     <div>
         <mat-form-field appearance="outline">
-            <mat-label>Nombre del usuario</mat-label>
-            <input matInput placeholder="Nombre del usuario" formControlName="username">
-             @if (!form.get("username")!.valid) {
+            <mat-label>Nombre del proveedor</mat-label>
+            <input matInput placeholder="Nombre del proveedor" formControlName="proveedor">
+             @if (!form.get("proveedor")!.valid) {
                 <mat-error>Campo requerido</mat-error>
             }
         </mat-form-field>
@@ -14,7 +14,7 @@
     <div class="dialog-bottom">
         <div>
             <button  class="secondary-cta" (click)="close()">Cancelar</button>
-            <button [disabled]="!form.valid" class="main-cta" (click)="createUser()">Crear</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createProveedor()">Crear</button>
         </div>
     </div>
 </form>

@@ -1,0 +1,63 @@
+.card{
+    height:280px;
+    cursor: pointer;
+    width: 232px;
+    background-color: var(--main);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,.01);
+    display: grid;
+    grid-template-rows: 26px 1fr 32px;
+    padding:16px 16px 0 16px;
+
+    & .card-section{
+        margin-top: 10px;
+        background-color: var(--contrast);
+        padding:8px;
+        border-radius: 8px;
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        color:var(--text);
+        & p{
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+    }
+    & .card-date{
+        color:var(--gray);
+        & mat-icon{
+            color:var(--gray);
+        }
+    }
+    & .menu{
+        width: 24px;
+        height:24px;
+        cursor: pointer;
+        color:var(--text)
+        
+    }
+    & .menu-holder{
+        display: grid;
+        grid-template-columns: 1fr 24px;
+        .badge{
+            display: inline;
+            font-size: 14px;
+            background-color: rgb(255, 248, 187);
+            padding:2px 6px 2px 6px;
+            border-radius: 12px;
+            color:var(--black)
+        }
+        & mat-icon{
+            justify-self: end;
+        }
+    }
+    & h2{
+        font-size: 22px;
+        margin:0;
+        color:var(--text)
+    }
+    & h2 + p{
+        color:var(--gray-text);
+        font-size: 18px;
+    }
+}

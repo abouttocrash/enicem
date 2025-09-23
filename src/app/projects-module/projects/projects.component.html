@@ -1,75 +1,27 @@
 <div class="projects">
     <div class="header">
-        <h1>📃Proyectos</h1>
-        <div class="bar">
-            <mat-form-field style="width: 400px;">
-            <mat-icon matTextPrefix>search</mat-icon>
-            <mat-label>Buscar proyecto</mat-label>
-            <input matInput placeholder="Nombre del proyecto" >
+        <h1>Proyectos</h1>
+        <bar placeholder="Buscar proyecto" [bar]="false">
+            <mat-form-field appearance="outline">
+            <mat-label>Filtrar proyectos</mat-label>
+            <mat-select [(ngModel)]="filtro" >
+                <mat-option value="ABIERTO" (click)="buscarProyecto('ABIERTO')">Abiertos</mat-option>
+                <mat-option value="CERRADO" (click)="buscarProyecto('CERRADO')">Cerrados</mat-option>
+                <mat-option value="CANCELADO" (click)="buscarProyecto('CANCELADO')">Cancelados</mat-option>
+            </mat-select>
         </mat-form-field>
-            <div class="center-ver-flex" style="justify-content: end;">
-                <button class="main-cta" (click)="newProject()">
+            <button class="main-cta" (click)="newProject()">
                 <mat-icon>add</mat-icon>
                 Nuevo Proyecto
             </button>
-            </div>
-        </div>
+        </bar>
     </div>
     <div class="projects-list">
         @for(p of API.projects;track p.name;let i = $index){
-            <div class="card" >
-               <div class="menu-holder">
-                <div>
-                    <span class="badge">{{p.status}}</span>
-                </div>
-                <div style="text-align: center;width: 24px;height: 24px;">
-                    <mat-icon class="menu" (click)="setItem(p)" [matMenuTriggerFor]="menu">more_vert</mat-icon>
-                </div>
-               </div>
-               <div >
-                 <h2>{{p.name}}</h2>
-                 <p>{{p.noSerie}}</p>
-                 <div class="card-section">
-                    <div class="center-ver">
-                        <mat-icon>face</mat-icon>
-                    </div>
-                    <div class="center-ver">
-                        <span>{{p.user.name}}</span>
-                    </div>
-                 </div>
-                 <div class="card-section">
-                    <div class="center-ver">
-                        <mat-icon fontSet="material-symbols-outlined">lab_profile</mat-icon>
-                    </div>
-                    <div class="center-ver">
-                        <span>{{p.getCountText() }} </span>
-                    </div>
-                 </div>
-               </div>
-               <div >
-                <div class="center-ver-flex" style="justify-content: end;">
-                    <div class="center-ver-flex card-date">
-                        <mat-icon>calendar_month</mat-icon>
-                    <span>{{p.createdAt | date}}</span>
-                    </div>
-                </div>
-               </div>
-            </div>
+            <project-card
+                (click)="seeDetails(p)"
+                [project]="p">
+            </project-card>
         }
-        <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="getFolders()" [disabled]="isAddLogButtonDisabled()">
-                <mat-icon>file_open</mat-icon>
-                <span>Registrar planos</span>
-            </button>
-            <button mat-menu-item [disabled]="!isAddLogButtonDisabled()"  (click)="seeDetails($event)">
-                <mat-icon>book_5</mat-icon>
-                <span >Bitácora</span>
-            </button>
-            <button mat-menu-item [disabled]="!isAddLogButtonDisabled()" >
-                <mat-icon fontSet="material-symbols-outlined">manufacturing</mat-icon>
-                <span >Manufactura</span>
-            </button>
-        </mat-menu>
     </div>
 </div>
-<input #folderInput type="file" webkitdirectory multiple hidden (change)="onFolderSelected($event)">
