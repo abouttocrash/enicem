@@ -25,24 +25,8 @@ export class AppComponent {
   async ngOnInit(){
     this.waveSnack.setViewContainerRef(this.vcr);   
   }
-  selectUser(user:User){
-    this.API.currentUser = user
-    
-    this.setShort()
-  }
-  async ngAfterViewInit(){
-    await this.API.getUsers()
-    this.API.currentUser = this.API.users[0]
-    this.setShort()
-    await this.API.getProjects()
-  }
+  
+  
 
-  setShort(){
-    const split = this.API.currentUser.name.split(" ")
-    try{
-      this.API.currentUser.short = `${split[0].charAt(0).toLocaleUpperCase()} ${split[1].charAt(0).toLocaleUpperCase()}`
-    }catch(e){
-      this.API.currentUser.short = `${split[0].charAt(0).toLocaleUpperCase()}`
-    }
-  }
+  
 }

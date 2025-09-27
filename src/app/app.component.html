@@ -3,25 +3,10 @@
         <sidebar></sidebar>
     </div>
     <div class="app-holder">
-        <div class="toolbar">
-            @if(API.currentUser){
-                <div  [matMenuTriggerFor]="menu" class="circle" [ngStyle]="{'backgroundColor':API.currentUser.color}">
-                <span>{{API.currentUser.short}}</span>
-            </div>
-            }
-            
-        </div>
+        
         <div class="pages-holder">
             <router-outlet></router-outlet>
         </div>
     </div>
 </div>
 
-<mat-menu #menu="matMenu">
-  @for(user of API.users;track user){
-  <button mat-menu-item (click)="selectUser(user)">
-     <mat-icon fontSet="material-symbols-outlined">face</mat-icon>
-    <span>{{user.name}}</span>
-  </button>
-  }
-</mat-menu>

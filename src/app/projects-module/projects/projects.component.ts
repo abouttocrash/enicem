@@ -1,89 +1,65 @@
-import { Component, ElementRef, inject, output, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject,ViewChild } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {MatMenuModule} from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { APIService } from '../../api.service';
-import { Project } from '../Proyecto';
 import { NewProjectDialog } from '../dialog-project/dialog-component';
-import { DatePipe } from '@angular/common';
-import { MatFormField } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { ProjectCardComponent } from '../project-card/project-card.component';
+import { StorageService } from '../../storage.service';
+import { BARComponent } from '../project-detail/bar/bar.component';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { Proyecto } from '@shared-types/Proyecto';
+import { WaveSnack } from '../../components/wave-snack/wave-snack-service';
 @Component({
   selector: 'app-projects',
-  imports: [MatIconModule,MatDialogModule,MatMenuModule,DatePipe,MatFormField,MatInputModule],
+  imports: [MatIconModule,MatDialogModule,MatMenuModule,ProjectCardComponent,BARComponent,MatSelectModule,MatFormFieldModule,FormsModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss'
 })
 export class ProjectsComponent {
   readonly dialog = inject(MatDialog);
-  @ViewChild('folderInput') folderInput!: ElementRef<HTMLInputElement>;
+  filtro = ""
   
-
-  constructor(private router:Router,public API:APIService){}
+  constructor(private router:Router,public API:APIService,private storage:StorageService,private snack:WaveSnack){}
 
   async ngAfterViewInit(){}
 
   async newProject(){
-    const dialogRef = this.dialog.open(NewProjectDialog);
-     dialogRef.componentInstance.actionPerformed.subscribe(async(data:Project)=>{
-      const project = await this.API.createProject(data)
+    const dialogRef = this.dialog.open(NewProjectDialog,
+      {width:"460px",height:"520px",disableClose:true}
+    );
+    dialogRef.componentInstance.actionPerformed.subscribe(async(data:Proyecto)=>{
+      await this.API.createProject(data)
+      await this.API.getProjects("ABIERTO")
       dialogRef.close()
-     })
+      //TODO error state?
+      
+      this.snack.showSnack("Proyecto creado")
+      await this.snack.timeout(1000)
+      this.snack.dismissSnack()
+    })
+  }
+
+  async buscarProyecto(filtro:string){
+    await this.API.getProjects(this.filtro)
   }
 
   
 
-  getFolders() {
-    this.folderInput.nativeElement.value = '';
-    this.folderInput.nativeElement.click();
-  }
+ 
 
-  
-
-  async onFolderSelected(event: Event) {
-    const formData = new FormData();
-    let files:any[] = []
-      const input = event.target as HTMLInputElement;
-      if (input.files && input.files.length > 0) 
-        files = Array.from(input.files);
-      
-      files.forEach(file => formData.append('files', file, file.name));
-      try{
-        //TODO checar porque fallo
-        //Warning: Indexing all PDF objects
-        //message: 'Invalid PDF structure'
-        const response = await this.API.createLog(formData)
-        this.API.currentProject.logId = response.log.insertedId
-        const r = await this.API.updateProject(response.log.insertedId,this.API.currentUser._id,this.API.currentProject._id!,files.length)
-        this.API.currentProject.setStatus("Bitácora")
-        this.API.currentProject.count = files.length
-      }catch(e){
-        throw e
-      }
-      
-
-  }
-
-  seeDetails(e:MouseEvent){
-    e.stopPropagation()
-    localStorage.setItem("project",JSON.stringify(this.API.currentProject))
+  seeDetails(p:Proyecto){
+    this.API.currentProject = p;
+    this.storage.setProject(this.API.currentProject)
     this.router.navigate(["/details"])
   }
 
-  setItem(p:Project){
+  setItem(p:Proyecto){
     this.API.currentProject = p;
   }
-
-  isAddLogButtonDisabled(){
-    if(!this.API.currentProject)return false
-    else{
-      if(this.API.currentProject.count)return true
-      else return false
-
-    }
-  }
-
   
 }
 

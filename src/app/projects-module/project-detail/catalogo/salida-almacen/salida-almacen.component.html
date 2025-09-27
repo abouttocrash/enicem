@@ -1,0 +1,30 @@
+<div class="dialog">
+    <div> <h2>Salida almacen</h2> </div>
+    <div>
+
+        @for(plano of piezas;track plano;let i = $index){
+            <div class="list">
+                <div class="item">
+                    <div class="center-ver">
+                        <input [placeholder]="max(plano)" type="text" [(ngModel)]="plano.cantidadInDialog">
+                    </div>
+                <div class="center-ver">
+                    <div>
+                        <p style="font-weight: 600;">{{plano.title}}</p>
+                        <p>{{plano.material}}</p>
+                    </div>
+                </div>
+                <div class="center-ver"></div>
+            </div>
+                
+            </div>
+        }
+
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            <button class="main-cta" (click)="actualizar(false)">Cancelar</button>
+            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+        </div>
+    </div>
+</div>

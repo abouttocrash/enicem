@@ -1,0 +1,21 @@
+@use '../../../../../styles/dialog.scss';
+
+
+.list{
+    display: grid;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--gray);
+}
+
+.item{
+    display: grid;
+    height:52px;
+    grid-template-columns: 50px 1fr 40px;
+    padding:4px 8px 4px 8px;
+    color:var(--text);
+    background-color: var(--list);
+    & input{
+        width: 40px;
+        height:32px
+    }
+}

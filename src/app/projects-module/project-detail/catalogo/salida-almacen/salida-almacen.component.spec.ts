@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DialogRechazoComponent } from './dialog-rechazo.component';
+import { SalidaAlmacenComponent } from './salida-almacen.component';
 
-describe('DialogRechazoComponent', () => {
-  let component: DialogRechazoComponent;
-  let fixture: ComponentFixture<DialogRechazoComponent>;
+describe('SalidaAlmacenComponent', () => {
+  let component: SalidaAlmacenComponent;
+  let fixture: ComponentFixture<SalidaAlmacenComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DialogRechazoComponent]
+      imports: [SalidaAlmacenComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DialogRechazoComponent);
+    fixture = TestBed.createComponent(SalidaAlmacenComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

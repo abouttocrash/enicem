@@ -2,28 +2,26 @@ import { User } from "../users-module/User"
 
 export class Project{
     name:string
-    idUser?:string
+    idUser?:string // TODO: es el id del designer, quitar y agregarlo desde el BE
     _id?:string
     noSerie:string
     status = "No Status"
-    user!:User
-    logId?:string
+    designer!:User
+    catalogId?:string
     createdAt?:Date
     createdBy?:string
     count?:number
-    constructor(name:string,noSerie:string,status="No Status"){
-        this.name = name
-        this.noSerie = noSerie
-        this.status = status
+    constructor(project:Project){
+        this.name = project.name
+        this.noSerie = project.noSerie
+        this.status = project.status
+        this._id = project._id
+        this.catalogId = project.catalogId
+        this.createdBy = project.createdBy
+        this.createdAt = project.createdAt
+        this.count = project.count
     }
 
-    setId(id:string){
-        this._id = id
-    }
-
-    getProjectName(){
-        return this.name
-    }
     getProjectKey(){
         return this.noSerie
     }
@@ -31,19 +29,17 @@ export class Project{
     setStatus(status:string){
         this.status = status
     }
-    setUser(user:User){
-        this.user = user
+    setUser(designer:User){
+        this.designer = designer
     }
 
-    getCountText(){
-        return this.count? this.count +" planos":"Sin bitácora"
-    }
+    
     toApi(){
         return {
             name:this.name,
             createdBy:this.createdBy,
             noSerie:this.noSerie,
-            idUser:this.user._id,
+            idUser:this.designer._id,
             status:this.status
         }
     }

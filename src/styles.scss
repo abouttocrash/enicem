@@ -1,6 +1,8 @@
 @use '@angular/material' as mat;
+@use './styles//dialog.scss';
 :root{
-    --bg-light:#ededed;
+    // --bg-light:#ededed;
+    --bg-light:#dfdfdf;
     --white:#f5f5f5;
     --contrast-white:#ebebeb;
     --contrast-black:#1c1d1f;
@@ -10,6 +12,8 @@
     --gray:#4d4d4d;
     --gold:#e6b979;
     --hover-field:#293347;
+    --badge:#2e384a;
+    --blue:#669bbc;
 }
 html, body { 
     height: 100%;
@@ -19,21 +23,27 @@ html, body {
     --main:var(--white);
     --primary:var(--blue-dark);
     --text:var(--black);
+    --text:var(--black2);
     --text-inv:var(--white);
     --gray-text:var(--gray);
     --gold-text:var(--gold);
     --contrast:var(--contrast-white);
+    --hover:var(--bg-light);
+    --list:var(--bg-light);
 }
 
 .theme-dark{
     --text:var(--white);
+    --text-2:var(--bg-light);
     --text-inv:var(--black)
     --gold-text:var(--gold);
-    --gray-text:var(--gray);
+    --gray-text:#818181;
     --bg:var(--black);
     --main:var(--black2);
     --primary:var(--blue-dark);
     --contrast:var(--contrast-black);
+    --hover:var(--gray);
+    --list:#18191b;
      @include mat.table-overrides((
         background-color:#131416,
         row-item-label-text-color:var(--white),
@@ -50,14 +60,24 @@ html, body {
         panel-background-color: var(--main)
     ));
     @include mat.sidenav-overrides((
-    container-background-color: var(--main)
-  ));
+        container-background-color: var(--main)
+    ));
+    @include mat.tabs-overrides((
+        active-focus-label-text-color: var(--text-2),
+        inactive-focus-label-text-color: var(--text-2),
+        active-label-text-color: var(--text-2),
+        inactive-label-text-color:#9e9e9e,
+        active-hover-label-text-color: var(--text-2),
+        inactive-hover-label-text-color: var(--text-2),
+    ));
 }
 body,p { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-menu-item .mat-icon{
     color:var(--text)!important;
 }
-
+.cdk-overlay-pane.mat-mdc-dialog-panel{
+    max-width: 2000px!important;
+}
 p,span,button,h1,h2,h3{
     margin:0;
 }
@@ -66,8 +86,23 @@ p,span,button,h1,h2,h3{
     align-items: center;
 }
 .center-ver-flex{
-   display: flex;
+    display: flex;
     align-items: center; 
+}
+.secondary-cta{
+    background-color: transparent;
+    color:var(--text);
+    height:38px;
+    border:none;
+    padding:0 12px 0 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+    gap: 0.5em;  
+    & .mat-icon{
+        color:var(--white);
+    }
 }
 .main-cta{
     background-color: var(--primary);
@@ -96,4 +131,13 @@ p,span,button,h1,h2,h3{
 
 .mat-mdc-option{
     color:var(--text)!important
+}
+
+.icon-button-app{
+    border:none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.icon-button-app:disabled{
+    cursor: default;
 }

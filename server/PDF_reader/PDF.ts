@@ -2,6 +2,8 @@
 import fs from 'fs'
 import pdfParse from "pdf-parse";
 import path from 'path';
+import { PDFDocument, PDFImage, PageSizes, StandardFonts, rgb } from 'pdf-lib'
+import { Pieza } from '@shared-types/Pieza.js';
 export class PDF{
     constructor(){}
     private getUploadsFolder() {
@@ -10,7 +12,7 @@ export class PDF{
     
     async readFolder(folder?:string){
         const dir = folder? folder: this.getUploadsFolder()
-        let arr = []
+        let arr:Pieza[] = []
         try{
             const files = fs.readdirSync(dir)
             for(let i = 0;i <files.length;i++){
@@ -27,18 +29,18 @@ export class PDF{
       
     }
 
-    emptyUploads(){
+    emptyUploads(projectId:string){
         const dir = this.getUploadsFolder()
+        const dataDir = path.join(process.cwd(), 'data',projectId)
+        fs.mkdirSync(dataDir, { recursive: true });
         fs.readdirSync(dir).forEach(file => {
+            
+            const srcPath = path.join(dir, file);
+            const tgtPath = path.join(dataDir, file);
+            fs.copyFileSync(srcPath, tgtPath);
+        
             fs.unlinkSync(path.join(dir, file));
         });
-    }
-    async readBuffer(file:any){
-        
-         const data = await pdfParse(file) as any;
-         console.log(data)
-        
-      
     }
 
     extractObject(text: string,metadata:any){
@@ -46,12 +48,63 @@ export class PDF{
         const acabadoMatch = text.match(/Acabado:\s*([^\n]+)/i);
         const piezasMatch = text.match(/Piezas:\s*([^\n]+)/i);
 
-    return {
+        return {
             material: materialMatch ? materialMatch[1]!.trim() : null,
             acabado: acabadoMatch ? acabadoMatch[1]!.trim() : null,
             piezas: piezasMatch ? piezasMatch[1]!.trim() : null,
             autor:metadata["dc:creator"],
             title:metadata["dc:title"]
-    };
-}
+        } as Pieza
+    }
+
+    async createPDF(orden:any){
+        console.log(orden)
+        const pdfDoc = await PDFDocument.create()
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+        const page = pdfDoc.addPage(PageSizes.A4)
+        const { width, height } = page.getSize()
+
+        const fontSize = 30
+        page.drawText('Nueva orden!', {
+        x: 50,
+        y: height - 4 * fontSize,
+        size: fontSize,
+        font: font,
+        color: rgb(0, 0.53, 0.71),
+        })
+        const pngImages = await this.getImages(pdfDoc,orden.data.img)
+        let x = 0
+        pngImages.forEach(im=>{
+            const pngDims = im.scale(0.5)
+            page.drawImage(im, {
+            x:x,
+            y: page.getHeight() / 2 - pngDims.height,
+            width: pngDims.width,
+            height: pngDims.height,
+            
+        })
+            x += page.getWidth() / 2 - pngDims.width / 2 + 75
+        })
+        const pdfBytes = await pdfDoc.save()
+        const buffer = Buffer.from(pdfBytes as Uint8Array).toString('base64')
+        return buffer
+    }
+
+    private async getImages(pdfDoc:PDFDocument,imagenes:any[]){
+        let arr = []
+        let l
+        for(let i =0;i<imagenes.length;i++){
+            let realPath = imagenes[i].split("http://localhost:3000/static/") as string
+            //TODO solo jpg o png o buscar otro formato
+            //SOI not found in JPEG
+            const format = realPath.includes("png") ? "png" : "jpg"
+            const pngImageBytes = fs.readFileSync(`imagenes/${realPath[1]}`)
+            let img:PDFImage
+                img = await pdfDoc.embedPng(pngImageBytes)
+            
+            arr.push(img)
+        }
+       
+        return arr
+    }
 }

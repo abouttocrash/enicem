@@ -1,0 +1,39 @@
+<div class="dialog">
+    <div> <h2>Rechazar piezas</h2> </div>
+    <div>
+
+        @for(plano of piezas;track plano;let i = $index){
+            <div class="list">
+                <div class="item">
+                    <div class="center-ver">
+                        <input [placeholder]="max(plano)" type="text" (keydown)="checkAmount($event,plano)">
+                    </div>
+                <div class="center-ver">
+                    <div>
+                        <p style="font-weight: 600;">{{plano.title}}</p>
+                        <p>{{plano.material}}</p>
+                    </div>
+                </div>
+                <div class="center-ver"></div>
+            </div>
+                
+            </div>
+        }
+        <mat-form-field appearance="outline">
+            <mat-label>Motivo de rechazo</mat-label>
+            <mat-select [(ngModel)]="razon">
+                <mat-option  value="SIN ROSCAS">SIN ROSCAS</mat-option>
+                <mat-option  value="MALA APARIENCIA">MALA APARIENCIA</mat-option>
+                <mat-option  value="MAL DIMENSIONADO">MAL DIMENSIONADO</mat-option>
+                <mat-option  value="OTROS">OTROS</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
+            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="dialog" >
+    <div>
+        <h2>Crear órden de trabajo <span>#{{folio}}</span></h2>
+    </div>
+    <div>
+        <form  [formGroup]="form">
+        <mat-form-field appearance="outline">
+            <mat-label>Tipo de orden</mat-label>
+            <mat-select formControlName="tipo">
+                <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Maquinado">Maquinado</mat-option>
+                <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Detalle">Detalle</mat-option>
+            </mat-select>
+            @if (!form.get("tipo")!.valid) {
+                <mat-error>Tipo de órden requerida</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Proveedor</mat-label>
+            <mat-select formControlName="proveedor">
+                @for(p of api.proveedores;track p){
+                    <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+                }
+            </mat-select>
+            @if (!form.get("proveedor")!.valid) {
+                <mat-error>Proveedor requerido</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Fecha estimada de entrega</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" placeholder="dd/mm/yyyy">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (!form.get("date")!.valid) {
+                <mat-error>Fecha estimada requerida</mat-error>
+            }
+        </mat-form-field>
+        </form>
+        @for(plano of data.list;track plano;let i = $index){
+            <div class="list" [ngClass]="plano.imagenes?.length ? 'has-images' : 'no-images'">
+                <div class="item">
+                    <div class="center-ver">
+                    <input type="text" [(ngModel)]="plano.piezas">
+                </div>
+                <div>
+                    <p>{{plano.material}}</p>
+                    <p>{{plano.title}}</p>
+                </div>
+                <div class="center-ver">
+                    <!-- <mat-icon 
+                        class="add-photo" 
+                        fontSet="material-symbols-outlined"
+                        (click)="photoInputs.get(i)?.nativeElement!.click()"
+                        #icon
+                    >add_photo_alternate</mat-icon> -->
+                    <input 
+                        type="file" 
+                        multiple
+                        accept=".jpeg,.jpg,.png,.gif,image/jpeg,image/png,image/gif"
+                        style="display: none;"
+                        #photoInput
+                        (change)="onPhotoSelected($event, plano)"
+                    >
+                </div>
+                </div>
+                <div class="imagenes">
+                </div>
+                
+            </div>
+        }
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            <button class="secondary-cta" (click)="close()" >Cancelar</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createOrder()">Guardar</button>
+        </div>
+    </div>
+</div>

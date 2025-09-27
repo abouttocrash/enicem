@@ -1,0 +1,43 @@
+<div class="panel">
+    @if(pieza){
+    <h2>{{pieza.title}}</h2>
+    <section>
+      <div class="input-drawer">
+      <p>Requerido</p>
+      <input type="text" [(ngModel)]="pieza.piezas">
+    </div>
+    <div class="input-drawer">
+      <p>Registradas</p>
+      <input type="text"[(ngModel)]="pieza.registrado">
+    </div>
+    <div class="input-drawer">
+      <p>Faltantes</p>
+      <input type="text" [(ngModel)]="pieza.faltantes">
+    </div>
+    <div class="input-drawer" style="border:none">
+      <p>Rechazadas</p>
+      <p>{{pieza.rechazadas}}</p>
+      
+    </div>
+    <div class="input-drawer-r"> 
+      <p>Razón</p>
+      <div>
+        @if(pieza.rechazo){
+          <span class="razon-badge">{{pieza.rechazo}}</span>
+        }
+        
+      </div>
+      <button (click)="dialogRechazo()">Rechazar</button>
+    </div>
+    
+   
+    <div class="comments">
+      <h3>Comentarios</h3>
+      <textarea [(ngModel)]="pieza.comentarios[0]" name="" id="" rows="6"></textarea>
+    </div>
+    </section>
+    <section class="center-ver-flex" style="justify-content: end;">
+      <button (click)="guardar()" class="main-cta" style="min-width: 100px;">Guardar</button>
+    </section>
+  }
+</div>
