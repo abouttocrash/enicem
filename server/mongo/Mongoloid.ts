@@ -1,9 +1,10 @@
-import type { Collection } from "../Mongo.js";
+import { Mongo, type Collection } from "../Mongo.js";
 import {MongoClient,ObjectId} from 'mongodb'
 export class Mongoloid{
     protected client:MongoClient
     private collection:Collection
     private dbName = 'icem';
+    mongo = Mongo.instance
     constructor(collection:Collection,client:MongoClient){
         this.client = client
         this.collection = collection
@@ -16,26 +17,26 @@ export class Mongoloid{
     }
 
     async getFolio(){
-        const folio = await this.getOne("Folio","000000000000000000000000","folio")
+        const folio = await this.getOne("Folio",new ObjectId("000000000000000000000000"),"folio")
         return folio!
     }
 
     
-    protected async getMany(by:string,id:string){
+    protected async getMany<T>(by:string,id:string){
         const obj = {[by]:id}
         const c = await this.getCollection(this.collection)
         const cursor = await c.find(obj)
         const r = await cursor.toArray()
         await this.client.close()
-        return r
+        return r as T[]
     }
     
-    protected async getOne(by:string,id:string,collection = this.collection){
-        const obj = {[by]:new ObjectId(id)}
+    protected async getOne(by:string,id:string | ObjectId,collection = this.collection){
+        const obj = {[by]:id}
         const c = await this.getCollection(collection)
         const r = await c.findOne(obj)
         await this.client.close()
-        return r
+        return r 
     }
     
     protected async create(obj:any){
@@ -52,11 +53,11 @@ export class Mongoloid{
         return collection
     }
 
-    protected async getAllItems(col:Collection){
+    protected async getAllItems<T>(col:Collection):Promise<T[]>{
         const c = await this.getCollection(col)
         const cursor = await c.find()
         const r = await cursor.toArray()
-        return r
+        return r as T[]
     }
 
 

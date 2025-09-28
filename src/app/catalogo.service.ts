@@ -3,7 +3,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { APIService } from './api.service';
 import { ICEMDR, ICEMR } from '@shared-types/ICEMR';
-import { Pieza } from '@shared-types/Pieza';
+import { Catalogo, Pieza } from '@shared-types/Pieza';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +16,11 @@ export class CatalogoService {
   dataSource!: MatTableDataSource<Pieza>;
   constructor(private api:APIService) { }
 
-  async init(sort:MatSort){
-    this.catalogId = this.api.currentProject.catalogId!
-    this.sort = sort;
-    const r = await this.getCatalog()
-    this.dataSource = new MatTableDataSource(r.data.logs);
-    this.dataSource.sort = sort;
-    return r
+  init(data:Catalogo,sort?:MatSort){
+    this.dataSource = new MatTableDataSource(data.logs);
+    if(sort)
+      this.sort = sort;
+    this.dataSource.sort = this.sort;
   }
   async createAlmacen(piezas:Pieza[]){
     const body = {

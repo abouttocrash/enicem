@@ -2,16 +2,16 @@ import { ObjectId, type MongoClient } from "mongodb";
 import { Mongoloid } from "./Mongoloid.js";
 import { Proyecto } from "@shared-types/Proyecto.js";
 import { Usuario } from "@shared-types/Usuario.js";
-
+export type Status = "ABIERTO" | "CERRADO" | "CANCELADO"
 export class ProyectosMongo extends Mongoloid{
 
     constructor(client:MongoClient){
         super("projects",client)
     }
 
-    async getAll(status:string):Promise<any>{
-        const p = await this.getAllItems("projects")
-        const projectsResponse = p.filter((a:any)=>{
+    async getAll(status:Status):Promise<Proyecto[]>{
+        const p = await this.getAllItems<Proyecto>("projects")
+        const projectsResponse = p.filter((a:Proyecto)=>{
             return a.status == status
         })
         return projectsResponse

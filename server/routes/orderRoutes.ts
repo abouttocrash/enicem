@@ -22,6 +22,7 @@ orderRouter.put("/status",async(req,res)=>{
 })
 orderRouter.get("/folio",async(req,res)=>{
     const p = await mongo.orders.getFolio()
+    console.log(p)
     res.status(200).send({data:p})
 })
 

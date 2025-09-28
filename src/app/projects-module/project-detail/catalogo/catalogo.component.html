@@ -2,7 +2,7 @@
     <bar placeholder="Buscar plano">
       <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete())" (click)="salidaAlmacen()">Salida Almacen</button>
       <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete())" (click)="createOrder()">Crear orden</button>
-      <button class="main-cta" [disabled]="api.currentProject.piezasCount! > 0"  (click)="getFolders()">{{textoPlanos}}</button>
+      <button class="main-cta" [disabled]="api.currentProject.piezasCount! > 0"  (click)="getFolders()">Agregar planos</button>
     </bar>
 
       <div style="height: 100%;overflow-y: scroll;">

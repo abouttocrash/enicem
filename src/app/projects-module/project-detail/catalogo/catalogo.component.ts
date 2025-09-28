@@ -15,7 +15,7 @@ import { BitacoraComponent } from '../bitacora/bitacora.component';
 import { MILESTONE_DESC } from '@shared-types/Bitacora';
 import { ProyectoService } from '../../../proyecto.service';
 import { SalidaAlmacenComponent } from './salida-almacen/salida-almacen.component';
-import { Pieza } from '@shared-types/Pieza';
+import { Catalogo, Pieza } from '@shared-types/Pieza';
 
 @Component({
   selector: 'catalogo',
@@ -32,14 +32,12 @@ export class CatalogoComponent {
  
   tableChecked = false
   currentPieza = {} as any
-  textoPlanos = "Crear Bitácora"
   drawer!:MatDrawer
   constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){}
 
-  async init(drawer:MatDrawer){
+  init(data:Catalogo,drawer:MatDrawer){
     this.drawer = drawer
-    const r = await this.p.c.init(this.sort)
-    this.textoPlanos = r.data.logs.length > 0 ? "Agregar planos" : "Crear Catálogo"
+    this.p.c.init(data,this.sort)
   }
 
   getFolders() {

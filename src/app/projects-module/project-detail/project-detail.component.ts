@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { WaveSnack } from '../../components/wave-snack/wave-snack-service';
 import { MatMenuModule } from '@angular/material/menu';
 import {MatTabsModule} from '@angular/material/tabs';
 import { CatalogoComponent } from './catalogo/catalogo.component';
@@ -34,18 +33,16 @@ export class ProjectDetailComponent {
   @ViewChild(MatDrawer) drawer!:MatDrawer
   readonly dialog = inject(MatDialog);
   icon = "work"
-  constructor(public api:APIService,private location:Location,private snack:WaveSnack,
+  constructor(public api:APIService,private location:Location,
     private storage:StorageService,private p:ProyectoService){
     this.api.currentProject = this.storage.getProject()
   }
 
   async ngAfterViewInit(){
-    this.snack.showSnack("Obteniendo información")
-    await this.snack.timeout(1000)
-    await this.bitacora.init()
-    await this.ordenes.init(this.drawer)
-    await this.catalogo.init(this.drawer)
-    this.snack.dismissSnack()
+    const response = await this.api.getAll()
+    this.bitacora.init(response.data.bitacora)
+    this.ordenes.init(response.data.ordenes,this.drawer)
+    this.catalogo.init(response.data.catalogo,this.drawer)
   }
 
   goBack(){

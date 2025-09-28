@@ -28,7 +28,7 @@ mat-drawer-content{
     cursor: pointer;
     top:16px;
     right:0px;
-    color:var(--gray);
+    color:var(--blue);
 }
 .designer-holder{
     display: grid;
@@ -60,6 +60,9 @@ mat-drawer-content{
     }
     & .project-detail{
         padding-left: 8px;
+        & mat-icon{
+            color:var(--text);
+        }
     }
 
     & h1{

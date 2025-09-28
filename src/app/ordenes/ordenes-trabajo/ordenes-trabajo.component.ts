@@ -8,7 +8,6 @@ import { BARComponent } from '../../projects-module/project-detail/bar/bar.compo
 import {MatDrawer, MatSidenavModule} from '@angular/material/sidenav';
 import { PanelOrdenComponent } from '../panel-orden/panel-orden.component';
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo';
-import { OrdenesService } from '../ordenes.service';
 import { ProyectoService } from '../../proyecto.service';
 @Component({
   selector: 'ordenes-trabajo',
@@ -24,9 +23,9 @@ export class OrdenesTrabajoComponent {
   drawer!:MatDrawer
   constructor(public p:ProyectoService){}
 
-  async init(drawer:MatDrawer){
+  init(data:OrdenTrabajo[],drawer:MatDrawer){
     this.drawer = drawer
-    const r = await this.p.o.init(this.sort)
+    const r = this.p.o.init(data,this.sort)
     
   }
   createOrder(checked:Array<any>){

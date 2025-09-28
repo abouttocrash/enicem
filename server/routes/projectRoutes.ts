@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { Mongo } from '../Mongo.js';
 import { ObjectId } from 'mongodb';
+import { Status } from '../mongo/ProyectosMongo.js';
 const projectRouter = Router();
 const mongo = Mongo.instance
 
 projectRouter.get("/all",async(req,res)=>{
-    const status = req.query.status as string
+    const status = req.query.status as Status
     const p = await mongo.projects.getAll(status)
     res.status(200).send({data:p})
 })

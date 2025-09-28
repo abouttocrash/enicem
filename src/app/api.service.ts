@@ -4,11 +4,16 @@ import { firstValueFrom } from 'rxjs';
 import { User } from './users-module/User';
 import { ICEMDR, ICEMR } from '@shared-types/ICEMR';
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo';
-import { Milestone } from '@shared-types/Bitacora';
+import { Bitacora, Milestone } from '@shared-types/Bitacora';
 import { Proyecto } from '@shared-types/Proyecto';
 import { Usuario } from '@shared-types/Usuario';
-import { Pieza } from '@shared-types/Pieza';
-
+import { Catalogo, Pieza } from '@shared-types/Pieza';
+export type AllR ={
+  proyectos:Proyecto[]
+  ordenes:OrdenTrabajo[]
+  catalogo:Catalogo
+  bitacora:Bitacora
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +28,15 @@ export class APIService {
   private headers = new HttpHeaders().append("Content-Type", 'application/json')
   http = inject(HttpClient);  
   constructor() { }
+
+  async getAll(){
+    const body = {
+      projectId:this.currentProject._id!,
+      catalogId:this.currentProject.catalogId!
+    }
+    const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/projectData",{params:body}))
+    return r;
+  }
 
   async readProject(dir:string){
     const params = new HttpParams().append('dir', dir);

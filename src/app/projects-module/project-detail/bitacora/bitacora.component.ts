@@ -7,6 +7,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDrawer } from '@angular/material/sidenav';
 import { BARComponent } from '../bar/bar.component';
 import { ProyectoService } from '../../../proyecto.service';
+import { Bitacora } from '@shared-types/Bitacora';
 
 @Component({
   selector: 'bitacora',
@@ -18,8 +19,8 @@ export class BitacoraComponent {
   @ViewChild(MatSort) sort!: MatSort;
   constructor(private api:APIService,public p:ProyectoService){}
 
-  async init(){
-    await this.p.b.init(this.api.currentProject._id!,this.sort)
+  init(data:Bitacora){
+    this.p.b.init(data,this.sort)
   }
   
   expandedElement: any | null;

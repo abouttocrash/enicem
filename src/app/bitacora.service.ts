@@ -18,12 +18,11 @@ export class BitacoraService {
     
   }
 
-  async init(projectId:string,sort:MatSort){
-    this.projectId = projectId
-    this.sort = sort;
-    const r = await this.getLog()
-    this.dataSource = new MatTableDataSource(r.data.milestones);
-    this.dataSource.sort = sort;
+  init(data:Bitacora,sort?:MatSort){
+    this.dataSource = new MatTableDataSource(data.milestones);
+    if(sort)
+      this.sort = sort;
+    this.dataSource.sort = this.sort;
   }
 
   async getLog(){

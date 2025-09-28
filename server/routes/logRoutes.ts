@@ -14,13 +14,7 @@ logRouter.put("/",async(req,res)=>{
 })
 
 logRouter.get("/",async(req,res)=>{
-    const p = await mongo.getLogs(req.query.projectId as string) as any
-    const users = await mongo.get("users")
-    p.milestones.forEach((m:any)=>{
-       const u = users.find((u)=>{return u._id.toString() == m.createdBy}) as any
-       m.usuario = u.name
-    })
-    
+    const p =  await mongo.logs.getBitacora(req.query.projectId as string)
     res.status(200).send({data:p})
 })
 

@@ -9,8 +9,7 @@ userRouter.post("/",async(req,res)=>{
     res.status(200).send({data:p})
 })
 userRouter.get("/",async(req,res)=>{
-    const p = await mongo.get("users")
-   
+    const p = await mongo.user.getUsers()
     res.status(200).send({data:p})
 })
 

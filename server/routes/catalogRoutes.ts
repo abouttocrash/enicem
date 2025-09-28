@@ -47,10 +47,9 @@ catalogRouter.put("/",async(req,res)=>{
 catalogRouter.get("/",async(req,res)=>{
     if(req.query.catalogId == "undefined")
         return res.status(200).send({data:{logs:[]}})
-    else{
-        const p = await mongo.getCatalog(req.query.catalogId as string)
-        res.status(200).send({data:p})
-    }
+    
+    const p = await mongo.catalog.getCatalogo(req.query.catalogId as string)
+    res.status(200).send({data:p})
 })
 
 

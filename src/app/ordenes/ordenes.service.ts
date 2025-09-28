@@ -19,11 +19,11 @@ export class OrdenesService {
   dataSource!: MatTableDataSource<OrdenTrabajo>;
   constructor(private api:APIService) {}
 
-  async init(sort:MatSort){
-    this.sort = sort;
-    const r = await this.getOrders()
-    this.dataSource = new MatTableDataSource(r.data);
-    this.dataSource.sort = sort;
+  init(data:OrdenTrabajo[],sort?:MatSort){
+    this.dataSource = new MatTableDataSource(data);
+    if(sort)
+      this.sort = sort;
+    this.dataSource.sort = this.sort;
   
   }
 

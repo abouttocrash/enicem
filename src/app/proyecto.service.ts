@@ -18,8 +18,9 @@ export class ProyectoService {
   }
 
   async getAll(){
-    await this.o.getOrders()
-    await this.b.getLog()
-    await this.c.getCatalog()
+    const r = await this.api.getAll()
+    this.o.init(r.data.ordenes)
+    this.b.init(r.data.bitacora)
+    this.c.init(r.data.catalogo)
   }
 }

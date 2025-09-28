@@ -8,7 +8,8 @@ export class OrdenTrabajoMongo extends Mongoloid{
     }
 
     async updateStatus(body:{status:string,id:string}){
-        const r = await this.updateOne({'status':body.status,'dateReal':new Date().toISOString()},"_id",new ObjectId(body.id))
+        const dateReal = body.status == "CERRADA" ? new Date().toISOString():"-"
+        const r = await this.updateOne({'status':body.status,'dateReal':dateReal},"_id",new ObjectId(body.id))
     }
     async updateOrden(orden:OrdenTrabajo,status:"RECIBIDA"|"RECHAZADA"){
         orden.piezas.forEach(p=>{
@@ -23,13 +24,15 @@ export class OrdenTrabajoMongo extends Mongoloid{
     }
 
     async getOrden(id:string){
-        const r = await this.getOne("_id",id)
+        const r = await this.getOne("_id",new ObjectId(id))
         return r
     }
 
     async getOrders(projectId:string){
-        const r = await this.getMany("idProject",projectId)
+        const r = await this.getMany<OrdenTrabajo>("idProject",projectId)
+        const proveedores = await this.mongo.provider.getProvedores()
         r.forEach(o=>{
+            o.proveedor = proveedores.find(p=>{return p._id == o.idProveedor})?.name!
             const x = o.piezas.reduce((sum: number, p: any) => sum + Number(p.piezas), 0);
             o["totalPiezas"] = x
         })

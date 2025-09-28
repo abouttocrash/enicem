@@ -4,6 +4,9 @@ import { BitacoraMongo } from './mongo/BitacoraMongo.js';
 import {  Milestone } from '@shared-types/Bitacora.js';
 import { ProyectosMongo } from './mongo/ProyectosMongo.js';
 import { Catalogo, Pieza } from '@shared-types/Pieza.js';
+import { CatalogoMongo } from './mongo/CatalogoMongo.js';
+import { UsuarioMongo } from './mongo/UsuarioMongo.js';
+import { ProveedorMongo } from './mongo/ProveedorMongo.js';
 export type Collection = "logs"|"projects"|"catalog"|"orders"|"users" | "provider" | "folio" | "almacen"
 export class Mongo{
     private url = 'mongodb://localhost:27017';
@@ -13,6 +16,9 @@ export class Mongo{
     orders!:OrdenTrabajoMongo
     logs!:BitacoraMongo
     projects!:ProyectosMongo
+    catalog!:CatalogoMongo
+    user!:UsuarioMongo
+    provider!:ProveedorMongo
     public static get instance(): Mongo {
         if (!Mongo.#instance) {
             Mongo.#instance = new Mongo();
@@ -20,6 +26,9 @@ export class Mongo{
             Mongo.#instance.orders = new OrdenTrabajoMongo(this.#instance.client)
             Mongo.#instance.projects = new ProyectosMongo(this.#instance.client)
             Mongo.#instance.logs = new BitacoraMongo(this.#instance.client)
+            Mongo.#instance.catalog = new CatalogoMongo(this.#instance.client)
+            Mongo.#instance.user = new UsuarioMongo(this.#instance.client)
+            Mongo.#instance.provider = new ProveedorMongo(this.#instance.client)
         }
         return Mongo.#instance;
     }
