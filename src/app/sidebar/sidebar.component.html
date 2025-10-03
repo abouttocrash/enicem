@@ -1,7 +1,7 @@
 <div class="sidebar">
     <section class="user-holder">
         @if(API.currentUser){
-                <div matTooltip="Cambiar usuario"  [matMenuTriggerFor]="menu" class="circle" [ngStyle]="{'backgroundColor':API.currentUser.color}">
+                <div matTooltip="Cambiar usuario" (click)="cambiarUsuario()" class="circle" [ngStyle]="{'backgroundColor':API.currentUser.color}">
                 <span>{{API.currentUser.short}}</span>
             </div>
             }
@@ -19,11 +19,3 @@
     </button>
 </div>
 
-<mat-menu #menu="matMenu">
-  @for(user of API.users;track user){
-  <button mat-menu-item (click)="selectUser(user)">
-     <mat-icon fontSet="material-symbols-outlined">face</mat-icon>
-    <span>{{user.name}}</span>
-  </button>
-  }
-</mat-menu>

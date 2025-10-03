@@ -21,7 +21,7 @@ export class APIService {
   BASE = "http://localhost:3000"
   
   currentProject!:Proyecto
-  currentUser!:User
+  currentUser!:Usuario
   projects:Proyecto[] = []
   users:Usuario[] = []
   proveedores:User[] = []
@@ -35,6 +35,7 @@ export class APIService {
       catalogId:this.currentProject.catalogId!
     }
     const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/projectData",{params:body}))
+    this.projects = r.data.proyectos
     return r;
   }
 
@@ -78,9 +79,10 @@ export class APIService {
     form.append("projectId",projectId)
     try{
       const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/catalog",form))
-      return r
+      this.currentProject.catalogId = r.log.insertedId
+      return {response:r}
     }catch(e){
-      throw e
+      return {e,response:undefined}
     }
   }
 
@@ -138,8 +140,8 @@ export class APIService {
     const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/projects",body,{headers:this.headers}))
     return project
   }
-  async createUser(usuario:string){
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/user",{name:usuario},{headers:this.headers}))
+  async createUser(usuario:string,code:string,rol:string){
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/user",{name:usuario,code:code,rol:rol},{headers:this.headers}))
   }
   async createProveedor(proveedor:string){
     await firstValueFrom<any>(this.http.post("http://localhost:3000/proveedor",{name:proveedor},{headers:this.headers}))

@@ -1,9 +1,28 @@
  <div class="tab">
-    <bar placeholder="Buscar plano">
-      <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete())" (click)="salidaAlmacen()">Salida Almacen</button>
-      <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete())" (click)="createOrder()">Crear orden</button>
-      <button class="main-cta" [disabled]="api.currentProject.piezasCount! > 0"  (click)="getFolders()">Agregar planos</button>
-    </bar>
+   <div class="bar">
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar</mat-label>
+          <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Buscar plano" #input>
+        </mat-form-field>
+      </div>
+      <div style="display: flex;justify-content: end;gap: 1rem;align-items: center;">
+        <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete()) || projectDisabled()" (click)="salidaAlmacen()">
+        <mat-icon fontSet="material-symbols-outlined">shelves</mat-icon>
+        Salida Almacen
+      </button>
+      <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete()) || projectDisabled()" (click)="createOrder()">
+        <mat-icon fontSet="material-symbols-outlined">assignment_add</mat-icon>
+        Crear orden
+      </button>
+      <button class="main-cta" [disabled]="api.currentProject.piezasCount! > 0 || projectDisabled()"  (click)="getFolders()">
+        <mat-icon fontSet="material-symbols-outlined">architecture</mat-icon>
+        Agregar planos
+      </button>
+      </div>
+    
+    </div>
+    
 
       <div style="height: 100%;overflow-y: scroll;">
          <table mat-table [dataSource]="p.c.dataSource" matSort>
@@ -13,12 +32,13 @@
             <mat-checkbox
               [(ngModel)]="tableChecked"
               [indeterminate]="partiallyComplete()"
+              [disabled]="projectDisabled()"
               (change)="checkTable()"
             >
             </mat-checkbox>
           </th>
           <td mat-cell *matCellDef="let row; let i = index"> 
-              <mat-checkbox [(ngModel)]="row.checked" (change)="updateRow(row)">
+            <mat-checkbox [(ngModel)]="row.checked" (change)="updateRow(row)" [disabled]="projectDisabled()">
             </mat-checkbox>  
           </td>
         </ng-container>
@@ -55,7 +75,7 @@
         <ng-container matColumnDef="expand">
           <th mat-header-cell *matHeaderCellDef ></th>
           <td mat-cell *matCellDef="let row"> 
-            <mat-icon style="cursor: pointer;" (click)="toggle(row)" fontSet="material-symbols-outlined">more_vert</mat-icon>
+            <mat-icon matTooltip="Ver Plano" style="cursor: pointer;" (click)="toggle(row)" fontSet="material-symbols-outlined">docs</mat-icon>
             <!-- <mat-icon (click)="toggle(row)" fontSet="material-symbols-outlined">docs</mat-icon> -->
           </td>
         </ng-container>

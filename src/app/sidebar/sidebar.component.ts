@@ -10,6 +10,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { User } from '../users-module/User';
 import { ProveedoresComponent } from '../users-module/proveedores/proveedores.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import { SelectUserComponent } from '../users-module/select-user/select-user.component';
+import { baseDialog } from '../utils/Utils';
+import { StorageService } from '../storage.service';
 @Component({
   selector: 'sidebar',
   imports: [MatIconModule, CommonModule,MatMenuModule,MatTooltipModule],
@@ -18,20 +21,29 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 })
 export class SidebarComponent {
   readonly dialog = inject(MatDialog);
-  constructor(public s:StylesService,private router:Router,public API:APIService){
-
+  constructor(public s:StylesService,private router:Router,public API:APIService,private storage:StorageService){
+    
   }
 
   async ngAfterViewInit(){
     await this.API.getUsers()
     await this.API.getProveedores()
     //TODO select 
-    this.API.currentUser = this.API.users[0]
-    this.setShort()
+    if(this.storage.getUser() == null){
+      this.cambiarUsuario()
+    }
+    else{
+      this.API.currentUser = this.storage.getUser()!
+    }
     await this.API.getProjects("ABIERTO")
   }
   gotoProjects(){
     this.router.navigate(["/"])
+  }
+  cambiarUsuario(){
+    this.dialog.open(SelectUserComponent,{
+      ...baseDialog
+    })
   }
   newUser(){
      const dialogRef = this.dialog.open(UsersDialogComponent,{disableClose:true});
@@ -40,18 +52,8 @@ export class SidebarComponent {
      const dialogRef = this.dialog.open(ProveedoresComponent,{disableClose:true});
   }
 
-  selectUser(user:User){
-    this.API.currentUser = user
-    this.setShort()
-  }
+  
 
-  setShort(){
-    const split = this.API.currentUser.name.split(" ")
-    try{
-      this.API.currentUser.short = `${split[0].charAt(0).toLocaleUpperCase()} ${split[1].charAt(0).toLocaleUpperCase()}`
-    }catch(e){
-      this.API.currentUser.short = `${split[0].charAt(0).toLocaleUpperCase()}`
-    }
-  }
+  
   
 }

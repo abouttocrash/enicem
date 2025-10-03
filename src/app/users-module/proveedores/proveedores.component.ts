@@ -4,7 +4,6 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { APIService } from '../../api.service';
-import { WaveSnack } from '../../components/wave-snack/wave-snack-service';
 
 @Component({
   selector: 'app-proveedores',
@@ -14,20 +13,16 @@ import { WaveSnack } from '../../components/wave-snack/wave-snack-service';
 })
 export class ProveedoresComponent {
   form!:FormGroup
-  constructor(private dialogRef:MatDialogRef<ProveedoresComponent>,private api:APIService,private snack:WaveSnack){
+  constructor(private dialogRef:MatDialogRef<ProveedoresComponent>,private api:APIService){
     this.form = new FormGroup({
       proveedor: new FormControl("", [Validators.required]),
     });
   }
 
   async createProveedor(){
-    this.snack.showSnack("Creando proveedor")
     await this.api.createProveedor(this.form.get("proveedor")?.value)
     await this.api.getProveedores()
-     this.dialogRef.close()
-    this.snack.successState("Provedor creado con éxito")
-    await this.snack.timeout(800)
-    this.snack.dismissSnack()
+    this.dialogRef.close()
   }
 
   async close(){

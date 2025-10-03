@@ -12,6 +12,10 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Creado por </th>
             <td mat-cell *matCellDef="let row"> {{row.usuario}} </td>
           </ng-container>
+          <ng-container matColumnDef="proveedor">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
+            <td mat-cell *matCellDef="let row"> {{row.proveedor}} </td>
+          </ng-container>
           <ng-container matColumnDef="createdAt">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
             <td mat-cell *matCellDef="let row"> {{row.createdAt}} </td>
@@ -40,7 +44,17 @@
               <div class="example-element-detail">
                 @if(element.what != undefined){
                   @for(w of element.what;track w){
-                    <p>{{w}}</p>
+                    <div class="item">
+                      <div class="center-ver">
+                          <div class="total center">{{w.cantidad}}</div>
+                      </div>
+                      <div class="center-ver">
+                          <div>
+                              <p style="font-weight: 600;">{{w.plano}}</p>
+                              <p>{{w.material}} {{w.acabado}}</p>
+                          </div>
+                      </div>
+                    </div>
                 } 
                 }
                 

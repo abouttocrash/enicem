@@ -1,0 +1,36 @@
+<form class="dialog" [formGroup]="form">
+    <h2>Nuevo proyecto</h2>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre del proyecto</mat-label>
+            <input matInput placeholder="Nombre del proyecto" formControlName="nombreProyecto">
+            @if (!form.get("nombreProyecto")!.valid) {
+                <mat-error>Nombre del proyecto requerido</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Clave del proyecto</mat-label>
+            <input matInput placeholder="Clave del proyecto" formControlName="claveProyecto">
+            @if (!form.get("claveProyecto")!.valid) {
+                <mat-error>Clave del proyecto requerida</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Diseñador</mat-label>
+            <mat-select formControlName="designer">
+                @for(u of API.users;track u._id){
+                    <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
+                }
+            </mat-select>
+            @if (!form.get("designer")!.valid) {
+                <mat-error>Diseñador requerido</mat-error>
+            }
+        </mat-form-field>
+    </div>
+    <div class="dialog-bottom">
+        <div >
+            <button  (click)="close()" class="secondary-cta">Cancelar</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createProject()">Crear</button>
+        </div>
+    </div>
+</form>

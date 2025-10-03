@@ -12,9 +12,12 @@ export class BitacoraMongo extends Mongoloid{
     async getBitacora(projectId:string){
         const p = await this.getOne("projectId",projectId) as unknown as Bitacora
         const users = await this.mongo.user.getUsers()
+        const proveedores = await this.mongo.provider.getProvedores()
         p.milestones.forEach((m:any)=>{
             const u = users.find((u)=>{return u._id.toString() == m.createdBy}) as any
+            const p = proveedores.find((u)=>{return u._id.toString() == m.proveedor}) as any
             m.usuario = u.name
+            m.proveedor = p? p.name:"-"
         })
         return p as unknown as Bitacora
     }
@@ -27,7 +30,7 @@ export class BitacoraMongo extends Mongoloid{
         updatedAt:date.toISOString(),
         createdBy:creadorId,
             milestones:[{
-                description:"PROYECTO CREADO",
+                description:"Proyecto creado",
                 createdAt:date.toISOString(),
                 updatedAt:date.toISOString(),
                 generalId: projectId.toString(),

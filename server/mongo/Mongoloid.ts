@@ -46,7 +46,7 @@ export class Mongoloid{
     }
     
     
-    private async getCollection(c:Collection){
+    protected async getCollection(c:Collection){
         await this.client.connect();
         const db = this.client.db(this.dbName);
         const collection = db.collection(c);

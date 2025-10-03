@@ -1,0 +1,26 @@
+<form class="dialog" [formGroup]="form">
+    <div>
+        <h2>Seleccione al usuario</h2>
+    </div>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Usuario</mat-label>
+            <mat-select formControlName="usuario">
+                @for(u of API.users;track u._id){
+                    <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
+                }
+            </mat-select>
+            @if (!form.get("usuario")!.valid) {
+                <mat-error>Usuario requerido</mat-error>
+            }
+        </mat-form-field>
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            @if(API.currentUser != undefined){
+            <button  (click)="ref.close()" class="secondary-cta">Cancelar</button>
+            }
+            <button [disabled]="!form.valid" class="main-cta" (click)="saveUser()">Seleccionar</button>
+        </div>
+    </div>
+</form>

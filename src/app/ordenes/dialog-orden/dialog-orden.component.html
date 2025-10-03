@@ -1,8 +1,8 @@
 <div class="dialog" >
     <div>
-        <h2>Crear órden de trabajo <span>#{{folio}}</span></h2>
+        <h2>Crear orden de trabajo <span>#{{folio}}</span></h2>
     </div>
-    <div>
+    <div class="content">
         <form  [formGroup]="form">
         <mat-form-field appearance="outline">
             <mat-label>Tipo de orden</mat-label>
@@ -11,7 +11,7 @@
                 <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Detalle">Detalle</mat-option>
             </mat-select>
             @if (!form.get("tipo")!.valid) {
-                <mat-error>Tipo de órden requerida</mat-error>
+                <mat-error>Tipo de orden requerida</mat-error>
             }
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -35,43 +35,32 @@
             }
         </mat-form-field>
         </form>
-        @for(plano of data.list;track plano;let i = $index){
-            <div class="list" [ngClass]="plano.imagenes?.length ? 'has-images' : 'no-images'">
+        <section style="overflow-y: auto;">
+            @for(plano of data.list;track plano;let i = $index){
+            <div class="list">
                 <div class="item">
-                    <div class="center-ver">
-                    <input type="text" [(ngModel)]="plano.piezas">
-                </div>
-                <div>
-                    <p>{{plano.material}}</p>
-                    <p>{{plano.title}}</p>
+                <div class="center-ver">
+                    <input type="text" [(ngModel)]="plano.piezas" (keydown)="isNumber($event)">
                 </div>
                 <div class="center-ver">
-                    <!-- <mat-icon 
-                        class="add-photo" 
-                        fontSet="material-symbols-outlined"
-                        (click)="photoInputs.get(i)?.nativeElement!.click()"
-                        #icon
-                    >add_photo_alternate</mat-icon> -->
-                    <input 
-                        type="file" 
-                        multiple
-                        accept=".jpeg,.jpg,.png,.gif,image/jpeg,image/png,image/gif"
-                        style="display: none;"
-                        #photoInput
-                        (change)="onPhotoSelected($event, plano)"
-                    >
+                    <div>
+                        <p style="font-weight: 600;">{{plano.title}}</p>
+                        <p>{{plano.material}}</p>
+                    </div>
                 </div>
-                </div>
-                <div class="imagenes">
-                </div>
-                
+                <div class="center-ver"></div>
             </div>
+            </div>
+            
+            
         }
+        </section>
+        
     </div>
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="close()" >Cancelar</button>
-            <button [disabled]="!form.valid" class="main-cta" (click)="createOrder()">Guardar</button>
+            <button [disabled]="disableForm()" class="main-cta" (click)="createOrder()">Guardar</button>
         </div>
     </div>
 </div>

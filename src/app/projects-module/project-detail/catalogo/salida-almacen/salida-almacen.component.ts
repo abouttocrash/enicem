@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Pieza } from '@shared-types/Pieza';
+import { allPiezasAreFilled } from '../../../../utils/Utils';
 
 @Component({
   selector: 'app-salida-almacen',
@@ -43,6 +44,9 @@ export class SalidaAlmacenComponent {
     return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0) - plano.cantidadRechazada!.reduce((sum, val) => sum + Number(val || 0), 0)
   }
 
+  allPiezasAreFilled(){
+    return allPiezasAreFilled(this.piezas)
+  }
   getMax(){
     return "Max "+this.max
   }

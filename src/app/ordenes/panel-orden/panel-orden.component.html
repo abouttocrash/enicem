@@ -57,7 +57,10 @@
             </section>
             <section class="checkbox-item">
                 <div class="center-ver">
-                    <mat-checkbox [indeterminate]="isMax(p)" [disabled]="isMax(p)" [(ngModel)]="p.checked"></mat-checkbox>
+                    <mat-checkbox [indeterminate]="isMax(p) || o.currentOrden.status != 'ABIERTA'" 
+                    [disabled]="isMax(p) || o.currentOrden.status != 'ABIERTA' || projectDisabled()"
+                    [(ngModel)]="p.checked">
+                    </mat-checkbox>
                 </div>
             <div class="center-ver">
                 <div>

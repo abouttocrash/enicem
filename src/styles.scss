@@ -85,6 +85,12 @@ p,span,button,h1,h2,h3{
     display: grid;
     align-items: center;
 }
+
+.center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .center-ver-flex{
     display: flex;
     align-items: center; 
@@ -154,6 +160,6 @@ p,span,button,h1,h2,h3{
 tbody > tr{
   cursor: pointer;
 }
-tbody > tr.mat-mdc-row:hover{
-  background-color:var(--blue);
+tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
+  background-color: var(--blue);
 }

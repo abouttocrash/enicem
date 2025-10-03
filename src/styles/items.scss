@@ -1,0 +1,30 @@
+.item{
+    display: grid;
+    height:52px;
+    grid-template-columns: 50px 1fr 40px;
+    padding:4px 8px 4px 8px;
+    color:var(--text);
+    background-color: var(--list);
+    & input{
+        width: calc(40px - 8px);
+        height:32px;
+        padding-left: 8px;
+        font-weight: 600;
+        background-color: var(--contrast);
+        border:none;
+        border-bottom: 2px solid var(--gray);
+        color:var(--text);
+    }
+    & .total{
+        width: calc(40px - 8px);
+        height:32px;
+        font-weight: 600;
+        background-color: var(--contrast);
+        border:none;
+        color:var(--text);
+        border-radius: 4px;
+    }
+    & input::placeholder{
+        color:var(--gray);
+    }
+}

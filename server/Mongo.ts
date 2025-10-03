@@ -135,16 +135,7 @@ export class Mongo{
         await this.client.close()
         return insertResult
     }
-    async createUser(user:any){
-        const u = {
-            name:user.name,
-            color:"#e76f51"
-        }
-        const c = await this.getCollection("users")
-        const insertResult = await c.insertOne(u);
-        await this.client.close()
-        return insertResult
-    }
+    
 
     async get(collection:Collection){
         const c = await this.getCollection(collection)

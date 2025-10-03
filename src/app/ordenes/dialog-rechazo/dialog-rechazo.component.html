@@ -33,7 +33,7 @@
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+            <button class="main-cta" [disabled]="allPiezasAreFilled() == false || razon == '' " (click)="actualizar(true)">Guardar</button>
         </div>
     </div>
 </div>

@@ -12,7 +12,7 @@ export class BitacoraService {
   private route = "logs"
   private projectId!:string
   private sort!:MatSort
-  displayedColumns: string[] = ['description','usuario','createdAt', 'expand'];
+  displayedColumns: string[] = ['description','usuario','proveedor', 'createdAt', 'expand'];
   dataSource!: MatTableDataSource<any>;
   constructor(private api:APIService) { 
     

@@ -1,35 +1,37 @@
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { APIService } from '../../../api.service';
 import { StorageService } from '../../../storage.service';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { BARComponent } from '../bar/bar.component';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DialogOrdenComponent } from '../../../ordenes/dialog-orden/dialog-orden.component';
-import { OrdenesTrabajoComponent } from '../../../ordenes/ordenes-trabajo/ordenes-trabajo.component';
-import { BitacoraComponent } from '../bitacora/bitacora.component';
-import { MILESTONE_DESC } from '@shared-types/Bitacora';
+import { createMilestone, MILESTONE_DESC } from '@shared-types/Bitacora';
 import { ProyectoService } from '../../../proyecto.service';
 import { SalidaAlmacenComponent } from './salida-almacen/salida-almacen.component';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { baseDialog, projectDisabled } from '../../../utils/Utils';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'catalogo',
-  imports: [MatTableModule,MatIconModule,MatCheckboxModule,FormsModule,
-    MatSortModule,BARComponent
-  ],
+  imports: [MatTableModule, MatIconModule, MatCheckboxModule, FormsModule,
+    MatSortModule, MatTooltipModule,MatFormFieldModule,MatInputModule],
   templateUrl: './catalogo.component.html',
   styleUrl: './catalogo.component.scss'
 })
 export class CatalogoComponent {
   @ViewChild('folderInput') folderInput!: ElementRef<HTMLInputElement>;
   @ViewChild(MatSort) sort!: MatSort;
+  private _snackBar = inject(MatSnackBar);
   readonly dialog = inject(MatDialog);
- 
+  projectDisabled = projectDisabled
   tableChecked = false
   currentPieza = {} as any
   drawer!:MatDrawer
@@ -37,6 +39,7 @@ export class CatalogoComponent {
 
   init(data:Catalogo,drawer:MatDrawer){
     this.drawer = drawer
+    
     this.p.c.init(data,this.sort)
   }
 
@@ -53,34 +56,30 @@ export class CatalogoComponent {
       files = Array.from(input.files);
       
     files.forEach(file => formData.append('files', file, file.name));
-    try{
-      //TODO checar porque fallo
-      //Warning: Indexing all PDF objects
-      //message: 'Invalid PDF structure'
-      const response = await this.api.createCatalog(formData,this.api.currentProject._id!)
-      this.p.c.catalogId = response.log.insertedId
-      this.api.currentProject.catalogId = response.log.insertedId
+    const res = await this.api.createCatalog(formData,this.api.currentProject._id!)
+    if(res.response){
       this.api.currentProject.piezasCount = files.length
       const r = await this.api.updateProject(files.length)
-      await this.api.updateLog({description:MILESTONE_DESC.CATALOG_CREATED,generalId:response.log.insertedId,createdBy:this.api.currentUser._id,expand:true})
+      //{description:MILESTONE_DESC.CATALOG_CREATED,generalId:res.response.log.insertedId,createdBy:this.api.currentUser._id,expand:false}
+      const milestone = createMilestone(MILESTONE_DESC.CATALOG_CREATED,res.response.log.insertedId,this.api.currentUser._id,[],"-",false)
+      await this.api.updateLog(milestone)
       this.storage.setProject(this.api.currentProject)
-      await this.api.getProjects("ABIERTO")
       await this.p.getAll()
-    }catch(e){throw e}
-
+      this._snackBar.open("Catálogo de piezas creado","OK",{duration:2000})
+    }
+    else
+      this._snackBar.open("Ha ocurrido un error, inténtelo nuevamente","OK",{duration:5000})
   }
 
   salidaAlmacen(){
     const selected = this.p.c.dataSource.data.slice().filter(d=>{return d.checked})
     const dialog = this.dialog.open(SalidaAlmacenComponent,{
-      width:"500px",
-      height:"600px",
-      disableClose:true,
+      ...baseDialog,
       data: JSON.parse(JSON.stringify(selected)),
         
     });
     dialog.afterClosed().subscribe(async(r:{bool:boolean,piezas:Pieza[]})=>{
-      if(r){
+      if(r.bool){
         await this.p.c.createAlmacen(r.piezas)
         await this.p.getAll()
       }
@@ -90,17 +89,17 @@ export class CatalogoComponent {
   createOrder(){
    const selected = this.p.c.dataSource.data.slice().filter(d=>{return d.checked})
     const dialog = this.dialog.open(DialogOrdenComponent,{
-      disableClose:true,
-      height:"700px",
-      width:"700px",
+      ...baseDialog,
       data: {
         list:JSON.parse(JSON.stringify(selected)),
         project:this.api.currentProject
       },
     });
     dialog.afterClosed().subscribe(async(r:boolean)=>{
-      if(r)
+      if(r){
+        this._snackBar.open("Orden creada con éxito","OK")
         await this.p.getAll()
+      }
     })
   }
   partiallyComplete() {
@@ -130,5 +129,10 @@ export class CatalogoComponent {
     const idProyecto = this.api.currentProject._id!
     const url = `http://localhost:3000/static/${idProyecto}/${row.title}.pdf`;
     window.open(url, '_blank');
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.p.c.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }

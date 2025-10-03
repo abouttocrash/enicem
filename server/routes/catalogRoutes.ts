@@ -32,7 +32,8 @@ catalogRouter.post('/', upload.array('files'), async(req, res) => {
 catalogRouter.post('/almacen', async(req, res) => {
     try{
         const p = await mongo.createAlmacen(req.body)
-        res.status(200).send({data:true,inserted:p})
+        const resp = await mongo.catalog.updateCatalog(req.body)
+        res.status(200).send({data:true,inserted:{p,resp}})
     }catch(e){
         console.log(e)
         res.status(400).send({error:e})

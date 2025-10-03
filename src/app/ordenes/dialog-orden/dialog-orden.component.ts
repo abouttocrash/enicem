@@ -76,12 +76,8 @@ export class DialogOrdenComponent {
 
   async createOrder(){
     const tipo = this.form.get("tipo")!.value
-    const r = await this.api.uploadPiezasConImagenes(this.data.list, this.form.get("date")?.value!,this.proveedorObj._id,tipo,this.folio)
-    let desc = tipo == "Maquinado"?MILESTONE_DESC.ORDER_MAQUI_CREATED:MILESTONE_DESC.ORDER_DETAIL_CREATED as string
-    desc = desc+" Folio #"+this.folio
-    const what:Array<string> = []
-    this.data.list.forEach((p:Pieza)=>{what.push(`(${p.piezas}) ${p.title}`)})
-    await this.api.updateLog(createMilestone(desc,r.insert.insertedId,this.api.currentUser._id!,what))
+    await this.p.o.createOrder(tipo,this.folio,this.data.list,this.form.get("date")?.value!,this.proveedorObj)
+    
     await this.p.getAll()
     this.ref.close(true)
   }
@@ -90,5 +86,33 @@ export class DialogOrdenComponent {
     if (img.previewUrl) return img.previewUrl;
     img.previewUrl = (window.URL || window.webkitURL).createObjectURL(img);
     return img.previewUrl
+  }
+
+  allPiezasAreFilled(){
+    let valid = true
+    this.data.list.forEach((p:Pieza) => {
+      if(p.piezas == ""){
+        valid = false;
+        return
+      }
+    });
+    return valid
+  }
+  isNumber($event:KeyboardEvent){
+    const input = $event.target as HTMLInputElement;
+    let value = input.value;
+    if ($event.key.length === 1) {
+      value += $event.key;
+    }
+    // Permite números decimales (solo un punto)
+    if (!/^\d*\.?\d*$/.test(value) && $event.key.length === 1) {
+      $event.preventDefault();
+  }
+    
+  }
+
+  disableForm(){
+    console.log(!this.form.valid, "&&", !this.allPiezasAreFilled(),!this.form.valid && !this.allPiezasAreFilled())
+    return !(this.form.valid && this.allPiezasAreFilled())
   }
 }

@@ -1,6 +1,11 @@
  
  <div class="tab">
-    <bar placeholder="Buscar orden"></bar>
+    <div class="bar">
+      <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
+      <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Buscar por plano, Status de orden" #input>
+    </mat-form-field>
+    </div>
 
     <div style="height: 100%;overflow-y: scroll;">
       <table mat-table [dataSource]="p.o.dataSource" matSort >

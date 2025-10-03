@@ -12,3 +12,7 @@
 :host ::ng-deep .mdc-text-field{
     padding: 0 16px 0 0;
 }
+
+:host ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input{
+    color:var(--text);
+}

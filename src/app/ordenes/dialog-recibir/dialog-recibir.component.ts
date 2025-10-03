@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Pieza } from '@shared-types/Pieza';
+import { allPiezasAreFilled } from '../../utils/Utils';
 
 @Component({
   selector: 'app-dialog-recibir',
@@ -13,7 +14,6 @@ export class DialogRecibirComponent {
   cantidad!:number
   data = inject<Pieza[]>(MAT_DIALOG_DATA);
   constructor(private dialog:MatDialogRef<DialogRecibirComponent>){
-    console.log(this.data)
     this.piezas = JSON.parse(JSON.stringify(this.data))
   }
 
@@ -40,6 +40,10 @@ export class DialogRecibirComponent {
 
   max(plano:Pieza){
     return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0) - plano.cantidadRechazada!.reduce((sum, val) => sum + Number(val || 0), 0)
+  }
+
+  allPiezasAreFilled(){
+    return allPiezasAreFilled(this.piezas)
   }
 
   getMax(){

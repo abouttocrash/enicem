@@ -11,7 +11,7 @@ export class ProyectoService {
   o:OrdenesService
   b:BitacoraService
   c:CatalogoService
-  constructor(private api:APIService,private or:OrdenesService,private bi:BitacoraService,private ca:CatalogoService) {
+  constructor(public api:APIService,private or:OrdenesService,private bi:BitacoraService,private ca:CatalogoService) {
     this.o = or;
     this.b = bi;
     this.c = ca;

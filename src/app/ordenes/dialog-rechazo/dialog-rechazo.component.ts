@@ -6,6 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogOrdenComponent } from '../dialog-orden/dialog-orden.component';
 import { Pieza } from '@shared-types/Pieza';
+import { allPiezasAreFilled } from '../../utils/Utils';
 
 @Component({
   selector: 'app-dialog-rechazo',
@@ -32,7 +33,7 @@ export class DialogRechazoComponent {
     if($event.key.length === 1)
       value = input.value + $event.key;
     const isValid = this.isValid(plano,Number(value))
-    if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid) {
+    if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid || value == "0") {
       $event.preventDefault();
     }
     else
@@ -40,12 +41,18 @@ export class DialogRechazoComponent {
   }
 
   private isValid(plano:Pieza,input:number){
-    return input <= this.max(plano)? true:false
+    return input <= this.max(plano)
   }
 
   max(plano:Pieza){
     return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0) - plano.cantidadRechazada!.reduce((sum, val) => sum + Number(val || 0), 0)
   }
+
+  allPiezasAreFilled(){
+    return allPiezasAreFilled(this.piezas)
+  }
+
+  
 
   getMax(){
     return "Max "+this.max

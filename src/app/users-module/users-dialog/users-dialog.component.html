@@ -10,6 +10,23 @@
                 <mat-error>Campo requerido</mat-error>
             }
         </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Código de usuario</mat-label>
+            <input matInput placeholder="Código de usuario" (keydown)="isNumber($event)" formControlName="code" maxlength="4" minlength="4">
+             @if (!form.get("code")!.valid) {
+                <mat-error>Campo requerido, 4 dígitos</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Rol</mat-label>
+            <mat-select formControlName="rol">
+                <mat-option value="Rol 1">Rol 1</mat-option>
+                <mat-option value="Rol 2">Rol 2</mat-option>
+            </mat-select>
+            @if (!form.get("rol")!.valid) {
+                <mat-error>Rol requerido</mat-error>
+            }
+        </mat-form-field>
     </div>
     <div class="dialog-bottom">
         <div>

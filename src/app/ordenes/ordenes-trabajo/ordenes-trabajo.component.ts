@@ -4,14 +4,15 @@ import { DialogOrdenComponent } from '../dialog-orden/dialog-orden.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { BARComponent } from '../../projects-module/project-detail/bar/bar.component';
 import {MatDrawer, MatSidenavModule} from '@angular/material/sidenav';
 import { PanelOrdenComponent } from '../panel-orden/panel-orden.component';
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo';
 import { ProyectoService } from '../../proyecto.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'ordenes-trabajo',
-  imports: [MatIconModule,MatTableModule,MatSortModule,BARComponent,MatSidenavModule],
+  imports: [MatIconModule,MatTableModule,MatSortModule,MatSidenavModule,MatFormFieldModule,MatInputModule],
   templateUrl: './ordenes-trabajo.component.html',
   styleUrl: './ordenes-trabajo.component.scss'
 })
@@ -38,7 +39,19 @@ export class OrdenesTrabajoComponent {
     
   }
 
- 
+ applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.p.o.dataSource.filterPredicate = (data: OrdenTrabajo, filter: string) => {
+        // Filtra por cualquier campo relevante
+        const matchOrden = data.status.toLowerCase().includes(filter);
+        // Filtra también por el título de cada pieza
+        const matchPieza = Array.isArray(data.piezas)
+            ? data.piezas.some((p: any) => p.title?.toLowerCase().includes(filter))
+            : false;
+        return matchOrden || matchPieza;
+    };
+    this.p.o.dataSource.filter = filterValue;
+}
 
   async recibirPiezas(element:OrdenTrabajo){
     this.p.o.currentOrden = await this.p.o.getOrder(element._id)
