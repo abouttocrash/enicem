@@ -3,44 +3,66 @@
         <h2>Crear orden de trabajo <span>#{{folio}}</span></h2>
     </div>
     <div class="content">
-        <form  [formGroup]="form">
-        <mat-form-field appearance="outline">
-            <mat-label>Tipo de orden</mat-label>
-            <mat-select formControlName="tipo">
-                <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Maquinado">Maquinado</mat-option>
-                <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Detalle">Detalle</mat-option>
-            </mat-select>
-            @if (!form.get("tipo")!.valid) {
-                <mat-error>Tipo de orden requerida</mat-error>
-            }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Proveedor</mat-label>
-            <mat-select formControlName="proveedor">
-                @for(p of api.proveedores;track p){
-                    <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
-                }
-            </mat-select>
-            @if (!form.get("proveedor")!.valid) {
-                <mat-error>Proveedor requerido</mat-error>
-            }
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Fecha estimada de entrega</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="date" placeholder="dd/mm/yyyy">
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            @if (!form.get("date")!.valid) {
-                <mat-error>Fecha estimada requerida</mat-error>
-            }
-        </mat-form-field>
+        <form [formGroup]="form">
+            <section class="double-form-dialog">
+                <mat-form-field appearance="outline">
+                    <mat-label>Tipo de orden</mat-label>
+                    <mat-select formControlName="tipo">
+                        <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Maquinado">Maquinado</mat-option>
+                        <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Detalle">Detalle</mat-option>
+                    </mat-select>
+                    @if (!form.get("tipo")!.valid) {
+                        <mat-error>Tipo de orden requerida</mat-error>
+                    }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Proveedor</mat-label>
+                    <mat-select formControlName="proveedor">
+                        @for(p of api.proveedores;track p){
+                            <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+                        }
+                    </mat-select>
+                    @if (!form.get("proveedor")!.valid) {
+                        <mat-error>Proveedor requerido</mat-error>
+                    }
+                </mat-form-field>
+            </section>
+            <section class="double-form-dialog">
+                <mat-form-field appearance="outline">
+                    <mat-label>Fecha estimada de entrega</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="date" placeholder="dd/mm/yyyy">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    @if (!form.get("date")!.valid) {
+                        <mat-error>Fecha estimada requerida</mat-error>
+                    }
+                </mat-form-field>
+                <div class="number-input">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Equipos</mat-label>
+                        <input (keydown)="disableInput($event)" matInput formControlName="equipos">
+                    </mat-form-field>
+                    <div class="center-ver-flex">
+                        <div class="input-buttons">
+                        <button (click)="changeEquipo(1)">+</button>
+                        <button (click)="changeEquipo(-1)">-</button>
+                    </div>
+                    </div>
+                </div>
+            </section>
+        
+        
         </form>
         <section style="overflow-y: auto;">
             @for(plano of data.list;track plano;let i = $index){
             <div class="list">
                 <div class="item">
                 <div class="center-ver">
-                    <input type="text" [(ngModel)]="plano.piezas" (keydown)="isNumber($event)">
+                    <input type="text" 
+                        [disabled]="form.get('equipos')?.value > 1"
+                        [(ngModel)]="plano.piezas"
+                        (keydown)="isNumber($event,plano)"
+                        (keyup)="keyup($event,plano)">
                 </div>
                 <div class="center-ver">
                     <div>
@@ -58,9 +80,14 @@
         
     </div>
     <div class="dialog-bottom">
-        <div>
-            <button class="secondary-cta" (click)="close()" >Cancelar</button>
-            <button [disabled]="disableForm()" class="main-cta" (click)="createOrder()">Guardar</button>
+        <div style="width: 100%;display: grid;grid-template-columns: 1fr 230px;">
+            <p class="msg">
+                <span>El campo de piezas sólo es editable cuando la cantidad de Equipos es <span style="font-weight: 600;">1</span></span>
+            </p>
+            <div>
+                <button class="secondary-cta" (click)="close()" >Cancelar</button>
+                <button [disabled]="disableForm()" class="main-cta" (click)="createOrder()">Guardar</button>
+            </div>
         </div>
     </div>
 </div>

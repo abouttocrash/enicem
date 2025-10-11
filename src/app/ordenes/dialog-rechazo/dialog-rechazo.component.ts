@@ -45,7 +45,7 @@ export class DialogRechazoComponent {
   }
 
   max(plano:Pieza){
-    return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0) - plano.cantidadRechazada!.reduce((sum, val) => sum + Number(val || 0), 0)
+    return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0)
   }
 
   allPiezasAreFilled(){

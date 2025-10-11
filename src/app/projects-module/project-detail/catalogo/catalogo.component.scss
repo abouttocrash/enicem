@@ -3,8 +3,13 @@
     background-color: var(--main);
     height:78px;
     border-radius: 8px;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 300px 1fr;
     display: grid;
     align-items: center;
     padding:0 24px 0 24px;
+}
+
+td.mat-mdc-footer-cell{
+    font-weight: 600;
+    color:var(--ultra-focus);
 }

@@ -2,44 +2,66 @@
  <div class="tab">
     <div class="bar">
       <mat-form-field appearance="outline">
-      <mat-label>Buscar</mat-label>
-      <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Buscar por plano, Status de orden" #input>
-    </mat-form-field>
+        <mat-label>Buscar</mat-label>
+        <input [matAutocomplete]="autoGroup" matInput (keyup)="applyFilter($event)" placeholder="Buscar por plano, Status de orden" #input>
+        <mat-autocomplete #autoGroup="matAutocomplete" >
+        @for (group of p.o.filteredFilters ; track group) {
+          <mat-optgroup [label]="group.filter">
+            @for (name of group.options; track name) {
+              <mat-option [value]="name" (click)="applyFilter(name)">{{name}}</mat-option>
+            }
+          </mat-optgroup>
+        }
+    </mat-autocomplete>
+      </mat-form-field>
     </div>
 
     <div style="height: 100%;overflow-y: scroll;">
-      <table mat-table [dataSource]="p.o.dataSource" matSort >
+      <table mat-table 
+        [dataSource]="p.o.dataSource"
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        (cdkDropListDropped)="drop($event)"
+        matSort>
         <ng-container matColumnDef="folio">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
           <td mat-cell *matCellDef="let row"> {{row.folio}} </td>
         </ng-container>
         <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
           <td mat-cell *matCellDef="let row"> {{row.tipo}} </td>
         </ng-container>
         <ng-container matColumnDef="totalPiezas">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> No. Piezas </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> No. Piezas </th>
           <td mat-cell *matCellDef="let row"> {{row.totalPiezas}} </td>
         </ng-container>
         <ng-container matColumnDef="proveedor">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
           <td mat-cell *matCellDef="let row"> {{row.proveedor}} </td>
         </ng-container>
         <ng-container matColumnDef="creada">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Creada </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Creada </th>
           <td mat-cell *matCellDef="let row"> {{row.createdAt}} </td>
         </ng-container>
         <ng-container matColumnDef="dateEntrega">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Entrega esperada </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Entrega esperada </th>
           <td mat-cell *matCellDef="let row"> {{row.dateEntrega}} </td>
         </ng-container>
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
           <td mat-cell *matCellDef="let row"> {{row.status}} </td>
         </ng-container>
         <ng-container matColumnDef="dateReal">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Entrega Real </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Entrega Real </th>
           <td mat-cell *matCellDef="let row"> {{row.dateReal || "-"}} </td>
+        </ng-container>
+        <ng-container matColumnDef="cantidadRecibida">
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Recibidas </th>
+          <td mat-cell style="color:var(--green)" *matCellDef="let row"> {{suma(row,"cantidadRecibida")}} </td>
+        </ng-container>
+        <ng-container matColumnDef="cantidadRechazada">
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Rechazadas </th>
+          <td mat-cell style="color:var(--red)" *matCellDef="let row"> {{suma(row,"cantidadRechazada")}} </td>
         </ng-container>
       
         <tr mat-header-row *matHeaderRowDef="p.o.displayedColumns;sticky:true"></tr>

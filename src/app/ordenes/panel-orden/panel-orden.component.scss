@@ -1,9 +1,15 @@
+.panel{
+    display: grid;
+    height:100%;
+    overflow-y: scroll;
+    grid-template-rows: 150px 1fr;
+}
 .pieza-item{
-    height:78px;
+    height:62px;
     display: grid;
     background-color: var(--list);
     margin-bottom: 4px;
-    grid-template-rows: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 2fr;
     & .pieza-title{
         font-weight: 600;
         color:var(--text);
@@ -34,26 +40,45 @@
         }
      }
 }
+.tab-holder{
+    height:100%;
+    overflow-y: auto;
+}
 .piezas{
     color:var(--text);
     position:relative;
-    margin-bottom: 12px;
-}
-.piezas::after{
-    content: "";
-    position: absolute;
-    bottom:-6px;
-    right:0;
-    background-color: var(--gray);
-    height: 1px;
-    width: 100%;
+    
+    display: grid;
+    overflow-y: auto;
+    grid-template-rows: 32px 1fr;
+    height:100%;
+    & .list{
+        height:100%;
+        overflow-y: scroll;
 
+    }
 }
+// .piezas::after{
+//     content: "";
+//     position: absolute;
+//     bottom:-6px;
+//     right:0;
+//     background-color: var(--gray);
+//     height: 1px;
+//     width: 100%;
+
+// }
+
 h2{
     margin-bottom: 16px;
 }
 .detalle{
     margin-bottom: 16px;
+    .detalle-row{
+        display: grid;
+        grid-template-columns: calc(50% - 20px) calc(50% - 20px);
+        column-gap: 40px;
+    }
     .detalle-item{
         display: grid;
         height:32px;
@@ -87,7 +112,7 @@ h2{
     display: flex;
     justify-content: end;
     padding-right: 12px;
-    padding-top: 4px;
+    font-size: 18px;
     & .icon-item{
         margin-left: 4px;
     }
@@ -97,6 +122,50 @@ h2{
     
 }
 .checkbox-item{
-        display: grid;
-        grid-template-columns: 42px 1fr;
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    & .ver-plano{
+        color:var(--blue);
     }
+}
+.images{
+    padding-top: 12px;
+    display: grid;
+    grid-template-rows: 32px 1fr;
+}
+
+.thumb {
+    display: block;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.star-icon {
+    position: absolute;
+    top: -12px;
+    right: -16px;
+    color: gold;
+    font-size: 20px;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.img-holder {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  overflow-y: auto;
+  max-height: 220px; // Ajusta según tu diseño
+  width: 100%;
+  padding-top: 8px;
+  flex-wrap: wrap;
+}
+
+.thumb-wrapper {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.img-holder img {
+  flex: 0 0 auto;
+}

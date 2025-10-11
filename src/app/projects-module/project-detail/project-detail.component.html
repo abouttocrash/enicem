@@ -1,5 +1,5 @@
-<mat-drawer-container class="example-container" hasBackdrop="true">
-<mat-drawer #drawer mode="over" position="end">
+<mat-drawer-container class="example-container" hasBackdrop="false">
+<mat-drawer #drawer mode="over" position="end" >
   <app-panel-orden></app-panel-orden>
 </mat-drawer>
 <mat-drawer-content >
@@ -45,14 +45,17 @@
     </div>
       <div class="container">
         <mat-tab-group animationDuration="0ms">
-      <mat-tab label="Catálogo">
+      <mat-tab label="Bitácora">
         <catalogo></catalogo>
       </mat-tab>
       <mat-tab label="Órdenes de trabajo">
         <ordenes-trabajo></ordenes-trabajo>
       </mat-tab>
-      <mat-tab label="Bitácora">
+      <mat-tab label="Historial">
         <bitacora></bitacora>
+      </mat-tab>
+      <mat-tab label="Salidas">
+        <salidas></salidas>
       </mat-tab>
     </mat-tab-group>
         

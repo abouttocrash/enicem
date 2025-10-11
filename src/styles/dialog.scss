@@ -5,6 +5,12 @@
     grid-template-rows: 44px 1fr 58px;
     overflow-y: auto;
 }
+
+.double-form-dialog{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+}
 .dialog-bottom{
     position:relative;
     padding:16px 0 0 0;
@@ -54,4 +60,9 @@ mat-form-field{
 
 :host ::ng-deep .cdk-overlay-pane.mat-mdc-dialog-panel{
     max-width: 2000px;
+}
+
+.msg{
+    color:var(--gray);
+    padding-top: 8px;
 }

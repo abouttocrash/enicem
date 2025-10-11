@@ -14,6 +14,9 @@
     --hover-field:#293347;
     --badge:#2e384a;
     --blue:#669bbc;
+    --red:#ad2831;
+    --green:#6a994e;
+    
 }
 html, body { 
     height: 100%;
@@ -30,6 +33,11 @@ html, body {
     --contrast:var(--contrast-white);
     --hover:var(--bg-light);
     --list:var(--bg-light);
+    --ultra-focus:#B37136;
+    @include mat.sidenav-overrides((
+        container-background-color: var(--main),
+        container-width:"50%"
+    ));
 }
 
 .theme-dark{
@@ -43,6 +51,7 @@ html, body {
     --primary:var(--blue-dark);
     --contrast:var(--contrast-black);
     --hover:var(--gray);
+    --ultra-focus:var(--gold);
     --list:#18191b;
      @include mat.table-overrides((
         background-color:#131416,
@@ -59,9 +68,10 @@ html, body {
     @include mat.select-overrides((
         panel-background-color: var(--main)
     ));
-    @include mat.sidenav-overrides((
-        container-background-color: var(--main)
+    @include mat.autocomplete-overrides((
+        background-color: var(--main)
     ));
+    
     @include mat.tabs-overrides((
         active-focus-label-text-color: var(--text-2),
         inactive-focus-label-text-color: var(--text-2),
@@ -70,6 +80,12 @@ html, body {
         active-hover-label-text-color: var(--text-2),
         inactive-hover-label-text-color: var(--text-2),
     ));
+    @include mat.sidenav-overrides((
+        container-background-color: var(--main),
+        container-width:"50%"
+    ));
+  
+
 }
 body,p { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-menu-item .mat-icon{
@@ -161,5 +177,11 @@ tbody > tr{
   cursor: pointer;
 }
 tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
-  background-color: var(--blue);
+  background-color: var(--hover);
+}
+:host ::ng-deep .mat-mdc-option:focus.mdc-list-item, .mat-mdc-option.mat-mdc-option-active.mdc-list-item{
+
+}
+.mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+  background-color: var(--blue)!important;
 }

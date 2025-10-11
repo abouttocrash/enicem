@@ -29,7 +29,7 @@ export class SalidaAlmacenComponent {
     if($event.key.length === 1)
       value = input.value + $event.key;
     const isValid = this.isValid(plano,Number(value))
-    if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid) {
+    if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid  ) {
       $event.preventDefault();
     }
     else
@@ -41,8 +41,17 @@ export class SalidaAlmacenComponent {
   }
 
   max(plano:Pieza){
-    return Number(plano.piezas) - (plano.cantidadInDialog || 0) - plano.cantidadRecibida!.reduce((sum, val) => sum + Number(val || 0), 0) - plano.cantidadRechazada!.reduce((sum, val) => sum + Number(val || 0), 0)
+    return Number(this.manufactured(plano) ) - (plano.cantidadInDialog || 0) - this.fuera(plano)
   }
+
+  manufactured(plano:Pieza){
+    return plano.cantidadManufactura!.reduce((sum, val) => sum + Number(val || 0), 0)
+  }
+  fuera(plano:Pieza){
+    return plano.cantidadAlmacen!.reduce((sum, val) => sum + Number(val || 0), 0)
+  }
+
+  
 
   allPiezasAreFilled(){
     return allPiezasAreFilled(this.piezas)

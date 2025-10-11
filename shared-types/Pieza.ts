@@ -1,6 +1,7 @@
 export interface Pieza{
     material:string
     indices:string[]
+    isEspejo:boolean
     acabado:string
     piezas:string
     autor:string
@@ -15,7 +16,8 @@ export interface Pieza{
     cantidadAlmacen:number[] // La cantidad que se fue a almacen
     cantidadRechazada:number[]
     cantidadRecibida:number[]
-    cantidadInDialog?:number
+    cantidadInDialog?:number | undefined
+    base?:number
     
 }
 

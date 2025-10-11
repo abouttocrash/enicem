@@ -46,14 +46,18 @@ export class Mongo{
         await this.client.close()
         return r
     }
-    async updateCatalog(body:{piezas:Pieza[],attr:'cantidadManufactura'|'cantidadDetalle',catalogId:string}){
+    async updateCatalog(body:{piezas:Pieza[],attr:'cantidadManufactura'|'cantidadDetalle'|"cantidadRechazada",catalogId:string}){
     
         const responses:any[] = []
         const pc = await this.getCollection("catalog")
         const catalog = await this.getCatalog(body.catalogId) as any
         for(let i = 0;i < body.piezas.length;i++){
             const pieza = body.piezas[i]!
-            const attr = pieza.cantidadRecibida
+            let attr:number[] = []
+            if(body.attr != "cantidadRechazada")
+                attr = pieza.cantidadRecibida
+            else
+                attr = pieza.cantidadRechazada
             
             const piezaEnCatalogo = catalog.logs.find((c:any)=>{return c.title == pieza.title}) as Pieza
             piezaEnCatalogo[body.attr].push(attr.at(-1)!)
@@ -96,19 +100,54 @@ export class Mongo{
         await this.client.close()
         return insertResult
     }
+
+    async createPieza(p:Pieza,catalogId:string){
+        const total = this.piezasAsNumber(p.piezas)
+        const piezas:Pieza[] = []
+        p.cantidadRechazada = []
+        p.cantidadDetalle = []
+        p.cantidadManufactura = []
+        p.cantidadAlmacen = []
+        p.cantidadRecibida = []
+        if(total == 0){
+            p.piezas = p.piezas.split("+")[0]!.trim()
+            const toPush = structuredClone(p)
+            toPush.title = `${toPush.title} (ESPEJO)`
+            piezas.push(toPush)
+            toPush.isEspejo = true;
+        }
+        piezas.push(p)
+        const pc = await this.getCollection("catalog")
+        const catalogo = await pc.findOne({ _id:new ObjectId(catalogId)}) as unknown as Catalogo
+        catalogo.logs.push(...piezas)
+        const r = await pc.updateOne( 
+            { _id:new ObjectId(catalogId)},
+            {$set: {[`logs`]:catalogo.logs}}
+        )
+        return {r,piezas}
+        
+    }
     async createCatalogo(piezas:Pieza[]){
+        const espejos:Pieza[] = []
         piezas.forEach((p:Pieza)=>{
             const total = this.piezasAsNumber(p.piezas)
-            p.indices = []
+            
             p.cantidadRechazada = []
             p.cantidadDetalle = []
             p.cantidadManufactura = []
             p.cantidadAlmacen = []
             p.cantidadRecibida = []
-            for(let i = 0;i < total;i++){
-               p.indices.push(p.title+"_$_"+i)
+            if(total == 0){
+                p.piezas = p.piezas.split("+")[0]!.trim()
+                const toPush = structuredClone(p)
+                toPush.title = `${toPush.title} (ESPEJO)`
+                toPush.isEspejo = true;
+                espejos.push(toPush)
             }
+            
         })
+        piezas.push(...espejos)
+        piezas = piezas.sort((a,b) => a.title.localeCompare(b.title));
         const catalogo:Catalogo = {
             logs:piezas,
             createdAt:new Date().toISOString()

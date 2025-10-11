@@ -15,12 +15,13 @@ import { PanelOrdenComponent } from '../../ordenes/panel-orden/panel-orden.compo
 import { MatDialog } from '@angular/material/dialog';
 import { DialogConfirmComponent } from '../../components/dialog-confirm/dialog-confirm.component';
 import { ProyectoService } from '../../proyecto.service';
+import { SalidasComponent } from '../../salidas/salidas.component';
 @Component({
   selector: 'app-project-detail',
   imports: [FormsModule,
     MatIconModule,MatCheckboxModule,FormsModule,
     MatTabsModule,CatalogoComponent,BitacoraComponent,OrdenesTrabajoComponent,
-    MatMenuModule,MatSidenavModule,PanelOrdenComponent,CommonModule
+    MatMenuModule,MatSidenavModule,PanelOrdenComponent,CommonModule,SalidasComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'
@@ -30,6 +31,7 @@ export class ProjectDetailComponent {
   @ViewChild(BitacoraComponent) bitacora!:BitacoraComponent
   @ViewChild(CatalogoComponent) catalogo!:CatalogoComponent
   @ViewChild(OrdenesTrabajoComponent) ordenes!:OrdenesTrabajoComponent
+  @ViewChild(SalidasComponent) salidas!:SalidasComponent
   @ViewChild(MatDrawer) drawer!:MatDrawer
   readonly dialog = inject(MatDialog);
   icon = "work"

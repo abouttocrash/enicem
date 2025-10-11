@@ -11,7 +11,8 @@ import { Catalogo, Pieza } from '@shared-types/Pieza';
 export class CatalogoService {
   private route = "catalog"
   private sort!:MatSort
-  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','expand'];
+  
+  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'expand'];
   dataSource!: MatTableDataSource<Pieza>;
   constructor(private api:APIService) { }
 
@@ -20,6 +21,7 @@ export class CatalogoService {
     if(sort)
       this.sort = sort;
     this.dataSource.sort = this.sort;
+    
   }
   async createAlmacen(piezas:Pieza[]){
     const body = {

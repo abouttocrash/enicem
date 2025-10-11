@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { APIService } from './api.service';
 import { OrdenesService } from './ordenes/ordenes.service';
 import { BitacoraService } from './bitacora.service';
@@ -8,14 +8,10 @@ import { CatalogoService } from './catalogo.service';
   providedIn: 'root'
 })
 export class ProyectoService {
-  o:OrdenesService
-  b:BitacoraService
-  c:CatalogoService
-  constructor(public api:APIService,private or:OrdenesService,private bi:BitacoraService,private ca:CatalogoService) {
-    this.o = or;
-    this.b = bi;
-    this.c = ca;
-  }
+  o = inject(OrdenesService)
+  b = inject(BitacoraService)
+  c = inject(CatalogoService)
+  constructor(public api:APIService ) {}
 
   async getAll(){
     const r = await this.api.getAll()

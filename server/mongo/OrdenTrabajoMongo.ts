@@ -24,7 +24,8 @@ export class OrdenTrabajoMongo extends Mongoloid{
     }
 
     async getOrden(id:string){
-        const r = await this.getOne("_id",new ObjectId(id))
+        const r = await this.getOne("_id",new ObjectId(id)) as unknown as OrdenTrabajo
+        r["totalPiezas"] = r.piezas.reduce((sum: number, p: any) => sum + Number(p.piezas), 0);
         return r
     }
 
@@ -43,6 +44,12 @@ export class OrdenTrabajoMongo extends Mongoloid{
     async createOrden(body:any){
         body.piezas.forEach((pieza:Pieza)=>{
             delete pieza.checked
+            pieza.cantidadAlmacen = []
+            pieza.cantidadRechazada = []
+            pieza.cantidadRecibida= []
+            pieza.cantidadManufactura = []
+            pieza.cantidadDetalle = []
+            pieza.cantidadInDialog = undefined
         })
         const obj = {
             piezas:body.piezas,

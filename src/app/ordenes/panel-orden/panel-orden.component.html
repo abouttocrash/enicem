@@ -1,77 +1,139 @@
 @if(o.currentOrden != undefined){
-    <div class="panel-top">
-        <div>
-            <p class="folio">#<span>{{o.currentOrden.folio}}</span> &nbsp;▪&nbsp; {{o.currentOrden.createdAt | date}}</p>
-        </div>
-        <div class="icon-holder">
-            @if(o.currentOrden.status == "ABIERTA"){
-                <button><mat-icon class="icon-action" [matMenuTriggerFor]="menu2">more_horiz</mat-icon></button>
-            }
-            @else {
-                <mat-icon class="icon-action" fontSet="material-symbols-outlined">file_save</mat-icon>
-            }
-            <mat-icon>close</mat-icon>
-        </div>
-    </div>
-    <h2> Orden {{o.currentOrden.tipo}}</h2>
-    <div class="detalle">
-        <div class="detalle-item">
-            <p>Status</p>
-            <p>{{o.currentOrden.status}}</p>
-        </div>
-        <div class="detalle-item">
-            <p>Proveedor</p>
-            <p>{{o.currentOrden.proveedor}}</p>
-        </div>
-        <div class="detalle-item">
-            <p>Fecha esperada</p>
-            <p>{{o.currentOrden.dateEntrega | date}}</p>
-        </div>
-    </div>
-    
-    <div class="piezas">
-        <div class="panel-top piezas">
-            <h3>Piezas </h3>
-            <div class="icon-holder">
-                <button class="update" [matMenuTriggerFor]="menu" [disabled]="piezasSelected()">Actualizar</button>
+    <div class="panel">
+        <div class="top-holder">
+            <div class="panel-top">
+                <div>
+                    <p class="folio">#<span>{{o.currentOrden.folio}}</span> &nbsp;▪&nbsp; {{o.currentOrden.createdAt | date}}</p>
+                </div>
+                <div class="icon-holder">
+                    @if(o.currentOrden.status == "ABIERTA"){
+                        <button><mat-icon class="icon-action" [matMenuTriggerFor]="menu2">more_horiz</mat-icon></button>
+                    }
+                    @else {
+                        <mat-icon class="icon-action" fontSet="material-symbols-outlined">file_save</mat-icon>
+                    }
+                    <mat-icon (click)="o.drawer.close()">close</mat-icon>
+                </div>
             </div>
+            <h2> Orden {{o.currentOrden.tipo}}</h2>
+            <div class="detalle">
+                <div class="detalle-row">
+                    <div class="detalle-item">
+                        <p>Status</p>
+                        <p>{{o.currentOrden.status}}</p>
+                    </div>
+                    <div class="detalle-item">
+                        <p>Proveedor</p>
+                        <p>{{o.currentOrden.proveedor}}</p>
+                    </div>
+                </div>
+               <div class="detalle-row">
+                <div class="detalle-item">
+                    <p>Fecha esperada</p>
+                    <p>{{o.currentOrden.dateEntrega | date}}</p>
+                </div>
+               </div>
+                
+                
+            </div>
+        </div>
+        <div class="tab-holder">
+            <mat-tab-group animationDuration="0ms">
+      <mat-tab [label]="getPiezasLabel()">
+        <div class="piezas">
+                <div class="panel-top piezas">
+                    <h3>Piezas </h3>
+                    <div class="icon-holder">
+                        <button class="update" [matMenuTriggerFor]="menu" [disabled]="piezasSelected()">Actualizar</button>
+                    </div>
+                    
+                </div>
+            <div class="list">
+                @for(p of o.piezasEnPanel;track p){
+                <div class="pieza-item">
+                    <section class="icon-items">
+                        <div class="icon-item center-ver-flex">
+                            <mat-icon fontSet="material-symbols-outlined" style="color:#936639">package_2</mat-icon>
+                            <span>{{p.piezas}}</span>
+                        </div>
+                        <div class="icon-item center-ver-flex">
+                            <mat-icon fontSet="material-symbols-outlined" style="color:#6a994e">check_small</mat-icon>
+                            <span>{{suma(p.cantidadRecibida) }}</span>
+                        </div>
+                        <div class="icon-item center-ver-flex">
+                            <mat-icon fontSet="material-symbols-outlined" style="color:#ad2831">close_small</mat-icon>
+                            <span>{{suma(p.cantidadRechazada) }}</span>
+                        </div>
+                    </section>
+                    <section class="checkbox-item">
+                        <div class="center-ver">
+                            <mat-checkbox [indeterminate]="isMax(p) || o.currentOrden.status != 'ABIERTA'" 
+                            [disabled]="isMax(p) || o.currentOrden.status != 'ABIERTA' || projectDisabled()"
+                            [(ngModel)]="p.checked">
+                            </mat-checkbox>
+                        </div>
+                    <div class="center-ver">
+                        <div>
+                            <p class="pieza-title"> {{p.title}}</p>
+                        </div>
+                        
+                    </div>
+                    <div class="center-ver ver-plano">
+                            <mat-icon matTooltip="Ver Plano" style="cursor: pointer;" (click)="toggle(p)" fontSet="material-symbols-outlined">docs</mat-icon>
+                        </div>
+                    </section>
+                    <section></section>
+                    
+                </div>
+            }
+            </div>
+            
+        </div>
+      </mat-tab>
+      <mat-tab [label]="getImagenLabel()">
+        <div class="images">
+                <div class="panel-top piezas">
+                    <h3 >Imágenes</h3>
+                    <div class="icon-holder">
+                        <button class="update" (click)="openNativeImageDialog()" style="margin-right: 16px;">Seleccionar</button>
+                        <button class="update" [disabled]="selectedImages.length == 0" (click)="guardarImagenes()">Guardar</button>
+                    </div>
+                </div>
+                <div class="img-holder">
+                    @for(img of selectedImages;track img){
+                        <div class="thumb-wrapper"
+                            (contextmenu)="removeImage(img, $event)">
+                            <img
+                                (click)="openImageTab(img)"
+                                [src]="img"
+                                width="62"
+                                height="62"
+                                class="thumb" />
+                            <mat-icon class="star-icon" fontSet="material-symbols-outlined">asterisk</mat-icon>
+                        </div>
+                    }
+                    @for(img of o.images;track img){
+                        <div class="thumb-wrapper">
+                            <img
+                                (click)="openImageTab(img)"
+                                [src]="img"
+                                width="62"
+                                height="62"
+                                class="thumb" />
+                        </div>
+                    }
+                </div>
+
+            </div>
+      </mat-tab>
+    </mat-tab-group>
+            
             
         </div>
         
     </div>
-    @for(p of o.piezasEnPanel;track p){
-        <div class="pieza-item">
-            <section class="icon-items">
-                <div class="icon-item center-ver-flex">
-                    <mat-icon fontSet="material-symbols-outlined" style="color:#936639">package_2</mat-icon>
-                    <span>{{p.piezas}}</span>
-                </div>
-                <div class="icon-item center-ver-flex">
-                    <mat-icon fontSet="material-symbols-outlined" style="color:#6a994e">check_small</mat-icon>
-                    <span>{{suma(p.cantidadRecibida) }}</span>
-                </div>
-                <div class="icon-item center-ver-flex">
-                    <mat-icon fontSet="material-symbols-outlined" style="color:#ad2831">close_small</mat-icon>
-                    <span>{{suma(p.cantidadRechazada) }}</span>
-                </div>
-            </section>
-            <section class="checkbox-item">
-                <div class="center-ver">
-                    <mat-checkbox [indeterminate]="isMax(p) || o.currentOrden.status != 'ABIERTA'" 
-                    [disabled]="isMax(p) || o.currentOrden.status != 'ABIERTA' || projectDisabled()"
-                    [(ngModel)]="p.checked">
-                    </mat-checkbox>
-                </div>
-            <div class="center-ver">
-                <div>
-                    <p class="pieza-title"> {{p.title}}</p>
-                </div>
-            </div>
-            </section>
-            <section></section>
-            
-        </div>
-    }
+    
+   
     <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="recibir()">
             <mat-icon>thumb_up</mat-icon>
@@ -83,9 +145,6 @@
         </button>
     </mat-menu>
     <mat-menu #menu2="matMenu">
-        <button mat-menu-item (click)="actualizarStatus('CERRADA')">
-            <span>Cerrar Orden</span>
-        </button>
          <button mat-menu-item (click)="actualizarStatus('CANCELADA')">
             <span>Cancelar Orden</span>
         </button>

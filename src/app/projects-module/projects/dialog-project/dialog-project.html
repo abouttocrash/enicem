@@ -3,14 +3,14 @@
     <div>
         <mat-form-field appearance="outline">
             <mat-label>Nombre del proyecto</mat-label>
-            <input matInput placeholder="Nombre del proyecto" formControlName="nombreProyecto">
+            <input autocomplete="off" matInput placeholder="Nombre del proyecto" formControlName="nombreProyecto">
             @if (!form.get("nombreProyecto")!.valid) {
                 <mat-error>Nombre del proyecto requerido</mat-error>
             }
         </mat-form-field>
         <mat-form-field appearance="outline">
             <mat-label>Clave del proyecto</mat-label>
-            <input matInput placeholder="Clave del proyecto" formControlName="claveProyecto">
+            <input autocomplete="off" matInput placeholder="Clave del proyecto" formControlName="claveProyecto">
             @if (!form.get("claveProyecto")!.valid) {
                 <mat-error>Clave del proyecto requerida</mat-error>
             }

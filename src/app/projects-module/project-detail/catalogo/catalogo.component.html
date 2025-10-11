@@ -2,12 +2,19 @@
    <div class="bar">
       <div>
         <mat-form-field appearance="outline">
-          <mat-label>Buscar</mat-label>
-          <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Buscar plano" #input>
+          <mat-icon matPrefix>search</mat-icon>
+          <mat-label>Buscar Plano</mat-label>
+          <input autocomplete="off" matInput (keyup)="applyFilter($event)" 
+          placeholder="Buscar plano por Id, Material o Acabado" #input>
         </mat-form-field>
       </div>
       <div style="display: flex;justify-content: end;gap: 1rem;align-items: center;">
         <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete()) || projectDisabled()" (click)="salidaAlmacen()">
+        <mat-icon >build</mat-icon>
+        Scrap
+      </button>
+      
+      <button class="main-cta" [disabled]="!(tableChecked || partiallyComplete()) || projectDisabled()" (click)="salidaAlmacen()">
         <mat-icon fontSet="material-symbols-outlined">shelves</mat-icon>
         Salida Almacen
       </button>
@@ -15,9 +22,9 @@
         <mat-icon fontSet="material-symbols-outlined">assignment_add</mat-icon>
         Crear orden
       </button>
-      <button class="main-cta" [disabled]="api.currentProject.piezasCount! > 0 || projectDisabled()"  (click)="getFolders()">
+      <button class="main-cta" (click)="textoPlanos === 'Crear Catálogo' ? getFolders():openPDFDialog()">
         <mat-icon fontSet="material-symbols-outlined">architecture</mat-icon>
-        Agregar planos
+        {{textoPlanos}}
       </button>
       </div>
     
@@ -25,10 +32,15 @@
     
 
       <div style="height: 100%;overflow-y: scroll;">
-         <table mat-table [dataSource]="p.c.dataSource" matSort>
+         <table mat-table 
+          [dataSource]="p.c.dataSource" 
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          (cdkDropListDropped)="drop($event)"
+          matSort>
 
         <ng-container matColumnDef="box">
-          <th mat-header-cell *matHeaderCellDef >
+          <th cdkDrag  mat-header-cell *matHeaderCellDef >
             <mat-checkbox
               [(ngModel)]="tableChecked"
               [indeterminate]="partiallyComplete()"
@@ -41,50 +53,68 @@
             <mat-checkbox [(ngModel)]="row.checked" (change)="updateRow(row)" [disabled]="projectDisabled()">
             </mat-checkbox>  
           </td>
+          <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
         <ng-container matColumnDef="material">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Material </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Material </th>
           <td mat-cell *matCellDef="let row"> {{row.material}} </td>
+          <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Id plano </th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Id plano </th>
           <td mat-cell *matCellDef="let row"> {{row.title}} </td>
+          <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
         <ng-container matColumnDef="acabado">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Acabado</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Acabado</th>
           <td mat-cell *matCellDef="let row"> {{row.acabado}} </td>
+          <td mat-footer-cell *matFooterCellDef>Total</td>
         </ng-container>
         <ng-container matColumnDef="piezas">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Registradas</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>En plano</th>
           <td mat-cell *matCellDef="let row"> {{row.piezas}} </td>
+          <td mat-footer-cell *matFooterCellDef>{{sumAttr("piezas")}}</td>
         </ng-container>
         <ng-container matColumnDef="cantidadManufactura">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Maquinadas</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Maquinadas</th>
           <td mat-cell *matCellDef="let row"> {{sum(row.cantidadManufactura)}} </td>
+          <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadManufactura")}}</td>
         </ng-container>
         <ng-container matColumnDef="cantidadDetalle">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Detalladas</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Detalladas</th>
           <td mat-cell *matCellDef="let row"> {{sum(row.cantidadDetalle)}} </td>
+          <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadDetalle")}}</td>
         </ng-container>
         <ng-container matColumnDef="cantidadAlmacen">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Pa fuera?</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>En integración</th>
           <td mat-cell *matCellDef="let row"> {{sum(row.cantidadAlmacen)}} </td>
+          <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadAlmacen")}}</td>
         </ng-container>
+        <ng-container matColumnDef="cantidadRechazada">
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Rechazadas</th>
+          <td mat-cell *matCellDef="let row"> {{sum(row.cantidadRechazada)}} </td>
+          <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadRechazada")}}</td>
+        </ng-container>
+        <!-- <ng-container matColumnDef="stock">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>stock</th>
+          <td mat-cell *matCellDef="let row"> {{calcularStock()}} </td>
+        </ng-container> -->
         
         
         <ng-container matColumnDef="expand">
-          <th mat-header-cell *matHeaderCellDef ></th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef >Plano</th>
           <td mat-cell *matCellDef="let row"> 
-            <mat-icon matTooltip="Ver Plano" style="cursor: pointer;" (click)="toggle(row)" fontSet="material-symbols-outlined">docs</mat-icon>
+            <mat-icon matTooltip="Ver Plano" style="cursor: pointer;color:var(--blue)" (click)="toggle(row)" fontSet="material-symbols-outlined">docs</mat-icon>
             <!-- <mat-icon (click)="toggle(row)" fontSet="material-symbols-outlined">docs</mat-icon> -->
           </td>
+          <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
 
         
 
         <tr mat-header-row *matHeaderRowDef="p.c.displayedColumns;sticky:true"></tr>
         <tr mat-row *matRowDef="let row; columns: p.c.displayedColumns;"></tr>
-
+        <tr mat-footer-row *matFooterRowDef="p.c.displayedColumns; sticky: true"></tr>
         <!-- Row shown when there is no matching data. -->
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell" colspan="4"></td>
@@ -94,5 +124,5 @@
  </div>
 
 
-
+<input #pdfInput type="file" accept="application/pdf" hidden (change)="onPDFSelected($event)">
 <input #folderInput type="file" webkitdirectory multiple hidden (change)="onFolderSelected($event)">

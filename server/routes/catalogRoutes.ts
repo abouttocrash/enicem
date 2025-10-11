@@ -29,6 +29,17 @@ catalogRouter.post('/', upload.array('files'), async(req, res) => {
         res.status(400).send({error:e})
     }
 });
+catalogRouter.post('/plano', upload.array('files'), async(req, res) => {
+    try{
+        const pdfs = await pdf.readFolder()
+        pdf.emptyUploads(req.body.projectId)
+        const p = await mongo.createPieza(pdfs[0]!,req.body.catalogId)
+        res.status(200).send({data:true,p:p})
+    }catch(e){
+        console.log(e)
+        res.status(400).send({error:e})
+    }
+});
 catalogRouter.post('/almacen', async(req, res) => {
     try{
         const p = await mongo.createAlmacen(req.body)

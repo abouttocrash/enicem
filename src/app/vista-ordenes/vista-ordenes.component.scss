@@ -1,0 +1,7 @@
+.ordenes{
+    height:calc(100% - 32px);
+    display: grid;
+    padding:16px 32px 16px 32px;
+    grid-template-rows: 160px 1fr;
+    overflow-y: auto;
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { APIService } from '../api.service';
 import { ICEMDR, ICEMR } from '@shared-types/ICEMR';
 import { OrdenTrabajo, StatusOrden } from '@shared-types/OrdenTrabajo';
@@ -6,28 +6,70 @@ import { Pieza } from '@shared-types/Pieza';
 import { createMilestone, MILESTONE_DESC, What } from '@shared-types/Bitacora';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { Usuario } from '@shared-types/Usuario';
 import { User } from '../users-module/User';
+import { AutoFilter } from './ordenes-trabajo/ordenes-trabajo.component';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { createWhat } from '../utils/Utils';
+import { MatDrawer } from '@angular/material/sidenav';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrdenesService {
+  http = inject(HttpClient)
+  images:Array<string> = []
+  filters:Array<AutoFilter>=[
+      {
+        filter:"Status",
+        options:[]
+      },
+      {
+        filter:"Tipo",
+        options:[]
+      },
+      {
+        filter:"Proveedor",
+        options:[]
+      },
+      {
+        filter:"Planos",
+        options:[]
+      }
+  
+  ]
+  filteredFilters:Array<AutoFilter> = []
   private sort!:MatSort
+  drawer!:MatDrawer
   currentOrden!:OrdenTrabajo
   piezasEnPanel:Array<Pieza> = []
-  displayedColumns: string[] = ['folio','tipo','totalPiezas','proveedor','creada', 'dateEntrega','status','dateReal'];
+  displayedColumns: string[] = ['folio','tipo','totalPiezas','proveedor','creada', 'dateEntrega','status','dateReal','cantidadRecibida','cantidadRechazada'];
   dataSource!: MatTableDataSource<OrdenTrabajo>;
   constructor(private api:APIService) {}
 
-  init(data:OrdenTrabajo[],sort?:MatSort){
+  init(data:OrdenTrabajo[],drawer?:MatDrawer,sort?:MatSort){
+    if(drawer)
+      this.drawer = drawer
     this.dataSource = new MatTableDataSource(data);
     if(sort)
       this.sort = sort;
     this.dataSource.sort = this.sort;
+    this.filters[0].options = Array.from(new Set(data.map(d=>{return d.status})))
+    this.filters[1].options = Array.from(new Set(data.map(d=>{return d.tipo})))
+    this.filters[2].options = Array.from(new Set(data.map(d=>{return d.proveedor})))
+    this.filters[3].options = Array.from(new Set(data.flatMap(d => d.piezas).map(p => p.title)))
+    this.filteredFilters = JSON.parse(JSON.stringify(this.filters))
   
   }
 
+  async getImages(){
+
+    const params = new HttpParams()
+    .set('projectId', this.api.currentProject._id!)
+    .set('ordenId', this.currentOrden._id);
+    const r = await firstValueFrom<ICEMR<any>>(this.http.get<ICEMR<any>>("http://localhost:3000/order/images",{params:params}))
+    this.images = r.data
+  }
   async getOrders(){
     const r = await this.api.GET<ICEMDR<OrdenTrabajo>>("order/all",{attr:"projectId",value:this.api.currentProject._id!})
     r.data.forEach(o=>{
@@ -51,7 +93,7 @@ export class OrdenesService {
     const r = await this.api.uploadPiezasConImagenes(list, date,proveedor._id!,tipo,folio)
     let desc = tipo == "Maquinado"?MILESTONE_DESC.ORDER_MAQUI_CREATED:MILESTONE_DESC.ORDER_DETAIL_CREATED as string
     desc = desc+" Folio #"+folio
-    const what = this.createWhat(list,"piezas")
+    const what = createWhat(list,"piezas")
     await this.api.updateLog(createMilestone(desc,r.insert.insertedId,this.api.currentUser._id!,what,proveedor._id))
   }
 
@@ -71,7 +113,7 @@ export class OrdenesService {
         p.cantidadRecibida.push(pieza.cantidadInDialog!)
       }
     })
-    what = this.createWhat(piezasToWhat,"cantidadInDialog")
+    what = createWhat(piezasToWhat,"cantidadInDialog")
 
     await this.api.updateOrder(this.currentOrden,"RECIBIDA")
     const cual = this.currentOrden.tipo == "Detalle" ? "cantidadDetalle":"cantidadManufactura"
@@ -99,10 +141,10 @@ export class OrdenesService {
         p.cantidadRechazada?.push(pieza.cantidadInDialog!)
       }
     })
-    what = this.createWhat(piezasToWhat,"cantidadInDialog")
+    what = createWhat(piezasToWhat,"cantidadInDialog")
     await this.api.updateOrder(this.currentOrden,"RECHAZADA")
     const desc =  `(${recibidas}) Piezas rechazadas para orden de ${this.currentOrden.tipo} #${this.currentOrden.folio} Razón: ${result.razon}`
-    
+    await this.api.updateCatalogo("cantidadRechazada",this.currentOrden.piezas,idCatalogo)
     await this.api.updateLog(createMilestone(desc,this.currentOrden._id,this.api.currentUser._id!,what,this.currentOrden.idProveedor))
     const r = await this.api.getOrder(this.currentOrden._id)
     this.currentOrden = r.data
@@ -116,17 +158,5 @@ export class OrdenesService {
     this.currentOrden.status = status
   }
 
-  private createWhat(piezas:Pieza[], attrCantidad:string){
-    const what:Array<What> = []
-    piezas.forEach(p=>{
-      what.push({
-        plano:p.title,
-        material:p.material,
-        acabado:p.acabado,
-        cantidad: p[attrCantidad as keyof Pieza] as number,
-        razon:p.razonRechazo
-      })
-    })
-    return what
-  }
+  
 }

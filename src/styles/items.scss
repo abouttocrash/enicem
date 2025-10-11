@@ -15,6 +15,11 @@
         border-bottom: 2px solid var(--gray);
         color:var(--text);
     }
+    & input:disabled{
+        background-color: var(--list);
+        color:var(--gray);
+        border-bottom: 2px solid var(--list);
+    }
     & .total{
         width: calc(40px - 8px);
         height:32px;

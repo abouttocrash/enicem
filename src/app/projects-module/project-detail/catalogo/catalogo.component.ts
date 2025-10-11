@@ -9,25 +9,27 @@ import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DialogOrdenComponent } from '../../../ordenes/dialog-orden/dialog-orden.component';
-import { createMilestone, MILESTONE_DESC } from '@shared-types/Bitacora';
+import { createMilestone, MILESTONE_DESC, What } from '@shared-types/Bitacora';
 import { ProyectoService } from '../../../proyecto.service';
 import { SalidaAlmacenComponent } from './salida-almacen/salida-almacen.component';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { baseDialog, projectDisabled } from '../../../utils/Utils';
+import { baseDialog, createWhat, longDialog, projectDisabled } from '../../../utils/Utils';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
+import {CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 @Component({
   selector: 'catalogo',
   imports: [MatTableModule, MatIconModule, MatCheckboxModule, FormsModule,
-    MatSortModule, MatTooltipModule,MatFormFieldModule,MatInputModule],
+    MatSortModule, MatTooltipModule,MatFormFieldModule,MatInputModule,CdkDropList, CdkDrag],
   templateUrl: './catalogo.component.html',
   styleUrl: './catalogo.component.scss'
 })
 export class CatalogoComponent {
   @ViewChild('folderInput') folderInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('pdfInput') pdfInput!: ElementRef<HTMLInputElement>;
+
   @ViewChild(MatSort) sort!: MatSort;
   private _snackBar = inject(MatSnackBar);
   readonly dialog = inject(MatDialog);
@@ -35,14 +37,53 @@ export class CatalogoComponent {
   tableChecked = false
   currentPieza = {} as any
   drawer!:MatDrawer
-  constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){}
-
-  init(data:Catalogo,drawer:MatDrawer){
-    this.drawer = drawer
+  textoPlanos = "Crear Catálogo"
+  constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){
     
+  }
+  drop(event: CdkDragDrop<string[]>) {
+    if(
+      event.currentIndex == 0 ||
+      event.currentIndex == this.p.c.displayedColumns.length -1 ||
+      event.previousIndex == 0 ||
+      event.previousIndex == this.p.c.displayedColumns.length -1
+    )return
+    moveItemInArray(this.p.c.displayedColumns, event.previousIndex, event.currentIndex);
+  }
+  init(data:Catalogo,drawer:MatDrawer){
+    if(data.logs || data.logs > 0)
+        this.textoPlanos = "Agregar planos adicionales"
+    this.drawer = drawer
     this.p.c.init(data,this.sort)
   }
+  openPDFDialog() {
+    this.pdfInput.nativeElement.value = '';
+    this.pdfInput.nativeElement.click();
+  }
 
+async onPDFSelected(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    const  files = Array.from(input.files);
+    const formData = new FormData();
+     files.forEach(file => formData.append('files', file, file.name));
+    const found = this.p.c.dataSource.data.find(d=>{return d.title == files[0].name.replace(".pdf","")})
+    if(found)
+      this._snackBar.open("❌ Este plano ya existe en el catálogo","OK")
+    else{
+      let what:Array<What> = []
+      const res = await this.api.addPieza(formData,this.api.currentProject.catalogId!)
+      let piezasToWhat:Pieza[] = []
+      piezasToWhat.push(...res.p.piezas)
+      what = createWhat(piezasToWhat,"piezas")
+    const desc = res.p.piezas == 1? "Plano agregado al catálogo":"Planos agregados al catálogo"
+    await this.api.updateLog(createMilestone(desc,this.api.currentProject.catalogId!,this.api.currentUser._id!,what,""))
+      this._snackBar.open("Plano agregado al catálogo","OK")
+      await this.p.getAll()
+    }
+
+  }
+}
   getFolders() {
     this.folderInput.nativeElement.value = '';
     this.folderInput.nativeElement.click();
@@ -65,6 +106,7 @@ export class CatalogoComponent {
       await this.api.updateLog(milestone)
       this.storage.setProject(this.api.currentProject)
       await this.p.getAll()
+      this.textoPlanos = "Agregar planos adicionales"
       this._snackBar.open("Catálogo de piezas creado","OK",{duration:2000})
     }
     else
@@ -89,7 +131,7 @@ export class CatalogoComponent {
   createOrder(){
    const selected = this.p.c.dataSource.data.slice().filter(d=>{return d.checked})
     const dialog = this.dialog.open(DialogOrdenComponent,{
-      ...baseDialog,
+      ...longDialog,
       data: {
         list:JSON.parse(JSON.stringify(selected)),
         project:this.api.currentProject
@@ -97,7 +139,7 @@ export class CatalogoComponent {
     });
     dialog.afterClosed().subscribe(async(r:boolean)=>{
       if(r){
-        this._snackBar.open("Orden creada con éxito","OK")
+        this._snackBar.open("Orden creada con éxito","OK",{duration:1000})
         await this.p.getAll()
       }
     })
@@ -124,15 +166,28 @@ export class CatalogoComponent {
     return data.reduce((sum: number, p: any) => sum + Number(p), 0);
   }
 
-  toggle(row:any){
+  toggle(row:Pieza){
     this.currentPieza = row
     const idProyecto = this.api.currentProject._id!
-    const url = `http://localhost:3000/static/${idProyecto}/${row.title}.pdf`;
+    const actualTitle = row.title.replace("(ESPEJO)","").trim()
+    const url = `http://localhost:3000/static/${idProyecto}/${actualTitle}.pdf`;
     window.open(url, '_blank');
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.p.c.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  sumAttr(attr: string): number {
+    if (!this.p?.c?.dataSource?.data) return 0;
+    return this.p.c.dataSource.data.reduce((total: number, row: any) => {
+      const val = row[attr];
+      // Si es un array, suma sus elementos; si es número, suma directo
+      if (Array.isArray(val)) {
+        return total + val.reduce((a: number, b: any) => a + Number(b || 0), 0);
+      }
+      return total + Number(val || 0);
+    }, 0);
   }
 }

@@ -31,6 +31,56 @@ orderRouter.get("/all",async(req,res)=>{
     res.status(200).send({data:p})
 })
 
+orderRouter.get("/images",async(req,res)=>{
+    const {projectId, ordenId } = req.query
+    let images:Array<string> = []
+    const projectDir = path.join(process.cwd(), 'imagenes', `${projectId}/${ordenId}`);
+    if(fs.existsSync(projectDir))
+        fs.readdirSync(projectDir).forEach(f=>{
+            images.push(`http://localhost:3000/static/${projectId}/${ordenId}/${f}`)
+        })
+    res.status(200).send({data:images})
+})
+
+orderRouter.post("/images", upload.array('imagenes'), async (req, res) => {
+    try {
+        const {projectId, ordenId } = req.body
+        if (!projectId || !ordenId) {
+            return res.status(400).send({ error: 'projectId and orderId are required' });
+        }
+
+        const files = req.files as Express.Multer.File[];
+        const projectDir = path.join(process.cwd(), 'imagenes', `${projectId}/${ordenId}`);
+        if (!fs.existsSync(projectDir)) {
+            fs.mkdirSync(projectDir, { recursive: true });
+        }
+
+        files.forEach(file => {
+            let ext = '';
+            switch (file.mimetype) {
+                case 'image/jpeg':
+                    ext = '.jpg';
+                    break;
+                case 'image/png':
+                    ext = '.png';
+                    break;
+                case 'image/gif':
+                    ext = '.gif';
+                    break;
+                default:
+                    ext = path.extname(file.originalname) || '';
+            }
+            const baseName = path.parse(file.originalname).name;
+            const destPath = path.join(projectDir, baseName + ext);
+            fs.renameSync(file.path, destPath);
+        });
+
+        res.status(200).send({ success: true, saved: files.length });
+    } catch (err) {
+        res.status(500).send({ error: 'Error al guardar imágenes', details: err });
+    }
+});
+
 orderRouter.post('/', async (req, res) => {
     try {
         //let {files,piezas } = setImages(req.files as Express.Multer.File[],req.body.piezas)
@@ -56,31 +106,6 @@ function setImages(files:Express.Multer.File[],p:any[]){
     return {files,piezas}
 }
 
-function saveImages(files:Express.Multer.File[],idProject:string,obj:any){
-    const projectDir = path.join(process.cwd(), 'imagenes', `${idProject}/${obj.id}`);
-    if (!fs.existsSync(projectDir)) {
-        fs.mkdirSync(projectDir, { recursive: true });
-    }
-        
-    files.forEach(file => {
-        let ext = '';
-        switch (file.mimetype) {
-            case 'image/jpeg':
-                ext = '.jpg';
-                break;
-            case 'image/png':
-                ext = '.png';
-                break;
-            case 'image/gif':
-                ext = '.gif';
-                break;
-            
-        }
-        const baseName = path.parse(file.originalname).name;
-        const destPath = path.join(projectDir, baseName + ext);
-        fs.renameSync(file.path, destPath);
-    });
-}
 
 // app.get("/order",async(req,res)=>{
 //     const p = await mongo.getOrder(req.query.orderId as string)

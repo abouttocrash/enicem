@@ -40,6 +40,12 @@ export class SidebarComponent {
   gotoProjects(){
     this.router.navigate(["/"])
   }
+  goToOrdenes(){
+    this.router.navigate(["ordenes"])
+  }
+  goToDashboard(){
+    this.router.navigate(["dashboard"])
+  }
   cambiarUsuario(){
     this.dialog.open(SelectUserComponent,{
       ...baseDialog

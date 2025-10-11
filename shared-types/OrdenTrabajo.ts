@@ -12,4 +12,5 @@ export interface OrdenTrabajo {
     createdAt:string
     status:StatusOrden
     totalPiezas?:number
+    cantidadRecibida:Array<number>
 }

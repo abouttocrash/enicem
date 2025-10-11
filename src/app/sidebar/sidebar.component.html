@@ -7,9 +7,11 @@
             }
     </section>
     <section class="menu-text">
+        <button matTooltip="Dashboard" (click)="goToDashboard()"><mat-icon >analytics</mat-icon></button>
         <button matTooltip="Proyectos" (click)="gotoProjects()"><mat-icon>work</mat-icon></button>
+        <button matTooltip="Órdenes" (click)="goToOrdenes()" ><mat-icon >assignment</mat-icon> </button>
         <button matTooltip="Nuevo Usuario" (click)="newUser()"><mat-icon>groups</mat-icon> </button>
-        <button matTooltip="Nuevo Proveedor" (click)="newProveedor()"><mat-icon fontSet="material-symbols-outlined">package_2</mat-icon> </button>
+        <button matTooltip="Nuevo Proveedor" (click)="newProveedor()"><mat-icon >add_business</mat-icon> </button>
         
     </section>
     <section></section>

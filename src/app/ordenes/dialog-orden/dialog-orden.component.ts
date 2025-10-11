@@ -27,7 +27,7 @@ export class DialogOrdenComponent {
   form!:FormGroup
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
-  data = inject(MAT_DIALOG_DATA);
+  data = inject(MAT_DIALOG_DATA) as {list:Array<Pieza>};
   folio = "-"
   proveedor!:User
   proveedorObj!:User
@@ -39,9 +39,22 @@ export class DialogOrdenComponent {
       tipo: new FormControl("", [Validators.required]),
       proveedor:new FormControl("",[ Validators.required]),
       date:new FormControl('',[Validators.required]),
+      equipos:new FormControl(1)
     });
-    this.data.list.forEach((d:any)=>{
+    this.data.list.forEach((d:Pieza)=>{
       d.piezas = this.piezasAsNumber(d.piezas)
+      d.base = Number(d.piezas)
+    })
+  }
+
+  changeEquipo(val:number){
+    let current = this.form.get("equipos")!.value as number
+    if(current == 1 && val == -1)
+      return
+    current += val
+    this.form.get("equipos")?.setValue(current)
+    this.data.list.forEach(p=>{
+      p.piezas = (Number(p.base) * current).toString()
     })
   }
 
@@ -98,21 +111,30 @@ export class DialogOrdenComponent {
     });
     return valid
   }
-  isNumber($event:KeyboardEvent){
+  isNumber($event:KeyboardEvent,plano:Pieza){
     const input = $event.target as HTMLInputElement;
     let value = input.value;
     if ($event.key.length === 1) {
       value += $event.key;
     }
     // Permite números decimales (solo un punto)
-    if (!/^\d*\.?\d*$/.test(value) && $event.key.length === 1) {
+    if (!/^\d*\.?\d*$/.test(value) && $event.key.length === 1 || value == "0") 
       $event.preventDefault();
   }
+
+  keyup($event:KeyboardEvent,plano:Pieza){
+    const input = $event.target as HTMLInputElement;
+    let value = Number(input.value)
     
+    plano.base = Number(value) || 1
   }
 
   disableForm(){
     console.log(!this.form.valid, "&&", !this.allPiezasAreFilled(),!this.form.valid && !this.allPiezasAreFilled())
     return !(this.form.valid && this.allPiezasAreFilled())
+  }
+
+  disableInput($event:KeyboardEvent){
+    $event.preventDefault()
   }
 }

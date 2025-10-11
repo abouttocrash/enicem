@@ -18,6 +18,7 @@ export type AllR ={
   providedIn: 'root'
 })
 export class APIService {
+  
   BASE = "http://localhost:3000"
   
   currentProject!:Proyecto
@@ -54,6 +55,10 @@ export class APIService {
     return r
   }
 
+  async uploadImagenes(formData: FormData) {
+    await firstValueFrom(this.http.post("http://localhost:3000/order/images",formData));
+  }
+
   
 
   async getFolio(){
@@ -72,6 +77,13 @@ export class APIService {
     const params = new HttpParams().append('orderId', orderId);
     const r = await this.GET<ICEMR<OrdenTrabajo>>("order",{attr:"orderId",value:orderId})
     r.data.proveedor = this.proveedores.find(p=>{return p._id == r.data.idProveedor})!.name
+    return r
+  }
+
+  async addPieza(form:FormData,catalogId:string){
+    form.append("catalogId",catalogId)
+    form.append("projectId",this.currentProject._id!)
+    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/catalog/plano",form))
     return r
   }
 
