@@ -4,6 +4,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { APIService } from './api.service';
 import {  ICEMR } from '@shared-types/ICEMR';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
+import { HttpParams } from '@angular/common/http';
+import { What } from '@shared-types/Bitacora';
+import { createWhat, sum } from './utils/Utils';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +15,7 @@ export class CatalogoService {
   private route = "catalog"
   private sort!:MatSort
   
-  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'expand'];
+  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stock', 'expand'];
   dataSource!: MatTableDataSource<Pieza>;
   constructor(private api:APIService) { }
 
@@ -23,27 +26,71 @@ export class CatalogoService {
     this.dataSource.sort = this.sort;
     
   }
+
+  async createScrap(piezas:Pieza[]){
+      const body = {
+        piezas:piezas,
+        tipo:"Scrap",
+        idProject:this.api.currentProject._id!,
+        user:this.api.currentUser,
+        catalogId:this.api.currentProject.catalogId
+      }
+      let total = 0
+    const what = createWhat(piezas,"cantidadInDialog")
+    what.forEach(w=>{
+      total += w.cantidad
+    })
+    const bodyStock = {
+        piezas:what,
+        catalogId:this.api.currentProject.catalogId!,
+        razon:"SALIDA Scrap"
+      }
+     
+    await this.api.updateStock(bodyStock)
+    const r = await this.api.POST<ICEMR<any>>(this.route+"/almacen",body) as any
+    const desc = `(${total}) Piezas a scrap - ${piezas[0].razonRechazo}`
+    await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what})
+  }
   async createAlmacen(piezas:Pieza[]){
     const body = {
       piezas:piezas,
+      tipo:"Integración",
+      idProject:this.api.currentProject._id!,
+      project:this.api.currentProject.name,
+      user:this.api.currentUser,
       catalogId:this.api.currentProject.catalogId
     }
     let total = 0
-    const what:Array<string> = []
-    piezas.forEach(p=>{
-      total += Number(p.cantidadInDialog) || 0
-      what.push(`${p.cantidadInDialog} ${p.title}`)
+    const what = createWhat(piezas,"cantidadInDialog")
+    what.forEach(w=>{
+      total += w.cantidad
     })
+    const bodyStock = {
+        piezas:what,
+        catalogId:this.api.currentProject.catalogId!,
+        razon:"SALIDA Integración"
+      }
+     
+    //await this.api.updateStock(bodyStock)
     const r = await this.api.POST<ICEMR<any>>(this.route+"/almacen",body) as any
-    const desc = `(${total}) Piezas salidas de almacen`
+    const desc = `(${total}) Piezas solicitadas a almacen #${r.inserted.prevFolio}`
     await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what})
     
   }
-
+  async reporteCatalogo(){
+    const params = new HttpParams()
+    .set("catalogId",this.api.currentProject.catalogId!)
+    .set("project",this.api.currentProject.name)
+    .set("clave",this.api.currentProject.noSerie)
+    const r = await this.api.GET2<ICEMR<any>>(`${this.route}/reporte`,params)
+    return r
+  }
+  
   async getCatalog(){
-    const r = await this.api.GET<ICEMR<any>>(this.route,{attr:"catalogId",value:this.api.currentProject.catalogId!})
-    this.dataSource = new MatTableDataSource(r.data.logs);
-    this.dataSource.sort = this.sort;
+    const params = new HttpParams()
+    params.set("catalogId",this.api.currentProject.catalogId!)
+    params.set("projectId",this.api.currentProject._id!)
+    const r = await this.api.GET2<ICEMR<any>>(this.route,params)
     return r
   }
 }

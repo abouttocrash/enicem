@@ -11,23 +11,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
-export type AutoFilter = {
-  filter:string,
-  options:Array<string>
-}
-export const _filter = (opt: string[], value: string): string[] => {
-  const filterValue = value.toLowerCase();
+import { _filter, AutoFilter, AutoIcemComponent } from '../../components/auto-icem/auto-icem.component';
 
-  return opt.filter(item => item.toLowerCase().includes(filterValue));
-};
 @Component({
   selector: 'ordenes-trabajo',
-  imports: [MatIconModule,MatTableModule,MatSortModule,
+  imports: [MatIconModule,MatTableModule,MatSortModule,AutoIcemComponent,
     MatSidenavModule,MatFormFieldModule,MatInputModule,MatAutocompleteModule,CdkDropList, CdkDrag],
   templateUrl: './ordenes-trabajo.component.html',
   styleUrl: './ordenes-trabajo.component.scss'
 })
 export class OrdenesTrabajoComponent {
+  @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
   readonly dialog = inject(MatDialog);
   @ViewChild(MatSort) sort!: MatSort;
   
@@ -39,8 +33,11 @@ export class OrdenesTrabajoComponent {
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.p.o.displayedColumns, event.previousIndex, event.currentIndex);
   }
+
+ 
   init(data:OrdenTrabajo[],drawer:MatDrawer){
     this.drawer = drawer
+    this.p.b.currentPieza = undefined
     const r = this.p.o.init(data,drawer,this.sort)
     
   }
@@ -72,20 +69,10 @@ export class OrdenesTrabajoComponent {
       return matchOrden || matchPieza || matchTipo || matchProveedor;
   };
   this.p.o.dataSource.filter = filterValue;
-  this.p.o.filteredFilters = this._filterGroup(filterValue)
+  this.p.o.filteredFilters = this.auto.filterGroup(filterValue)
 }
 
- private _filterGroup(value: string): AutoFilter[] {
-    if (value) {
-      const x = this.p.o.filters
-        .map(group => ({filter: group.filter, options: _filter(group.options, value)}))
-        .filter(group => group.options.length > 0);
-        console.log(x)
-      return x
-    }
-
-    return this.p.o.filters
-  }
+ 
 
   async recibirPiezas(element:OrdenTrabajo){
     this.p.o.currentOrden = await this.p.o.getOrder(element._id)
@@ -102,5 +89,11 @@ export class OrdenesTrabajoComponent {
       suma += pieza[attr].reduce((sum, val) => sum + Number(val || 0), 0)
     })
     return suma
+  }
+
+ 
+
+  calcularPendientes(row:OrdenTrabajo){
+    return row.totalPiezas! - this.suma(row,"cantidadRecibida") 
   }
 }

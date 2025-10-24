@@ -1,6 +1,10 @@
 @use '../../../styles/dialog.scss';
 @use '../../../styles/items.scss';
 
+.item{
+    grid-template-columns: 50px 1fr 80px;
+}
+
 .list{
     display: grid;
     grid-template-rows: 52px ;
@@ -24,7 +28,7 @@
     height:100%;
     overflow-y: hidden;
     overflow-x: hidden;
-    grid-template-rows: 1fr 200px;
+    grid-template-rows: 1fr 290px;
 }
 
 .add-photo{

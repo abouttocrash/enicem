@@ -20,7 +20,8 @@ export class NewProjectDialog {
     name:"",
     _id:"",
     color:"#",
-    short:""
+    short:"",
+    actions:[]
   }
   project = {} as Proyecto
   actionPerformed = output<any>()
@@ -32,7 +33,7 @@ export class NewProjectDialog {
     });
   }
   async ngAfterViewInit(){
-    
+    await this.API.getUsers(false)
   }
 
   selectUser(u:any){

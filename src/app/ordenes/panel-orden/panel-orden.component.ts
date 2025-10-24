@@ -19,6 +19,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { createMilestone, What } from '@shared-types/Bitacora';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { APIService } from '../../api.service';
+export type IMG_OBJ = {
+  URL:string,
+  name:string,
+  obj:File
+}
 @Component({
   selector: 'app-panel-orden',
   imports: [MatCheckboxModule,FormsModule,MatIconModule,DatePipe,
@@ -30,8 +36,10 @@ export class PanelOrdenComponent {
   readonly dialog = inject(MatDialog);
   projectDisabled = projectDisabled
   imageInput!: HTMLInputElement;
-  selectedImages: string[] = [];
-  constructor(public o:OrdenesService,private p:ProyectoService,private snack:MatSnackBar){}
+  selectedImages: IMG_OBJ[] = [];
+  constructor(public o:OrdenesService,public p:ProyectoService,private snack:MatSnackBar,
+    private api:APIService
+  ){}
 
   ngOnInit() {
   // Crea el input solo una vez
@@ -53,10 +61,10 @@ export class PanelOrdenComponent {
         await this.o.aprobar(result,this.p.api.currentProject.catalogId!)
         await this.p.getAll()
         let suma = 0
-        this.o.currentOrden.piezas.forEach(pieza=>{
+        this.o.currentOrden!.piezas.forEach(pieza=>{
           suma += sum(pieza.cantidadRecibida || [])
        })
-        if(this.o.currentOrden.totalPiezas! == suma ){
+        if(this.o.currentOrden!.totalPiezas! == suma ){
           this.actualizarStatus("CERRADA")
           this.snack.open("Orden cerrada","OK",{duration:2000})
         }
@@ -118,16 +126,20 @@ openNativeImageDialog() {
 
   onImagesSelected(event: Event) {
     const input = event.target as HTMLInputElement;
+    const images:Array<IMG_OBJ> = []
     if (input.files && input.files.length > 0) {
-      this.selectedImages.push(... Array.from(input.files).map(file =>URL.createObjectURL(file)))
+     Array.from(input.files).forEach(file=>{
+        images.push({name:file.name,URL:URL.createObjectURL(file),obj:file})
+      })
+      this.selectedImages.push(...images)
     }
   }
   openImageTab(imgUrl: string) {
     window.open(imgUrl, '_blank');
   }
-  removeImage(img: string, event: MouseEvent) {
+  removeImage(img: IMG_OBJ, event: MouseEvent) {
     event.preventDefault();
-    this.selectedImages = this.selectedImages.filter(i => i !== img);
+    this.selectedImages = this.selectedImages.filter(i => i.name !== img.name);
   }
   async guardarImagenes(){
     const d = this.dialog.open(DialogConfirmComponent,{
@@ -138,14 +150,14 @@ openNativeImageDialog() {
     })
     const r = await firstValueFrom(d.afterClosed())
     if(r){
-      const files = Array.from(this.imageInput.files ?? []);
+      
       const formData = new FormData();
-      files.forEach(file => formData.append('imagenes', file, file.name));
+     this.selectedImages.forEach(file => formData.append('imagenes', file.obj, file.name));
       formData.append('projectId', this.p.api.currentProject._id!);
-      formData.append('ordenId',this.p.o.currentOrden._id)
+      formData.append('ordenId',this.p.o.currentOrden!._id)
       await this.p.api.uploadImagenes(formData)
       const what:What[] = []
-      files.forEach(f=>{
+      this.selectedImages.forEach(f=>{
         let w:What = {
         cantidad:1,
         plano:f.name,
@@ -154,8 +166,8 @@ openNativeImageDialog() {
         }
         what.push(w)
       })
-      const desc = `${files.length} Imágenes agregadas a la orden ${this.p.o.currentOrden.tipo} con folio ${this.p.o.currentOrden.folio}`
-      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden._id!,this.p.api.currentUser._id!,what,"",false))
+      const desc = `${this.selectedImages.length} Imágenes agregadas a la orden ${this.p.o.currentOrden!.tipo} con folio ${this.p.o.currentOrden!.folio}`
+      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,what,"",false))
       await this.o.getImages()
       await this.p.getAll()
       // Opcional: limpiar imágenes seleccionadas
@@ -167,6 +179,12 @@ openNativeImageDialog() {
     return `Imágenes (${this.o.images.length})`
   }
   getPiezasLabel(){
-    return `Piezas (${this.o.currentOrden.totalPiezas!})`
+    return `Piezas (${this.o.currentOrden!.totalPiezas!})`
+  }
+
+  async getPDF(){
+    this.o.currentOrden!.project = this.api.currentProject.name
+    const r = await this.api.POST<any>("pdf/orden",{orden:this.o.currentOrden})
+    window.open(r.data.path, '_blank');
   }
 }

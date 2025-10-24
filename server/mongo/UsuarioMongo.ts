@@ -21,14 +21,22 @@ export class UsuarioMongo extends Mongoloid{
 
     async getUsers(){
         const p = await this.getAllItems<Usuario>("users")
-        return p
+        const r = await this.getAllItems<any>("roles")
+        return {p,r}
     }
-
+    async editUser(user:any){
+        let id = user._id
+        delete user._id
+        delete user.actions
+        let r = await this.updateOne(user,"_id",new ObjectId(id))
+        return r
+    }
     async createUser(user:any){
         const u = {
             name:user.name,
             code:user.code,
             rol:user.rol,
+            active:true,
             short:this.setShort(user.name),
             color:this.colors[Number(user.code.charAt(0))]
         }

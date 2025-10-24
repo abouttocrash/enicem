@@ -1,20 +1,26 @@
 <div class="projects">
     <div class="header">
         <h1>Proyectos</h1>
-        <bar placeholder="Buscar proyecto" [bar]="false">
-            <mat-form-field appearance="outline">
-            <mat-label>Filtrar proyectos</mat-label>
-            <mat-select [(ngModel)]="filtro" >
-                <mat-option value="ABIERTO" (click)="buscarProyecto('ABIERTO')">Abiertos</mat-option>
-                <mat-option value="CERRADO" (click)="buscarProyecto('CERRADO')">Cerrados</mat-option>
-                <mat-option value="CANCELADO" (click)="buscarProyecto('CANCELADO')">Cancelados</mat-option>
-            </mat-select>
-        </mat-form-field>
-            <button class="main-cta" (click)="newProject()">
+        <div class="bar">
+            <div>
+                <!-- <auto-icem (keyup)="applyFilter($event)" [filters]="filters" [filteredFilters]="filteredFilters"></auto-icem> -->
+            </div>
+            <div></div>
+            <div class="filter-holder center-ver">
+                <mat-form-field appearance="outline">
+                <mat-label>Filtrar proyectos</mat-label>
+                <mat-select [(ngModel)]="filtro" >
+                    <mat-option value="ABIERTO" (click)="buscarProyecto('ABIERTO')">Abiertos</mat-option>
+                    <mat-option value="CERRADO" (click)="buscarProyecto('CERRADO')">Cerrados</mat-option>
+                    <mat-option value="CANCELADO" (click)="buscarProyecto('CANCELADO')">Cancelados</mat-option>
+                </mat-select>
+            </mat-form-field>
+                <button class="main-cta" (click)="newProject()">
                 <mat-icon>add</mat-icon>
                 Nuevo Proyecto
-            </button>
-        </bar>
+                </button>
+            </div>
+        </div>
     </div>
     <div class="projects-list">
         @for(p of API.projects;track p.name;let i = $index){

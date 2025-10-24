@@ -22,10 +22,11 @@
         <mat-form-field appearance="outline">
             <mat-label>Motivo de rechazo</mat-label>
             <mat-select [(ngModel)]="razon">
-                <mat-option  value="SIN ROSCAS">SIN ROSCAS</mat-option>
-                <mat-option  value="MALA APARIENCIA">MALA APARIENCIA</mat-option>
-                <mat-option  value="MAL DIMENSIONADO">MAL DIMENSIONADO</mat-option>
-                <mat-option  value="OTROS">OTROS</mat-option>
+                @for(rechazo of api.rechazos;track rechazo){
+                    <mat-option  [value]="rechazo.name">{{rechazo.name}}</mat-option>
+                }
+                
+                
             </mat-select>
         </mat-form-field>
 

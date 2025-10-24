@@ -1,13 +1,17 @@
 import {MongoClient,ObjectId} from 'mongodb'
 import { OrdenTrabajoMongo } from './mongo/OrdenTrabajoMongo.js';
 import { BitacoraMongo } from './mongo/BitacoraMongo.js';
-import {  Milestone } from '@shared-types/Bitacora.js';
+import {  Milestone, What } from '@shared-types/Bitacora.js';
 import { ProyectosMongo } from './mongo/ProyectosMongo.js';
 import { Catalogo, Pieza } from '@shared-types/Pieza.js';
+import { Proveedor} from '@shared-types/Proveedor.js';
 import { CatalogoMongo } from './mongo/CatalogoMongo.js';
 import { UsuarioMongo } from './mongo/UsuarioMongo.js';
 import { ProveedorMongo } from './mongo/ProveedorMongo.js';
-export type Collection = "logs"|"projects"|"catalog"|"orders"|"users" | "provider" | "folio" | "almacen"
+import { SalidaMongo } from './mongo/SalidaMongo.js';
+import moment from 'moment';
+import { RechazoMongo } from './mongo/RechazoMongo.js';
+export type Collection = "logs"|"projects"|"catalog"|"orders"|"users" | "provider" | "folio" | "almacen" |"out" | "roles" | "rechazo"
 export class Mongo{
     private url = 'mongodb://localhost:27017';
     private client!:MongoClient
@@ -19,6 +23,8 @@ export class Mongo{
     catalog!:CatalogoMongo
     user!:UsuarioMongo
     provider!:ProveedorMongo
+    salida!:SalidaMongo
+    rechazo!:RechazoMongo
     public static get instance(): Mongo {
         if (!Mongo.#instance) {
             Mongo.#instance = new Mongo();
@@ -29,13 +35,15 @@ export class Mongo{
             Mongo.#instance.catalog = new CatalogoMongo(this.#instance.client)
             Mongo.#instance.user = new UsuarioMongo(this.#instance.client)
             Mongo.#instance.provider = new ProveedorMongo(this.#instance.client)
+            Mongo.#instance.salida = new SalidaMongo(this.#instance.client)
+            Mongo.#instance.rechazo = new RechazoMongo(this.#instance.client)
         }
         return Mongo.#instance;
     }
     async updateLog(body:any){
         const date = new Date()
         const milestone:Milestone = body.milestone
-        milestone.expand = true
+        milestone.expand = body.expand
         milestone.createdAt = date.toISOString()
         milestone.updatedAt =  date.toISOString()
         milestone.generalId = milestone.generalId!
@@ -45,6 +53,36 @@ export class Mongo{
         { $push: { milestones: milestone as any } })
         await this.client.close()
         return r
+    }
+
+    async updateStock(body:any){
+        const responses:any[] = []
+        const piezas = body.piezas as What[]
+        const catalogId = body.catalogId as string
+        const razon = body.razon as string
+        const pc = await this.getCollection("catalog")
+        const catalog = await this.getCatalog(catalogId) as any
+        for(let i = 0;i < piezas.length;i++){
+            const pieza = piezas[i]!
+            const piezaEnCatalogo = catalog.logs.find((c:any)=>{return c.title == pieza.plano}) as Pieza
+            const cantidad = razon.includes("ENTRADA")? Number(pieza.cantidad) : pieza.cantidad * -1
+            piezaEnCatalogo.stock.push({c:cantidad ,t:razon})
+            await this.client.connect();
+            const r = await pc.updateOne(
+            { _id:new ObjectId(catalogId)},
+            {$set: 
+                {
+                    [`logs.$[x].stock`]:piezaEnCatalogo.stock
+                }
+            },
+            {
+                arrayFilters: [{"x.title": pieza.plano}]
+            })
+            responses.push(r)
+        }
+         await this.client.close()
+         return responses
+
     }
     async updateCatalog(body:{piezas:Pieza[],attr:'cantidadManufactura'|'cantidadDetalle'|"cantidadRechazada",catalogId:string}){
     
@@ -61,6 +99,8 @@ export class Mongo{
             
             const piezaEnCatalogo = catalog.logs.find((c:any)=>{return c.title == pieza.title}) as Pieza
             piezaEnCatalogo[body.attr].push(attr.at(-1)!)
+            if(body.attr != "cantidadRechazada")
+                piezaEnCatalogo.stock.push({c:attr.at(-1)!,t:body.attr})
             await this.client.connect();
             const r = await pc.updateOne(
             { _id:new ObjectId(body.catalogId)},
@@ -82,7 +122,6 @@ export class Mongo{
 
     
     async createLog(log:any){
-        
         const c = await this.getCollection("logs")
         const insertResult = await c.insertOne(log);
         await this.client.close()
@@ -93,7 +132,7 @@ export class Mongo{
         const item = {
             piezas:body.piezas,
             catalogId:body.catalogId,
-            createdAt:new Date().toISOString()
+            createdAt:moment().endOf("D").toISOString()
         }
          const c = await this.getCollection("almacen")
         const insertResult = await c.insertOne(item);
@@ -109,6 +148,8 @@ export class Mongo{
         p.cantidadManufactura = []
         p.cantidadAlmacen = []
         p.cantidadRecibida = []
+        p.fechaRecibida = []
+        p.stock = []
         if(total == 0){
             p.piezas = p.piezas.split("+")[0]!.trim()
             const toPush = structuredClone(p)
@@ -129,20 +170,27 @@ export class Mongo{
     }
     async createCatalogo(piezas:Pieza[]){
         const espejos:Pieza[] = []
+        let errored = false
         piezas.forEach((p:Pieza)=>{
-            const total = this.piezasAsNumber(p.piezas)
-            
-            p.cantidadRechazada = []
-            p.cantidadDetalle = []
-            p.cantidadManufactura = []
-            p.cantidadAlmacen = []
-            p.cantidadRecibida = []
-            if(total == 0){
-                p.piezas = p.piezas.split("+")[0]!.trim()
-                const toPush = structuredClone(p)
-                toPush.title = `${toPush.title} (ESPEJO)`
-                toPush.isEspejo = true;
-                espejos.push(toPush)
+            try{
+                const total = this.piezasAsNumber(p.piezas)
+                p.cantidadRechazada = []
+                p.cantidadDetalle = []
+                p.cantidadManufactura = []
+                p.cantidadAlmacen = []
+                p.cantidadRecibida = []
+                p.stock = []
+                if(total == 0){
+                    p.piezas = p.piezas.split("+")[0]!.trim()
+                    const toPush = structuredClone(p)
+                    toPush.title = `${toPush.title} (ESPEJO)`
+                    toPush.isEspejo = true;
+                    espejos.push(toPush)
+                }
+            }
+            catch(e){
+                errored = true
+                console.log(p.title)
             }
             
         })
@@ -152,6 +200,7 @@ export class Mongo{
             logs:piezas,
             createdAt:new Date().toISOString()
         }
+        if(errored) return false
         const c = await this.getCollection("catalog")
         const insertResult = await c.insertOne(catalogo as any);
         await this.client.close()
@@ -164,13 +213,10 @@ export class Mongo{
         }
         return 0
     }
-    async createProveedor(user:any){
-        const u = {
-            name:user.name,
-            color:"#e76f51"
-        }
+    async createProveedor(proveedor:Proveedor){
+       
         const c = await this.getCollection("provider")
-        const insertResult = await c.insertOne(u);
+        const insertResult = await c.insertOne(proveedor as any);
         await this.client.close()
         return insertResult
     }

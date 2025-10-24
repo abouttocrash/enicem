@@ -6,12 +6,19 @@
         <mat-form-field appearance="outline">
             <mat-label>Usuario</mat-label>
             <mat-select formControlName="usuario">
-                @for(u of API.users;track u._id){
+                @for(u of API.filteredUsuarios;track u._id){
                     <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
                 }
             </mat-select>
             @if (!form.get("usuario")!.valid) {
                 <mat-error>Usuario requerido</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Código de usuario</mat-label>
+            <input class="txtPassword" type="desc" autocomplete="off" matInput placeholder="Código de usuario" (keydown)="isNumber($event)" formControlName="code" maxlength="4" minlength="4">
+             @if (!form.get("code")!.valid) {
+                <mat-error>Campo requerido, 4 dígitos</mat-error>
             }
         </mat-form-field>
     </div>

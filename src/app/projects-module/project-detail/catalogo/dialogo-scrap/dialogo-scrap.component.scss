@@ -1,0 +1,15 @@
+@use '../../../../../styles/dialog.scss';
+@use '../../../../../styles/items.scss';
+
+
+.list{
+    display: grid;
+    margin-bottom: 16px;
+}
+
+.scrap-dialog{
+    height:100%;
+    display: grid;
+    grid-template-rows: 1fr 100px; 
+}
+

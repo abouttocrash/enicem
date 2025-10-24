@@ -4,10 +4,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { APIService } from '../../api.service';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-proveedores',
-  imports: [MatFormFieldModule,MatInputModule,FormsModule,ReactiveFormsModule],
+  imports: [MatFormFieldModule,MatInputModule,FormsModule,ReactiveFormsModule,MatSelectModule],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.scss'
 })
@@ -16,17 +17,17 @@ export class ProveedoresComponent {
   constructor(private dialogRef:MatDialogRef<ProveedoresComponent>,private api:APIService){
     this.form = new FormGroup({
       proveedor: new FormControl("", [Validators.required]),
+      tipo: new FormControl("", [Validators.required]),
     });
   }
 
   async createProveedor(){
-    await this.api.createProveedor(this.form.get("proveedor")?.value)
-    await this.api.getProveedores()
-    this.dialogRef.close()
+    await this.api.createProveedor(this.form)
+    this.dialogRef.close(true)
   }
 
   async close(){
-    this.dialogRef.close()
+    this.dialogRef.close(false)
   }
   
 }

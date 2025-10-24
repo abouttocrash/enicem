@@ -1,0 +1,28 @@
+<form class="dialog" [formGroup]="form">
+    <div>
+        <h2>{{title}}</h2>
+    </div>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre del rechazo</mat-label>
+            <input autocomplete="off" matInput placeholder="Nombre del rechazo" formControlName="name">
+             @if (!form.get("name")!.valid) {
+                <mat-error>Campo requerido</mat-error>
+            }
+        </mat-form-field>
+        
+        
+        @if(data != null){
+            <mat-slide-toggle formControlName="active" >
+            Activo
+            </mat-slide-toggle>
+        }
+        
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            <button  class="secondary-cta" (click)="close()">Cancelar</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createRechazo()">Crear</button>
+        </div>
+    </div>
+</form>

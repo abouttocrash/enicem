@@ -42,3 +42,4 @@ testem.log
 Thumbs.db
 server/imagenes/*
 server/data/*
+server/excel/*

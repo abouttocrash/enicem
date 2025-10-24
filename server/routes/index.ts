@@ -5,6 +5,8 @@ import logRouter from './logRoutes.js';
 import userRouter from './userRoutes.js';
 import providerRouter from './ProviderRoutes.js';
 import orderRouter from './orderRoutes.js';
+import salidaRouter from './salidasRoutes.js';
+import rechazoRouter from './RechazoRoutes.js';
 
 const apiRouter = Router();
 
@@ -14,6 +16,8 @@ apiRouter.use('/logs', logRouter);
 apiRouter.use('/user', userRouter);
 apiRouter.use('/proveedor', providerRouter);
 apiRouter.use('/order', orderRouter);
+apiRouter.use('/out', salidaRouter);
+apiRouter.use('/rechazo', rechazoRouter);
 
 export default apiRouter;
 

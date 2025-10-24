@@ -3,5 +3,9 @@ export interface Usuario{
     name:string
     color:string
     short:string
-    rol?:string
+    rol?:string,
+    actions:string[],
+    code?:string
+    active?:boolean
+    isActive?:string
 }

@@ -1,18 +1,18 @@
 <form class="dialog" [formGroup]="form">
     <div>
-        <h2>Crear Usuario</h2>
+        <h2>{{title}}</h2>
     </div>
     <div>
         <mat-form-field appearance="outline">
             <mat-label>Nombre del usuario</mat-label>
-            <input matInput placeholder="Nombre del usuario" formControlName="username">
+            <input autocomplete="off" matInput placeholder="Nombre del usuario" formControlName="username">
              @if (!form.get("username")!.valid) {
                 <mat-error>Campo requerido</mat-error>
             }
         </mat-form-field>
         <mat-form-field appearance="outline">
             <mat-label>Código de usuario</mat-label>
-            <input matInput placeholder="Código de usuario" (keydown)="isNumber($event)" formControlName="code" maxlength="4" minlength="4">
+            <input autocomplete="off" matInput placeholder="Código de usuario" (keydown)="isNumber($event)" formControlName="code" maxlength="4" minlength="4">
              @if (!form.get("code")!.valid) {
                 <mat-error>Campo requerido, 4 dígitos</mat-error>
             }
@@ -20,13 +20,21 @@
         <mat-form-field appearance="outline">
             <mat-label>Rol</mat-label>
             <mat-select formControlName="rol">
-                <mat-option value="Rol 1">Rol 1</mat-option>
-                <mat-option value="Rol 2">Rol 2</mat-option>
+                @for(rol of api.roles;track rol){
+                    <mat-option [value]="rol.rol">{{rol.rol}}</mat-option> 
+                }
+                
             </mat-select>
             @if (!form.get("rol")!.valid) {
                 <mat-error>Rol requerido</mat-error>
             }
         </mat-form-field>
+        @if(data != null){
+            <mat-slide-toggle formControlName="activo" >
+            Activo
+            </mat-slide-toggle>
+        }
+        
     </div>
     <div class="dialog-bottom">
         <div>

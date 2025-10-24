@@ -4,6 +4,12 @@
     overflow-y: scroll;
     grid-template-rows: 150px 1fr;
 }
+.panel-pieza{
+    display: grid;
+    height:100%;
+    overflow-y: scroll;
+    grid-template-rows: 60px 1fr;
+}
 .pieza-item{
     height:62px;
     display: grid;
@@ -21,14 +27,13 @@
 
 .panel-top{
      display: grid;
-     grid-template-columns: 1fr 70px;
+     grid-template-columns: 1fr 140px;
      & .icon-holder{
         display: flex;
         justify-content: end;
         & button{
             background-color: transparent;
             border:none;
-            cursor: pointer;
         }
         & mat-icon{
         cursor: pointer;
@@ -37,6 +42,9 @@
         & .icon-action{
             margin-right: 8px;
             color:var(--blue);
+        }
+        & .icon-action:disabled{
+            cursor:default
         }
      }
 }
@@ -103,6 +111,7 @@ h2{
 }
 .update:disabled{
     color:var(--gray);
+   
 }
 .update:disabled{
     cursor: default;
@@ -168,4 +177,34 @@ h2{
 
 .img-holder img {
   flex: 0 0 auto;
+}
+
+.milestone{
+    display: grid;
+    color:var(--text);
+    height:64px;
+    column-gap: 12px;
+    grid-template-columns: 1fr 24px 3fr;
+}
+.mil-holder{
+    height:100%;
+    overflow-y: auto;
+    display: grid;
+    justify-content: center;
+}
+
+.dot{
+    justify-content: center;
+    position:relative
+}
+.dot::after{
+    position:absolute;
+    content:"";
+    background-color: var(--blue);
+    width: 2px;
+    height:100%;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    z-index: -1;
 }

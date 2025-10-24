@@ -38,8 +38,8 @@ export class ProjectCardComponent {
   getOrdenesText(){
     const b =  this.project().ordenesCount? this.project().ordenesCount! :0
     switch(true){
-      case b == 0:return "Sin Ordenes";
-      case b > 1: return b+" Ordenes";
+      case b == 0:return "Sin Órdenes";
+      case b > 1: return b+" Órdenes";
       case b == 1: return b+ " Orden";
       default: return ""
 

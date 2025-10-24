@@ -4,6 +4,7 @@
     "paths": {
       "@shared-types/*": ["../shared-types/*"]
     },
+    
     // File Layout
     // "rootDir": "./src",
     // "outDir": "./dist",

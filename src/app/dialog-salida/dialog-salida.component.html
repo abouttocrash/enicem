@@ -1,0 +1,37 @@
+<div class="dialog">
+    <div> <h2>Revisar Salida</h2> </div>
+    <div>
+
+        @for(plano of data.salidas;track plano;let i = $index){
+            <div class="list">
+                <div class="item">
+                    <div class="center-ver">
+                        <input [(ngModel)]="plano.piezas" [disabled]=true [placeholder]="plano.piezas" type="text">
+                    </div>
+                <div class="center-ver">
+                    <div>
+                        <p style="font-weight: 600;">{{plano.pieza}}</p>
+                        <p>{{plano.material}}</p>
+                    </div>
+                </div>
+                <div class="center-ver"></div>
+            </div>
+                
+            </div>
+        }
+        <mat-form-field appearance="outline">
+            <mat-label>Acción</mat-label>
+            <mat-select [(ngModel)]="revision">
+                <mat-option value="APROBADA">Aprobar</mat-option>
+                <mat-option value="RECHAZADA">Rechazar</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+    </div>
+    <div class="dialog-bottom">
+        <div>
+            <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
+            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+        </div>
+    </div>
+</div>

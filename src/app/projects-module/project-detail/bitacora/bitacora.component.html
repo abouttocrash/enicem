@@ -1,7 +1,21 @@
  <div class="tab">
-    <bar placeholder="Buscar orden" [bar]="false">
-      <button class="main-cta" >Crear reporte</button>
-    </bar>
+    <div class="bar">
+      <mat-form-field>
+        <mat-label>Buscar</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-icon matSuffix style="cursor: pointer;" (click)="clear($event)">clear</mat-icon>
+        <input #searchInput [matAutocomplete]="autoGroup" matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
+        <mat-autocomplete #autoGroup="matAutocomplete" >
+        @for (group of p.b.filteredFilters ; track group) {
+          <mat-optgroup [label]="group.filter">
+            @for (name of group.options; track name) {
+              <mat-option [value]="name" (click)="applyFilter(name)">{{name}}</mat-option>
+            }
+          </mat-optgroup>
+        }
+    </mat-autocomplete>
+      </mat-form-field>
+    </div>
       <div style="height: 100%;overflow-y: scroll;">
         <table mat-table [dataSource]="p.b.dataSource" matSort multiTemplateDataRows>
           <ng-container matColumnDef="description">
@@ -29,9 +43,12 @@
               (click)="toggle(element); $event.stopPropagation()"
               class="example-toggle-button"
               [class.example-toggle-button-expanded]="isExpanded(element)">
-              @if(element.expand){
+              @if(true){
                 <mat-icon>keyboard_arrow_down</mat-icon>
               }
+              <!-- @if(element.expand){
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              } -->
               @else {
                 <mat-icon>remove</mat-icon>
               }

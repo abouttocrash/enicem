@@ -2,32 +2,29 @@ import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { StylesService } from '../styles.service';
 import { MatDialog } from '@angular/material/dialog';
-import { UsersDialogComponent } from '../users-module/users-dialog/users-dialog.component';
 import { Router } from '@angular/router';
 import {CommonModule} from '@angular/common';
 import { APIService } from '../api.service';
 import { MatMenuModule } from '@angular/material/menu';
-import { User } from '../users-module/User';
-import { ProveedoresComponent } from '../users-module/proveedores/proveedores.component';
+import {MatRippleModule} from '@angular/material/core';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { SelectUserComponent } from '../users-module/select-user/select-user.component';
 import { baseDialog } from '../utils/Utils';
 import { StorageService } from '../storage.service';
 @Component({
   selector: 'sidebar',
-  imports: [MatIconModule, CommonModule,MatMenuModule,MatTooltipModule],
+  imports: [MatIconModule, CommonModule,MatMenuModule,MatTooltipModule,MatRippleModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
   readonly dialog = inject(MatDialog);
+  centered = true;
   constructor(public s:StylesService,private router:Router,public API:APIService,private storage:StorageService){
     
   }
 
-  async ngAfterViewInit(){
-    await this.API.getUsers()
-    await this.API.getProveedores()
+   ngAfterContentInit(){
     //TODO select 
     if(this.storage.getUser() == null){
       this.cambiarUsuario()
@@ -35,7 +32,7 @@ export class SidebarComponent {
     else{
       this.API.currentUser = this.storage.getUser()!
     }
-    await this.API.getProjects("ABIERTO")
+    
   }
   gotoProjects(){
     this.router.navigate(["/"])
@@ -43,19 +40,35 @@ export class SidebarComponent {
   goToOrdenes(){
     this.router.navigate(["ordenes"])
   }
+  goToSalidas(){
+    this.router.navigate(["salidas"])
+  }
   goToDashboard(){
     this.router.navigate(["dashboard"])
+  }
+  goToProveedores(){
+    this.router.navigate(["proveedores"])
+  }
+  goToRechazos(){
+    this.router.navigate(["rechazos"])
+  }
+  goToUsuarios(){
+    this.router.navigate(["usuarios"])
   }
   cambiarUsuario(){
     this.dialog.open(SelectUserComponent,{
       ...baseDialog
     })
   }
-  newUser(){
-     const dialogRef = this.dialog.open(UsersDialogComponent,{disableClose:true});
+  
+  
+  //TODO
+  isAdmin(){
+    return this.API.currentUser.rol == "ADMIN"
   }
-  newProveedor(){
-     const dialogRef = this.dialog.open(ProveedoresComponent,{disableClose:true});
+  canCreateUsuario(){
+    return this.API.currentUser.actions.includes("NUEVO_USUARIO") &&
+    this.API.currentUser.actions.includes("NUEVO_PROVEEDOR")
   }
 
   

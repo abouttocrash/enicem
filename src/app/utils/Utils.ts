@@ -1,8 +1,24 @@
 
+import { CdkDropList, CdkDrag } from "@angular/cdk/drag-drop";
+import { FormsModule } from "@angular/forms";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatDialogConfig } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSortModule } from "@angular/material/sort";
+import { MatTableModule } from "@angular/material/table";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { What } from "@shared-types/Bitacora";
 import { Pieza } from "@shared-types/Pieza";
 import { Proyecto } from "@shared-types/Proyecto";
+
+export const ViewsImports =[
+  MatTableModule, MatIconModule, MatSortModule, MatTooltipModule,
+  MatSelectModule, FormsModule, MatFormFieldModule,
+  MatInputModule, CdkDropList, CdkDrag, MatDatepickerModule
+]
 
 export const baseDialog = {
   width:"500px",
@@ -36,11 +52,11 @@ export function sum(array:number[]){
  return array.reduce((sum: number, p: number) => sum + p, 0);
 }
 
-export function createWhat(piezas:Pieza[], attrCantidad:string){
+export function createWhat(piezas:any[], attrCantidad:string){
     const what:Array<What> = []
     piezas.forEach(p=>{
       what.push({
-        plano:p.title,
+        plano:p.title || p.pieza,
         material:p.material,
         acabado:p.acabado,
         cantidad: p[attrCantidad as keyof Pieza] as number,
@@ -49,3 +65,10 @@ export function createWhat(piezas:Pieza[], attrCantidad:string){
     })
     return what
   }
+
+export function isF(eventKey:string){
+  return /^F([1-9]|1[0-2])$/i.test(eventKey);
+}
+export function isArrow(eventKey:string){
+  return eventKey.includes("Arrow")
+}

@@ -8,8 +8,8 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Tipo de orden</mat-label>
                     <mat-select formControlName="tipo">
-                        <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Maquinado">Maquinado</mat-option>
-                        <mat-option (click)="setFolio(form.get('tipo')!.value!)" value="Detalle">Detalle</mat-option>
+                        <mat-option (click)="setFolio('Maquinado')" value="Maquinado">Maquinado</mat-option>
+                        <mat-option (click)="setFolio('Detalle')" value="Detalle">Detalle</mat-option>
                     </mat-select>
                     @if (!form.get("tipo")!.valid) {
                         <mat-error>Tipo de orden requerida</mat-error>
@@ -18,7 +18,7 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Proveedor</mat-label>
                     <mat-select formControlName="proveedor">
-                        @for(p of api.proveedores;track p){
+                        @for(p of filteredProveedores;track p){
                             <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
                         }
                     </mat-select>
@@ -30,17 +30,17 @@
             <section class="double-form-dialog">
                 <mat-form-field appearance="outline">
                     <mat-label>Fecha estimada de entrega</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="date" placeholder="dd/mm/yyyy">
+                    <input autocomplete="off" matInput [min]="todayDate" [matDatepicker]="picker" formControlName="date" placeholder="DD/MM/AAAA">
                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                     @if (!form.get("date")!.valid) {
-                        <mat-error>Fecha estimada requerida</mat-error>
+                        <mat-error>Fecha estimada requerida DD/MM/AAAA</mat-error>
                     }
                 </mat-form-field>
                 <div class="number-input">
                     <mat-form-field appearance="outline">
                         <mat-label>Equipos</mat-label>
-                        <input (keydown)="disableInput($event)" matInput formControlName="equipos">
+                        <input autocomplete="off" (keydown)="disableInput($event)" matInput formControlName="equipos">
                     </mat-form-field>
                     <div class="center-ver-flex">
                         <div class="input-buttons">
@@ -54,13 +54,14 @@
         
         </form>
         <section style="overflow-y: auto;">
+            <h3>{{data.list.length}} Planos</h3>
             @for(plano of data.list;track plano;let i = $index){
             <div class="list">
                 <div class="item">
                 <div class="center-ver">
                     <input type="text" 
                         [disabled]="form.get('equipos')?.value > 1"
-                        [(ngModel)]="plano.piezas"
+                        [(ngModel)]="plano.cantidadInDialog"
                         (keydown)="isNumber($event,plano)"
                         (keyup)="keyup($event,plano)">
                 </div>
@@ -70,7 +71,9 @@
                         <p>{{plano.material}}</p>
                     </div>
                 </div>
-                <div class="center-ver"></div>
+                <div class="center-ver">
+                    <p>Stock <strong>{{sumStock(plano)}}</strong></p>
+                </div>
             </div>
             </div>
             

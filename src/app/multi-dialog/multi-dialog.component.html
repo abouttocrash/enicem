@@ -1,0 +1,39 @@
+<div class="dialog">
+    <div> <h2>Verificar planos</h2> </div>
+    <div style="height: 100%;overflow-y: scroll;">
+
+        @for(plano of data;track plano;let i = $index){
+            <div class="list">
+                <div class="item">
+                    <div class="center-ver">
+                        <input [disabled]="true"  type="text" value ="-">
+                    </div>
+                <div class="center-ver">
+                    <div>
+                        <p style="font-weight: 600;">{{plano.name}}</p>
+                        <p>-</p>
+                    </div>
+                </div>
+                <div class="center-ver">
+                    <mat-icon matTooltip="Remover" 
+                    (click)="remove(i)" 
+                    style="cursor: pointer;color:var(--blue)" fontSet="material-symbols-outlined">delete</mat-icon>
+                </div>
+            </div>
+                
+            </div>
+        }
+
+    </div>
+    <div class="dialog-bottom">
+        <div style="width: 100%;display: grid;grid-template-columns: 1fr 230px;">
+            <p class="msg">
+                <span>Número de planos<span style="font-weight: 600;">&nbsp;{{data.length}}</span></span>
+            </p>
+            <div>
+                <button class="secondary-cta" (click)="actualizar(false)" >Cancelar</button>
+                <button  class="main-cta" (click)="actualizar(true)">Crear</button>
+            </div>
+        </div>
+    </div>
+</div>

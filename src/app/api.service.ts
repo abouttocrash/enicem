@@ -8,11 +8,23 @@ import { Bitacora, Milestone } from '@shared-types/Bitacora';
 import { Proyecto } from '@shared-types/Proyecto';
 import { Usuario } from '@shared-types/Usuario';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
+import { Salida } from '@shared-types/Salida';
+import { StorageService } from './storage.service';
+import { FormGroup } from '@angular/forms';
+import { Proveedor } from '@shared-types/Proveedor';
+import { Rechazo } from '@shared-types/Rechazo';
 export type AllR ={
   proyectos:Proyecto[]
   ordenes:OrdenTrabajo[]
   catalogo:Catalogo
   bitacora:Bitacora
+  salidas:Salida[],
+  rechazos:Rechazo[],
+  userData:{
+    p: Usuario[];
+    r: any[];
+}
+  proveedores:Proveedor[]
 }
 @Injectable({
   providedIn: 'root'
@@ -25,10 +37,13 @@ export class APIService {
   currentUser!:Usuario
   projects:Proyecto[] = []
   users:Usuario[] = []
-  proveedores:User[] = []
+  rechazos:Rechazo[] = []
+  filteredUsuarios:Usuario[] = []
+  roles:any[] = []
+  proveedores:Proveedor[] = []
   private headers = new HttpHeaders().append("Content-Type", 'application/json')
-  http = inject(HttpClient);  
-  constructor() { }
+  http = inject(HttpClient); 
+  constructor(private storage:StorageService) { }
 
   async getAll(){
     const body = {
@@ -37,6 +52,15 @@ export class APIService {
     }
     const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/projectData",{params:body}))
     this.projects = r.data.proyectos
+    this.users = []
+    this.filteredUsuarios = []
+    this.roles = []
+    this.roles = r.data.userData.r
+    this.rechazos = r.data.rechazos
+    this.proveedores = r.data.proveedores
+    
+    r.data.userData.p.forEach((u:User)=>{this.users.push({name:u.name,rol:u.rol!,color:u.color!,_id:u._id,short:u.short!,actions:this.roles.find(r=>{return r.rol == u.rol}).permisos})})
+    this.filteredUsuarios = structuredClone(this.users.filter(u=>{return u.active!}))
     return r;
   }
 
@@ -87,6 +111,10 @@ export class APIService {
     return r
   }
 
+  async updateStock(body:any){
+     const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/catalog/stock",body))
+  }
+
   async createCatalog(form:FormData,projectId:string){
     form.append("projectId",projectId)
     try{
@@ -105,13 +133,7 @@ export class APIService {
     }
     await this.PUT<ICEMR<OrdenTrabajo>>("order",body)
   }
-  async updateOrderStatus(orden:string,status:string){
-    const body = {
-      status:status,
-      id:orden
-    }
-    await this.PUT<ICEMR<OrdenTrabajo>>("order/status",body)
-  }
+  
   async updateLog(milestone:Milestone){
     const body = {
       milestone:milestone,
@@ -152,23 +174,71 @@ export class APIService {
     const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/projects",body,{headers:this.headers}))
     return project
   }
-  async createUser(usuario:string,code:string,rol:string){
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/user",{name:usuario,code:code,rol:rol},{headers:this.headers}))
+  async createUser(form:FormGroup){
+    let body = {
+      name:form.get("username")?.value,
+      code:form.get("code")?.value,
+      rol:form.get("rol")?.value,
+      active:form.get('active')?.value,
+      
+    } 
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/user",body))
   }
-  async createProveedor(proveedor:string){
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/proveedor",{name:proveedor},{headers:this.headers}))
+  async createRechazo(form:FormGroup){
+    let body = {
+      name:form.get("name")?.value,
+      active:form.get('active')?.value,
+    } 
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/rechazo",body))
+  }
+  async editUser(usuario:Usuario){
+    await firstValueFrom<any>(this.http.put("http://localhost:3000/user",usuario))
+  }
+  async editRechazo(rechazo:Rechazo){
+    await firstValueFrom<any>(this.http.put("http://localhost:3000/rechazo",rechazo))
+  }
+  
+  async createProveedor(form:FormGroup){
+    const body = {
+      name:form.get("proveedor")?.value,
+      tipo:form.get("tipo")?.value,
+      createdBy:this.currentUser._id
+    }
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/proveedor",body,{headers:this.headers}))
   }
 
-  async getUsers(){
+  async getUsers(returnAdmin = true){
     this.users = []
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/user",{headers:this.headers}))
-    r.data.forEach((u:User)=>{this.users.push({name:u.name,rol:u.rol!,color:u.color!,_id:u._id,short:u.short!})})
+    this.roles = []
+    this.filteredUsuarios = []
+    const r = await this.GET<any>("user",{attr:"a",value:returnAdmin+""})
+    this.roles = r.data.r
+    r.data.p.forEach((u:any)=>{this.users.push({
+      name:u.name,
+      rol:u.rol!,
+      color:u.color!,
+      _id:u._id,
+      short:u.short!,
+      code:u.code,
+      active:u.active,
+      isActive:u.active == true? "Activo":"No Activo",
+      actions:this.roles.find(r=>{return r.rol == u.rol}).permisos})})
+    this.filteredUsuarios = structuredClone(this.users.filter(u=>{return u.active!}))
     return this.users
+  }
+  async getRechazos(){
+    this.rechazos = []
+    const r = await this.GET<ICEMDR<Rechazo>>("rechazo")
+    r.data.forEach(re=>{
+      re.isActive = re.active? "Activo":"No Activo"
+    })
+    this.rechazos = r.data
+    return this.rechazos
   }
   async getProveedores(){
     this.proveedores = []
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/proveedor",{headers:this.headers}))
-    r.data.forEach((u:User)=>{this.proveedores.push(new User(u.name,u.rol!,u.color!,u._id))})
+    const r = await this.GET<ICEMDR<Proveedor>>("proveedor")
+    this.proveedores = r.data
     return this.proveedores
   }
 
@@ -187,11 +257,14 @@ export class APIService {
   async uploadPiezasConImagenes(piezas: any[],date:Date,p:string,tipo:string,folio:string) {
     const body = {
       idProject:this.currentProject._id!,
+      project:this.currentProject.name,
+      catalogId:this.currentProject.catalogId,
       idProveedor:p,
       dateEntrega:date.toISOString(),
       tipo:tipo,
       folio:folio,
-      piezas:piezas
+      piezas:piezas,
+      user:this.currentUser
     }
     // const formData = new FormData();
     // formData.append("idProject",this.currentProject._id!)
@@ -220,13 +293,17 @@ export class APIService {
   async POST<T>(route:string,body:Object){
     return await firstValueFrom<T>(this.http.post<T>(`${this.BASE}/${route}`, body));
   }
-  private async PUT<T>(route:string,body:Object){
+
+  async PUT<T>(route:string,body:Object){
     await firstValueFrom<T>(this.http.put<T>(`${this.BASE}/${route}`, body));
   }
 
-  async GET<T>(route:string,param:{attr:string,value:string}){
-    const params = new HttpParams().append(param.attr, param.value);
-    console.log(`${this.BASE}/${route}`)
+  async GET<T>(route:string,param?:{attr:string,value:string}){
+    const params =  param? new HttpParams().append(param.attr, param.value):{}
+    const r = await firstValueFrom<T>(this.http.get<T>(`${this.BASE}/${route}`,{params:params}))
+    return r
+  }
+  async GET2<T>(route:string,params?:HttpParams){
     const r = await firstValueFrom<T>(this.http.get<T>(`${this.BASE}/${route}`,{params:params}))
     return r
   }

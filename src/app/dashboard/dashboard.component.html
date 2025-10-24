@@ -1,1 +1,22 @@
-<p>dashboard works!</p>
+
+<mat-form-field appearance="outline">
+    <mat-label>Proveedor</mat-label>
+    <mat-select >
+        @for(p of api.proveedores;track p){
+            <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+        }
+    </mat-select>
+    
+    
+</mat-form-field>
+<mat-form-field appearance="outline">
+        <mat-label>Ingresa un rango de fecha</mat-label>
+        <mat-date-range-input [rangePicker]="picker" >
+            <input matStartDate placeholder="Start date" [(ngModel)]="fecha1">
+            <input matEndDate placeholder="End date" [(ngModel)]="fecha2">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+<button class="main-cta" (click)="reporter1()">Crear reporte 1</button>
+<button class="main-cta" (click)="reporteProveedor()">Crear reporte 2</button>

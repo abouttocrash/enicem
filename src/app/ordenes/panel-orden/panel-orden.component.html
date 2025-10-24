@@ -7,11 +7,13 @@
                 </div>
                 <div class="icon-holder">
                     @if(o.currentOrden.status == "ABIERTA"){
-                        <button><mat-icon class="icon-action" [matMenuTriggerFor]="menu2">more_horiz</mat-icon></button>
+                        <button ><mat-icon class="icon-action" [matMenuTriggerFor]="menu2">more_horiz</mat-icon></button>
                     }
-                    @else {
-                        <mat-icon class="icon-action" fontSet="material-symbols-outlined">file_save</mat-icon>
-                    }
+                    <!-- @if(o.currentOrden.tipo == 'Detalle'){ -->
+                        <mat-icon (click)="getPDF()" matTooltip="PDF de la orden" class="icon-action" fontSet="material-symbols-outlined">file_save</mat-icon>
+                    <!-- } -->
+                    
+                    
                     <mat-icon (click)="o.drawer.close()">close</mat-icon>
                 </div>
             </div>
@@ -95,7 +97,7 @@
                 <div class="panel-top piezas">
                     <h3 >Imágenes</h3>
                     <div class="icon-holder">
-                        <button class="update" (click)="openNativeImageDialog()" style="margin-right: 16px;">Seleccionar</button>
+                        <button class="update"[disabled]="projectDisabled()"  (click)="openNativeImageDialog()" style="margin-right: 16px;">Seleccionar</button>
                         <button class="update" [disabled]="selectedImages.length == 0" (click)="guardarImagenes()">Guardar</button>
                     </div>
                 </div>
@@ -104,8 +106,8 @@
                         <div class="thumb-wrapper"
                             (contextmenu)="removeImage(img, $event)">
                             <img
-                                (click)="openImageTab(img)"
-                                [src]="img"
+                                (click)="openImageTab(img.URL)"
+                                [src]="img.URL"
                                 width="62"
                                 height="62"
                                 class="thumb" />
@@ -145,10 +147,45 @@
         </button>
     </mat-menu>
     <mat-menu #menu2="matMenu">
-         <button mat-menu-item (click)="actualizarStatus('CANCELADA')">
+         <button [disabled]="projectDisabled()" mat-menu-item (click)="actualizarStatus('CANCELADA')">
             <span>Cancelar Orden</span>
         </button>
     </mat-menu>
     
+}
+@if(p.b.currentPieza != undefined){
+    <div class="panel-pieza">
+        <div class="top-holder">
+            <div class="panel-top">
+                <div></div>
+                <div class="icon-holder"><mat-icon (click)="o.drawer.close()">close</mat-icon></div>
+            </div>
+            <h2> Plano {{p.b.currentPieza.title}}</h2>
+            <div ></div>
+        </div>
+        <div class="mil-holder">
+            <div style="height: 100%;overflow-y: scroll;">
+
+                @for(desc of p.b.bitacoraPieza;track desc){
+                <div class="milestone">
+                    <div class="center-ver" style="justify-content: end;">
+                        <p style="font-weight: 600;">{{desc.createdAt}}</p>
+                    </div>
+                    <div  class="center-ver dot">
+                        <p style="font-size: 32px;color:var(--gold)">●</p>
+                    </div>
+                    <div class="center-ver">
+                        <div>
+                            <p style="font-weight:600;color:var(--gray)">{{desc.description}}</p>
+                        <p>{{desc.pieza.cantidad}} Piezas son parte de esta orden</p>
+                        </div>
+                    </div>
+                    
+                </div>
+            }
+            </div>
+        </div>
+        
+    </div>
 }
 

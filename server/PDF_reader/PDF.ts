@@ -12,6 +12,7 @@ export class PDF{
     
     async readFolder(folder?:string){
         const dir = folder? folder: this.getUploadsFolder()
+        let errored = false
         let arr:Pieza[] = []
         try{
             const files = fs.readdirSync(dir)
@@ -22,6 +23,8 @@ export class PDF{
             arr.push( this.extractObject(data.pageData[0],data.metadata._metadata))
             }
         }catch(e){
+            errored = true
+            arr = []
             console.log(e)
         }
         return arr
@@ -29,7 +32,7 @@ export class PDF{
       
     }
 
-    emptyUploads(projectId:string){
+    emptyUploads(projectId:string,create = true){
         const dir = this.getUploadsFolder()
         const dataDir = path.join(process.cwd(), 'data',projectId)
         fs.mkdirSync(dataDir, { recursive: true });
@@ -37,7 +40,8 @@ export class PDF{
             
             const srcPath = path.join(dir, file);
             const tgtPath = path.join(dataDir, file);
-            fs.copyFileSync(srcPath, tgtPath);
+            if(create)
+                fs.copyFileSync(srcPath, tgtPath);
         
             fs.unlinkSync(path.join(dir, file));
         });

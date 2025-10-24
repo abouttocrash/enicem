@@ -1,6 +1,6 @@
 @use '../../../styles/search.scss';
 @use '../../../styles/dialog.scss';
-
+@use '../../../styles/views.scss';
 .projects{
     height:calc(100% - 32px);
     display: grid;
@@ -21,6 +21,16 @@
     margin-top: 1.5rem;
     overflow-y: scroll;
 }
+.bar{
+    background-color: var(--main);
+    height:78px;
+    border-radius: 8px;
+    grid-template-columns: 350px 1fr 400px;
+    column-gap: 24px;
+    display: grid;
+    align-items: center;
+    padding:0 16px 0 16px;
+}
 
 h1{
     color:var(--text);
@@ -33,6 +43,17 @@ h1{
     padding-left: 8px;
 }
 
+.buttons-right {
+  display: flex;
+  align-items: center;   /* centra verticalmente los botones dentro del contenedor */
+  justify-content: flex-end; /* alinea los botones a la derecha */
+  gap: 12px; /* espacio entre botones */
+}
+.filter-holder {
+  display: flex;
+  align-items: center; /* centra verticalmente los hijos */
+  justify-content: space-between; /* separa la zona izquierda y la de botones */
+}
 
 
 

@@ -7,16 +7,27 @@
             }
     </section>
     <section class="menu-text">
-        <button matTooltip="Dashboard" (click)="goToDashboard()"><mat-icon >analytics</mat-icon></button>
-        <button matTooltip="Proyectos" (click)="gotoProjects()"><mat-icon>work</mat-icon></button>
-        <button matTooltip="Órdenes" (click)="goToOrdenes()" ><mat-icon >assignment</mat-icon> </button>
-        <button matTooltip="Nuevo Usuario" (click)="newUser()"><mat-icon>groups</mat-icon> </button>
-        <button matTooltip="Nuevo Proveedor" (click)="newProveedor()"><mat-icon >add_business</mat-icon> </button>
+        @if(API.currentUser != undefined){
+            @if(isAdmin()){
+                <button matRipple [matRippleCentered]="centered" matTooltip="Dashboard" (click)="goToDashboard()"><mat-icon >analytics</mat-icon></button>
+            }
+        
+            <button matRipple [matRippleCentered]="centered" matTooltip="Proyectos" (click)="gotoProjects()"><mat-icon>work</mat-icon></button>
+            <button matRipple [matRippleCentered]="centered" matTooltip="Órdenes" (click)="goToOrdenes()" ><mat-icon >assignment</mat-icon> </button>
+            <button matRipple [matRippleCentered]="centered" matTooltip="Salidas" (click)="goToSalidas()" ><mat-icon >assignment_return</mat-icon> </button>
+            <div class="line"></div>
+            @if(canCreateUsuario()){
+                <button matRipple [matRippleCentered]="centered" matTooltip="Nuevo Usuario" (click)="goToUsuarios()"><mat-icon>groups</mat-icon> </button>
+                <button matRipple [matRippleCentered]="centered" matTooltip="Nuevo Proveedor" (click)="goToProveedores()"><mat-icon >store</mat-icon> </button>
+                <button matRipple [matRippleCentered]="centered" matTooltip="Motivos de rechazo" (click)="goToRechazos()"><mat-icon >settings_alert</mat-icon> </button>
+            }
+        }
+       
         
     </section>
     <section></section>
     
-   <button (click)="s.changeMode()" >
+   <button matRipple [matRippleCentered]="centered" (click)="s.changeMode()" >
         <mat-icon [ngStyle]="{'color':s.currentMode.color}">{{s.currentMode.icon}}</mat-icon>
     </button>
 </div>

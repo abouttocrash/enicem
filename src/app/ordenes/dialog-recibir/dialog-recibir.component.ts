@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Pieza } from '@shared-types/Pieza';
-import { allPiezasAreFilled } from '../../utils/Utils';
+import { allPiezasAreFilled, isArrow, isF } from '../../utils/Utils';
 
 @Component({
   selector: 'app-dialog-recibir',
@@ -15,6 +15,9 @@ export class DialogRecibirComponent {
   data = inject<Pieza[]>(MAT_DIALOG_DATA);
   constructor(private dialog:MatDialogRef<DialogRecibirComponent>){
     this.piezas = JSON.parse(JSON.stringify(this.data))
+    this.piezas.forEach(p=>{
+      p.max = this.max(p)
+    })
   }
 
   actualizar(bool:boolean){
@@ -26,16 +29,37 @@ export class DialogRecibirComponent {
     let value = ""
     if($event.key.length === 1)
       value = input.value + $event.key;
+    console.log(value)
     const isValid = this.isValid(plano,Number(value))
     if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid) {
       $event.preventDefault();
     }
-    else
+    else{
+      if(
+        $event.key != "Tab" 
+        && $event.key != "Alt" 
+        && $event.key != "CapsLock" 
+        && $event.key != "Enter" 
+        && $event.key != "Meta" 
+        && $event.key != "Shift" 
+        && $event.key != "ContextMenu" 
+        && $event.key != "Insert" 
+        && $event.key != "Home" 
+        && $event.key != "End" 
+        && $event.key != "PageUp" 
+        && $event.key != "PageDown" 
+        && $event.key != "Delete" 
+        && !isF($event.key) 
+        && $event.key != "Escape" 
+        && !isArrow($event.key) 
+        && $event.key != "Control")
       plano.cantidadInDialog = Number(value)
+    }
+    
   }
 
   private isValid(plano:Pieza,input:number){
-    return input <= this.max(plano)? true:false
+    return input <= plano.max!? true:false
   }
 
   max(plano:Pieza){

@@ -31,13 +31,15 @@ html, body {
     --gray-text:var(--gray);
     --gold-text:var(--gold);
     --contrast:var(--contrast-white);
-    --hover:var(--bg-light);
+    --hover:#cad4d8;
     --list:var(--bg-light);
     --ultra-focus:#B37136;
+    --placeholder:#c4c4c4;
     @include mat.sidenav-overrides((
         container-background-color: var(--main),
         container-width:"50%"
     ));
+   
 }
 
 .theme-dark{
@@ -53,6 +55,7 @@ html, body {
     --hover:var(--gray);
     --ultra-focus:var(--gold);
     --list:#18191b;
+    --placeholder:#363636;
      @include mat.table-overrides((
         background-color:#131416,
         row-item-label-text-color:var(--white),
@@ -174,7 +177,7 @@ p,span,button,h1,h2,h3{
 }
 
 tbody > tr{
-  cursor: pointer;
+  cursor: default
 }
 tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
   background-color: var(--hover);

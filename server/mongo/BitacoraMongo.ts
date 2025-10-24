@@ -2,6 +2,7 @@ import type { MongoClient, ObjectId } from "mongodb";
 import { Mongoloid } from "./Mongoloid.js";
 import { Bitacora } from "@shared-types/Bitacora.js";
 import { Mongo } from "../Mongo.js";
+import moment from "moment";
 
 export class BitacoraMongo extends Mongoloid{
     mongo = Mongo.instance
@@ -11,11 +12,12 @@ export class BitacoraMongo extends Mongoloid{
 
     async getBitacora(projectId:string){
         const p = await this.getOne("projectId",projectId) as unknown as Bitacora
-        const users = await this.mongo.user.getUsers()
+        const users = (await this.mongo.user.getUsers()).p
         const proveedores = await this.mongo.provider.getProvedores()
         p.milestones.forEach((m:any)=>{
             const u = users.find((u)=>{return u._id.toString() == m.createdBy}) as any
             const p = proveedores.find((u)=>{return u._id.toString() == m.proveedor}) as any
+            m.createdAt = moment(m.createdAt).locale("es").format("DD MMMM YYYY")
             m.usuario = u.name
             m.proveedor = p? p.name:"-"
         })

@@ -1,0 +1,17 @@
+<div>
+    <mat-form-field [appearance]="appareance() || 'outline'">
+        <mat-label>Buscar</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-icon matSuffix style="cursor: pointer;" (click)="clear($event)">clear</mat-icon>
+        <input [matAutocomplete]="autoGroup" matInput (keyup)="keyup.emit($event)" [placeholder]="placeholder()" #searchInput>
+        <mat-autocomplete #autoGroup="matAutocomplete" >
+            @for (group of filteredFilters() ; track group) {
+            <mat-optgroup [label]="group.filter">
+                @for (name of group.options; track name) {
+                <mat-option [value]="name" (click)="keyup.emit(name)">{{name}}</mat-option>
+                }
+            </mat-optgroup>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</div>

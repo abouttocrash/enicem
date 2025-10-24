@@ -5,8 +5,19 @@
     <div>
         <mat-form-field appearance="outline">
             <mat-label>Nombre del proveedor</mat-label>
-            <input matInput placeholder="Nombre del proveedor" formControlName="proveedor">
+            <input autocomplete="off" matInput placeholder="Nombre del proveedor" formControlName="proveedor">
              @if (!form.get("proveedor")!.valid) {
+                <mat-error>Campo requerido</mat-error>
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline" >
+            <mat-label>Tipo de proveedor</mat-label>
+            <mat-select formControlName="tipo">
+                <mat-option value="Ambos">Ambos</mat-option>
+                <mat-option value="Maquinado">Maquinado</mat-option>
+                <mat-option value="Detalle">Detalle</mat-option>
+            </mat-select>
+            @if (!form.get("tipo")!.valid) {
                 <mat-error>Campo requerido</mat-error>
             }
         </mat-form-field>

@@ -4,6 +4,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs'
 import { ObjectId } from 'mongodb';
+import { Salida } from '@shared-types/Salida.js';
+import moment from 'moment';
 const orderRouter = Router();
 const mongo = Mongo.instance
 const upload = multer({ dest: 'uploads/' });
@@ -28,6 +30,10 @@ orderRouter.get("/folio",async(req,res)=>{
 
 orderRouter.get("/all",async(req,res)=>{
     const p = await mongo.orders.getOrders(req.query.projectId as string)
+    res.status(200).send({data:p})
+})
+orderRouter.get("/ordersview",async(req,res)=>{
+    const p = await mongo.orders.getOrdersView(req.query)
     res.status(200).send({data:p})
 })
 
@@ -83,11 +89,60 @@ orderRouter.post("/images", upload.array('imagenes'), async (req, res) => {
 
 orderRouter.post('/', async (req, res) => {
     try {
-        //let {files,piezas } = setImages(req.files as Express.Multer.File[],req.body.piezas)
         const obj = await mongo.orders.createOrden(req.body)
-        //saveImages(files,req.body.idProject,obj)
         const o = await mongo.orders.getOrders(req.body.idProject!)
         await mongo.projects.updateProject({ordenesCount:o.length},"_id",new ObjectId(req.body.idProject))
+        
+        if(req.body.tipo == "Detalle"){
+            let salidas:{
+                salidas:Array<Salida>,
+                idUsuario:string,
+                usuario:string,
+                fechaSalida:string,
+                projectId:string,
+                catalogId:string,
+                project:string,
+                folio:string,
+                folioOrden:string
+                tipo:string,
+                status:string,
+                actualSalidas:Array<number>
+            } = {
+                salidas:[],
+                usuario:req.body.user.name,
+                catalogId:req.body.catalogId,
+                idUsuario:req.body.user._id,
+                fechaSalida:moment().endOf("D").toISOString(),
+                projectId:req.body.idProject!,
+                project:req.body.project!,
+                folio:"",
+                folioOrden:req.body.folio,
+                tipo:"Detalle",
+                status:"ABIERTA",
+                actualSalidas : []
+            }
+            const folio = await mongo.orders.getFolio()
+            salidas.folio = folio.Almacen
+            for(let i = 0 ;i < req.body.piezas.length;i++){
+                const pieza = req.body.piezas[i]
+                const salida:Salida ={
+                    tipo:"Detalle",
+                    fechaSalida:moment().endOf("D").toISOString(),
+                    pieza:pieza.title,
+                    folio:folio.Almacen,
+                    folioOrden:req.body.folio,
+                    piezas:Number(pieza.piezas),
+                    idUsuario:req.body.user.name,
+                    usuario:req.body.user._id,
+                    projectId:req.body.idProject!
+                }
+                salidas.salidas.push(salida)
+            }
+            await mongo.salida.createSalida(salidas)
+            await mongo.salida.incrementFolio("Almacen")
+            
+            
+        }   
         res.status(200).send({ success: true, insert:obj });
     } catch (err) {
         console.log(err)

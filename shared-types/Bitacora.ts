@@ -2,7 +2,7 @@ import { Usuario } from "./Usuario"
 
 export enum MILESTONE_DESC {
     PROJECT_CREATED = "Proyecto creado",
-    CATALOG_CREATED = "Catálogo creado",
+    CATALOG_CREATED = "Bitácora creada",
     CATALOG_UPDATED = "Catálogo Actualizado",
     ORDER_MAQUI_CREATED = "Orden de Maquinado Creada",
     ORDER_DETAIL_CREATED = "Orden de Detalle Creada",
@@ -22,7 +22,7 @@ export type Milestone = {
     updatedAt?:string
     createdBy?:string
     updatedBy?:string
-    what?:Array<any>
+    what?:Array<What>
     proveedor?:Usuario
 }
 export interface Bitacora{
@@ -43,6 +43,7 @@ export interface What{
 }
 
 export function createMilestone(description:string,generalId:string,createdBy:string,what:Array<What>,p:any,expand = true){
+    console.log(expand)
     const milestone = {
         description:description,
         generalId:generalId,

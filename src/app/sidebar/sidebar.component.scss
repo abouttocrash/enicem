@@ -47,3 +47,9 @@ button{
         text-align: center;
     }
 }
+.line{
+    width: calc(100% - 16px);
+    height:2px;
+    margin:8px;
+    border-bottom:1px solid var(--gray);
+}

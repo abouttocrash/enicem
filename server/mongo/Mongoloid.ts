@@ -30,6 +30,13 @@ export class Mongoloid{
         await this.client.close()
         return r as T[]
     }
+    protected async getManyObj<T>(obj:any){
+        const c = await this.getCollection(this.collection)
+        const cursor = await c.find(obj)
+        const r = await cursor.toArray()
+        await this.client.close()
+        return r as T[]
+    }
     
     protected async getOne(by:string,id:string | ObjectId,collection = this.collection){
         const obj = {[by]:id}

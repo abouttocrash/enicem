@@ -6,7 +6,9 @@ import { MatSelectModule } from '@angular/material/select';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogOrdenComponent } from '../dialog-orden/dialog-orden.component';
 import { Pieza } from '@shared-types/Pieza';
-import { allPiezasAreFilled } from '../../utils/Utils';
+import { allPiezasAreFilled, isArrow, isF } from '../../utils/Utils';
+import { ProyectoService } from '../../proyecto.service';
+import { APIService } from '../../api.service';
 
 @Component({
   selector: 'app-dialog-rechazo',
@@ -19,8 +21,11 @@ export class DialogRechazoComponent {
   razon = ""
   cantidad!:number
   data = inject<Pieza[]>(MAT_DIALOG_DATA);
-  constructor(private dialog:MatDialogRef<DialogOrdenComponent>){
+  constructor(private dialog:MatDialogRef<DialogOrdenComponent>,private p:ProyectoService,public api:APIService){
     this.piezas = JSON.parse(JSON.stringify(this.data))
+    this.piezas.forEach(p=>{
+      p.max = this.max(p)
+    })
   }
 
   actualizar(bool:boolean){
@@ -36,12 +41,31 @@ export class DialogRechazoComponent {
     if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid || value == "0") {
       $event.preventDefault();
     }
-    else
-      plano.cantidadInDialog = Number(value)
+    else{
+          if(
+            $event.key != "Tab" 
+            && $event.key != "Alt" 
+            && $event.key != "CapsLock" 
+            && $event.key != "Enter" 
+            && $event.key != "Meta" 
+            && $event.key != "Shift" 
+            && $event.key != "ContextMenu" 
+            && $event.key != "Insert" 
+            && $event.key != "Home" 
+            && $event.key != "End" 
+            && $event.key != "PageUp" 
+            && $event.key != "PageDown" 
+            && $event.key != "Delete" 
+            && !isF($event.key) 
+            && $event.key != "Escape" 
+            && !isArrow($event.key) 
+            && $event.key != "Control")
+          plano.cantidadInDialog = Number(value)
+        }
   }
 
   private isValid(plano:Pieza,input:number){
-    return input <= this.max(plano)
+    return input <= plano.max!? true:false
   }
 
   max(plano:Pieza){

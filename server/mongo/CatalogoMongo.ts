@@ -9,7 +9,13 @@ export class CatalogoMongo extends Mongoloid{
     }
 
     async getCatalogo(id:string){
-        if(id == undefined || id == "undefined")return [] as Catalogo[]
+        if(id == undefined || id == "undefined"){
+            const empty:Catalogo = {
+                logs:[],
+                createdAt:""
+            }
+            return empty
+        }
         const p = await this.getOne( "_id",new ObjectId(id))
         return p
     }

@@ -1,0 +1,13 @@
+@use '../../styles/views.scss';
+
+.buttons-right {
+  display: flex;
+  align-items: center;   /* centra verticalmente los botones dentro del contenedor */
+  justify-content: flex-end; /* alinea los botones a la derecha */
+  gap: 12px; /* espacio entre botones */
+}
+.filter-holder {
+  display: flex;
+  align-items: center; /* centra verticalmente los hijos */
+  justify-content: space-between; /* separa la zona izquierda y la de botones */
+}

@@ -1,3 +1,5 @@
+import { OrdenTrabajo } from "./OrdenTrabajo"
+
 export interface Pieza{
     material:string
     indices:string[]
@@ -9,7 +11,7 @@ export interface Pieza{
     registrado:number // La cantidad que viene en el PDF
     checked?:boolean
     status?:string
-    fechaRecibida?:string
+    fechaRecibida:{c:number,fecha:string}[]
     razonRechazo?:string
     cantidadManufactura:number[] //La cantidad que se fue a manufactura
     cantidadDetalle:number[] // La cantidad que se fue a detalle
@@ -17,7 +19,10 @@ export interface Pieza{
     cantidadRechazada:number[]
     cantidadRecibida:number[]
     cantidadInDialog?:number | undefined
-    base?:number
+    base?:number//para calcular equipos
+    asociadas?:string[]
+    max?:number
+    stock:Array<{c:number,t:string}>
     
 }
 
