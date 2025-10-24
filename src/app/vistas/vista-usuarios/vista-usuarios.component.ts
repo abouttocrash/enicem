@@ -1,14 +1,14 @@
 import { Component, inject, ViewChild } from '@angular/core';
-import { AutoFilter, AutoIcemComponent } from '../components/auto-icem/auto-icem.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource} from '@angular/material/table';
 import { Usuario } from '@shared-types/Usuario';
-import { UsersDialogComponent } from '../users-module/users-dialog/users-dialog.component';
-import { baseDialog, ViewsImports } from '../utils/Utils';
 import { firstValueFrom } from 'rxjs';
-import { APIService } from '../api.service';
 import { MatSort} from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { APIService } from '../../api.service';
+import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
+import { UsersDialogComponent } from '../../users-module/users-dialog/users-dialog.component';
+import { ViewsImports, baseDialog } from '../../utils/Utils';
 
 
 @Component({

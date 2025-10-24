@@ -1,15 +1,15 @@
 import { Component, inject, signal, ViewChild } from '@angular/core';
-import { _filter, AutoFilter, AutoIcemComponent } from '../components/auto-icem/auto-icem.component';
-import { baseDialog, ViewsImports } from '../utils/Utils';
 import { HttpParams } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { Proveedor } from '@shared-types/Proveedor';
 import { MatSort } from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
-import { ProveedoresComponent } from '../users-module/proveedores/proveedores.component';
 import { firstValueFrom } from 'rxjs';
-import { APIService } from '../api.service';
+import { APIService } from '../../api.service';
+import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
+import { ProveedoresComponent } from '../../users-module/proveedores/proveedores.component';
+import { ViewsImports, baseDialog } from '../../utils/Utils';
 
 @Component({
   selector: 'app-vista-proveedores',

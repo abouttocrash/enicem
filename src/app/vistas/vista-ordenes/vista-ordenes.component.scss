@@ -1,5 +1,4 @@
-@use '../../styles/search.scss';
-// @use '../../styles/dialog.scss';
+@use '../../../styles.scss';
 .ordenes{
     height:calc(100% - 32px);
     display: grid;
@@ -21,7 +20,7 @@
 
 .filter-holder{
     display: grid;
-    grid-template-columns: 1fr 201px 120px;
+    grid-template-columns: 1fr 201px 201px 120px;
     column-gap: 16px;
 }
 
@@ -34,6 +33,6 @@
     top:12px;
     right: -13px;
     width: 1px;
-    height:calc(100% - 12px);
+    height:calc(100% - 30px);
     background-color: var(--gray);
 }

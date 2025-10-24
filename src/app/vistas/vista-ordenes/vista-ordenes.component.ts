@@ -1,5 +1,4 @@
 import { Component, inject, signal, ViewChild } from '@angular/core';
-import { OrdenesService } from '../ordenes/ordenes.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CdkDropList, CdkDrag, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -15,7 +14,8 @@ import { FormsModule } from '@angular/forms';
 import moment from 'moment'
 import { HttpParams } from '@angular/common/http';
 import { ICEMDR } from '@shared-types/ICEMR';
-import { AutoFilter, AutoIcemComponent } from '../components/auto-icem/auto-icem.component';
+import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
+import { OrdenesService } from '../../ordenes/ordenes.service';
 @Component({
   selector: 'app-vista-ordenes',
   providers:[

@@ -4,19 +4,19 @@ import { MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
 import { MatSort } from '@angular/material/sort';
 import {  MatTableDataSource } from '@angular/material/table';
 import moment from 'moment';
-import { SalidaService } from '../salida.service';
 import { Salida } from '@shared-types/Salida';
 import { HttpParams } from '@angular/common/http';
 import { ICEMDR } from '@shared-types/ICEMR';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogSalidaComponent } from '../dialog-salida/dialog-salida.component';
-import { baseDialog, createWhat, longDialog, ViewsImports } from '../utils/Utils';
 import { firstValueFrom } from 'rxjs';
-import { APIService } from '../api.service';
-import { ProyectoService } from '../proyecto.service';
 import { createMilestone } from '@shared-types/Bitacora';
-import { DialogEditarSalidaComponent } from '../dialog-editar-salida/dialog-editar-salida.component';
-import { AutoFilter, AutoIcemComponent } from '../components/auto-icem/auto-icem.component';
+import { APIService } from '../../api.service';
+import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
+import { DialogEditarSalidaComponent } from '../../dialog-editar-salida/dialog-editar-salida.component';
+import { DialogSalidaComponent } from '../../dialog-salida/dialog-salida.component';
+import { ProyectoService } from '../../proyecto.service';
+import { SalidaService } from '../../salida.service';
+import { ViewsImports, longDialog, createWhat, baseDialog } from '../../utils/Utils';
 
 @Component({
   selector: 'app-vista-salidas',
