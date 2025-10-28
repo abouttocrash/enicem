@@ -85,7 +85,7 @@ export class OrdenesService {
   }
 
   async uploadImagenes(formData: FormData) {
-    await firstValueFrom(this.http.post("http://localhost:3000/api/order/images",formData));
+    await firstValueFrom(this.http.post(`${this.api.BASE}/${this.route}/images`,formData));
   }
   async getOrders(){
     const r = await this.api.GET<ICEMDR<OrdenTrabajo>>("order/all",{attr:"projectId",value:this.api.currentProject._id!})
@@ -117,7 +117,7 @@ export class OrdenesService {
       user:this.api.currentUser
     }
     
-    const r = await firstValueFrom(this.http.post("http://localhost:3000/api/order", body));
+    const r = await firstValueFrom(this.http.post(`${this.api.BASE}/${this.route}`, body));
     return r as any
   }
   async verifyOrder(list:Array<Pieza>){

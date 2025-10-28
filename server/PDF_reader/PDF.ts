@@ -4,6 +4,7 @@ import pdfParse from "pdf-parse";
 import path from 'path';
 import { PDFDocument, PDFImage, PageSizes, StandardFonts, rgb } from 'pdf-lib'
 import { Pieza } from '@shared-types/Pieza.js';
+import { ip } from '../App.js';
 export class PDF{
     constructor(){}
     private getUploadsFolder() {
@@ -98,7 +99,7 @@ export class PDF{
         let arr = []
         let l
         for(let i =0;i<imagenes.length;i++){
-            let realPath = imagenes[i].split("http://localhost:3000/static/") as string
+            let realPath = imagenes[i].split(`${ip}/static/`) as string
             //TODO solo jpg o png o buscar otro formato
             //SOI not found in JPEG
             const format = realPath.includes("png") ? "png" : "jpg"

@@ -49,7 +49,7 @@ export class APIService {
       projectId:this.currentProject._id!,
       catalogId:this.currentProject.catalogId!
     }
-    const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/api/projectData",{params:body}))
+    const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>(`${this.BASE}/projectData`,{params:body}))
     this.projects = r.data.proyectos
     this.users = []
     this.filteredUsuarios = []
@@ -64,7 +64,7 @@ export class APIService {
   }
 
   async getFolio(){
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/api/order/folio"))
+    const r = await firstValueFrom<any>(this.http.get(`${this.BASE}/order/folio`))
     return r
   }
 
@@ -80,7 +80,7 @@ export class APIService {
   
 
   async updateStock(body:any){
-     const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/catalog/stock",body))
+     const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/catalog/stock`,body))
   }
   
   async updateLog(milestone:Milestone){
@@ -88,7 +88,7 @@ export class APIService {
       milestone:milestone,
       projectId:this.currentProject._id
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/logs",body))
+    const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/logs`,body))
   }
   //TODO mover al back
   async updateCatalogo(attr:string, piezas:Pieza[],catalogId:string){
@@ -97,7 +97,7 @@ export class APIService {
       attr:attr,
       catalogId:catalogId
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/catalog",body))
+    const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/catalog`,body))
     return r
   }
 
@@ -111,7 +111,7 @@ export class APIService {
       projectId:this.currentProject._id!,
       count:count
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/projects",ids,{headers:this.headers}))
+    const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/projects`,ids,{headers:this.headers}))
     return r
   }
 
@@ -120,7 +120,7 @@ export class APIService {
       proyecto:project,
       creador:this.currentUser
     }
-    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/api/projects",body,{headers:this.headers}))
+    const r = await firstValueFrom<any>(this.http.post(`${this.BASE}/projects`,body,{headers:this.headers}))
     return project
   }
   
@@ -129,13 +129,13 @@ export class APIService {
       name:form.get("name")?.value,
       active:form.get('active')?.value,
     } 
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/api/rechazo",body))
+    await firstValueFrom<any>(this.http.post(`${this.BASE}/rechazo`,body))
   }
   async editUser(usuario:Usuario){
-    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/user",usuario))
+    await firstValueFrom<any>(this.http.put(`${this.BASE}/user`,usuario))
   }
   async editRechazo(rechazo:Rechazo){
-    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/rechazo",rechazo))
+    await firstValueFrom<any>(this.http.put(`${this.BASE}/rechazo`,rechazo))
   }
   
   async createProveedor(form:FormGroup){
@@ -144,7 +144,7 @@ export class APIService {
       tipo:form.get("tipo")?.value,
       createdBy:this.currentUser._id
     }
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/api/proveedor",body,{headers:this.headers}))
+    await firstValueFrom<any>(this.http.post(`${this.BASE}/proveedor`,body,{headers:this.headers}))
   }
   async editProveedor(form:FormGroup,id:string){
     const body = {
@@ -153,7 +153,7 @@ export class APIService {
       tipo:form.get("tipo")?.value,
       active:form.get("active")?.value
     }
-    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/proveedor",body,{headers:this.headers}))
+    await firstValueFrom<any>(this.http.put(`${this.BASE}/proveedor`,body,{headers:this.headers}))
   }
 
   async getUsers(returnAdmin = true){

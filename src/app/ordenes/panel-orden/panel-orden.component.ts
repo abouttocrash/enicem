@@ -115,7 +115,7 @@ export class PanelOrdenComponent {
   toggle(row:Pieza){
     const idProyecto = this.p.api.currentProject._id!
     const actualTitle = row.title.replace("(ESPEJO)","").trim()
-    const url = `http://localhost:3000/static/${idProyecto}/${actualTitle}.pdf`;
+    const url = `${this.api.BASE}/static/${idProyecto}/${actualTitle}.pdf`;
     window.open(url, '_blank');
   }
 

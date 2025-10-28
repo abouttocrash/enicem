@@ -16,6 +16,7 @@ app.use('/static',express.static(path.join(process.cwd(), 'data')));
 app.use('/static',express.static(path.join(process.cwd(), 'excel')));
 app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
+export const ip = "http://localhost:3000"
 app.use(express.static(browserDist));
 
 // tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)
@@ -88,7 +89,7 @@ app.get("/api/report",async(req,res)=>{
     fs.writeFileSync(`${excelPath}${filename}.xlsx`,buffer)
     res.status(200).send({
         data:{
-            path:`http://localhost:3000/static/${filename}.xlsx`
+            path:`${ip}/static/${filename}.xlsx`
         }
     })
 })
@@ -111,10 +112,10 @@ app.get("/api/report/proveedor",async(req,res)=>{
     ) as any
     const excelPath  = path.join(process.cwd(), 'excel\\');
     fs.writeFileSync(`${excelPath}proveedor_${id}.xlsx`,buffer)
-    console.log('http://localhost:3000/static/proveedor_${id}.xlsx')
+    console.log(`${ip}/static/proveedor_${id}.xlsx`)
     res.status(200).send({
         data:{
-            path:`http://localhost:3000/static/proveedor_${id}.xlsx`
+            path:`${ip}/static/proveedor_${id}.xlsx`
         }
     })
 })
@@ -124,7 +125,7 @@ app.post("/api/pdf/orden",async(req,res)=>{
     const r = writePDF(req.body.orden)
     res.status(200).send({
         data:{
-            path:`http://localhost:3000/static/${r}`
+            path:`${ip}/static/${r}`
         }
     })
 })
@@ -160,7 +161,7 @@ app.post("/api/pdf/salida",async(req,res)=>{
      const r = writePDF(orden!)
         res.status(200).send({
             data:{
-                path:`http://localhost:3000/static/${r}`
+                path:`${ip}/static/${r}`
             }
         })
     

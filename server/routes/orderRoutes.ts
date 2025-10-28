@@ -7,6 +7,7 @@ import { ObjectId } from 'mongodb';
 import { Salida } from '@shared-types/Salida.js';
 import moment from 'moment';
 import { Pieza } from '@shared-types/Pieza.js';
+import { ip } from '../App.js';
 const orderRouter = Router();
 const mongo = Mongo.instance
 const upload = multer({ dest: 'uploads/' });
@@ -75,7 +76,7 @@ orderRouter.get("/images",async(req,res)=>{
     const projectDir = path.join(process.cwd(), 'imagenes', `${projectId}/${ordenId}`);
     if(fs.existsSync(projectDir))
         fs.readdirSync(projectDir).forEach(f=>{
-            images.push(`http://localhost:3000/static/${projectId}/${ordenId}/${f}`)
+            images.push(`${ip}/static/${projectId}/${ordenId}/${f}`)
         })
     res.status(200).send({data:images})
 })

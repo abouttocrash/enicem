@@ -8,6 +8,7 @@ import { Salida } from '@shared-types/Salida.js';
 import moment from 'moment';
 import { Reporter } from '../Reporter.js';
 import { Catalogo } from '@shared-types/Pieza.js';
+import { ip } from '../App.js';
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(process.cwd(), 'uploads'));
@@ -137,7 +138,7 @@ catalogRouter.get("/reporte",async(req,res)=>{
     
     res.status(200).send({
         data:{
-            path:`http://localhost:3000/static/bitacora_${req.query.project}_${req.query.clave}.xlsx`
+            path:`${ip}/static/bitacora_${req.query.project}_${req.query.clave}.xlsx`
         }
     })
 })
