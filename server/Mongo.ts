@@ -190,7 +190,6 @@ export class Mongo{
             }
             catch(e){
                 errored = true
-                console.log(p.title)
             }
             
         })
@@ -214,7 +213,7 @@ export class Mongo{
         return 0
     }
     async createProveedor(proveedor:Proveedor){
-       
+        proveedor.active = true
         const c = await this.getCollection("provider")
         const insertResult = await c.insertOne(proveedor as any);
         await this.client.close()

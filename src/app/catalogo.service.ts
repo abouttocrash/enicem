@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { APIService } from './api.service';
-import {  ICEMR } from '@shared-types/ICEMR';
+import {  ICEMDR, ICEMR } from '@shared-types/ICEMR';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
 import { HttpParams } from '@angular/common/http';
-import { What } from '@shared-types/Bitacora';
 import { createWhat, sum } from './utils/Utils';
 
 @Injectable({
@@ -15,11 +14,16 @@ export class CatalogoService {
   private route = "catalog"
   private sort!:MatSort
   
-  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stock', 'expand'];
   dataSource!: MatTableDataSource<Pieza>;
   constructor(private api:APIService) { }
 
   init(data:Catalogo,sort?:MatSort){
+    data.logs.forEach(item=>{
+      item.stockNumber = 0
+      item.stock.forEach(s=>{
+       item.stockNumber! += s.c
+      })
+    })
     this.dataSource = new MatTableDataSource(data.logs);
     if(sort)
       this.sort = sort;
@@ -27,10 +31,29 @@ export class CatalogoService {
     
   }
 
+  async createCatalog(form:FormData){
+    try{
+      form.append("projectId",this.api.currentProject._id!)
+      const r = await this.api.POST<ICEMR<any>>("catalog",form)
+      this.api.currentProject.catalogId = r.data.insertedId
+      return {response:r.data}
+    }catch(e){
+      return {e,response:undefined}
+    }
+  }
+
+  async addPieza(form:FormData){
+      form.append("catalogId",this.api.currentProject.catalogId!)
+      form.append("projectId",this.api.currentProject._id!)
+      const r =  await this.api.POST<ICEMDR<Pieza>>("catalog/plano",form)
+      return r
+    }
+
   async createScrap(piezas:Pieza[]){
       const body = {
         piezas:piezas,
         tipo:"Scrap",
+        project:this.api.currentProject.name,
         idProject:this.api.currentProject._id!,
         user:this.api.currentUser,
         catalogId:this.api.currentProject.catalogId
@@ -65,13 +88,6 @@ export class CatalogoService {
     what.forEach(w=>{
       total += w.cantidad
     })
-    const bodyStock = {
-        piezas:what,
-        catalogId:this.api.currentProject.catalogId!,
-        razon:"SALIDA Integración"
-      }
-     
-    //await this.api.updateStock(bodyStock)
     const r = await this.api.POST<ICEMR<any>>(this.route+"/almacen",body) as any
     const desc = `(${total}) Piezas solicitadas a almacen #${r.inserted.prevFolio}`
     await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what})

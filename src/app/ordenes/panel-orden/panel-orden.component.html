@@ -97,7 +97,7 @@
                 <div class="panel-top piezas">
                     <h3 >Imágenes</h3>
                     <div class="icon-holder">
-                        <button class="update"[disabled]="projectDisabled()"  (click)="openNativeImageDialog()" style="margin-right: 16px;">Seleccionar</button>
+                        <button class="update"[disabled]="projectDisabled() || o.currentOrden.status != 'ABIERTA'"  (click)="openNativeImageDialog()" style="margin-right: 16px;">Seleccionar</button>
                         <button class="update" [disabled]="selectedImages.length == 0" (click)="guardarImagenes()">Guardar</button>
                     </div>
                 </div>

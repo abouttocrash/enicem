@@ -14,4 +14,10 @@ providerRouter.get("/",async(req,res)=>{
     res.status(200).send({data:p})
 })
 
+providerRouter.put("/",async(req,res)=>{
+   
+    const p = await mongo.provider.editProveedor(req.body)
+    res.status(200).send({data:p})
+})
+
 export default providerRouter;

@@ -12,7 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class MultiDialogComponent {
 data = inject<any[]>(MAT_DIALOG_DATA);
   constructor(private dialog:MatDialogRef<MultiDialogComponent>){
-    console.log(this.data)
 
   }
   remove(index:number){

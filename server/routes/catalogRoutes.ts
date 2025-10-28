@@ -10,11 +10,9 @@ import { Reporter } from '../Reporter.js';
 import { Catalogo } from '@shared-types/Pieza.js';
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Puedes personalizar la carpeta destino aquí
         cb(null, path.join(process.cwd(), 'uploads'));
     },
     filename: function (req, file, cb) {
-        // Usa el nombre original del archivo
         cb(null, file.originalname);
     }
 });
@@ -37,7 +35,7 @@ catalogRouter.post('/', upload.array('files'), async(req, res) => {
             return res.status(400).send({error:"Error al obtener info de un PDF"})
         }
         pdf.emptyUploads(req.body.projectId)
-        res.status(200).send({data:true,log:p})
+        res.status(200).send({data:p})
     }catch(e){
         console.log(e)
         res.status(400).send({error:e})
@@ -48,7 +46,7 @@ catalogRouter.post('/plano', upload.array('files'), async(req, res) => {
         const pdfs = await pdf.readFolder()
         pdf.emptyUploads(req.body.projectId)
         const p = await mongo.createPieza(pdfs[0]!,req.body.catalogId)
-        res.status(200).send({data:true,p:p})
+        res.status(200).send({data:p.piezas})
     }catch(e){
         console.log(e)
         res.status(400).send({error:e})

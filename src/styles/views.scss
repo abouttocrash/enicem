@@ -3,12 +3,24 @@
     height:calc(100% - 32px);
     display: grid;
     padding:16px 32px 16px 32px;
-    grid-template-rows: 160px 1fr;
+    grid-template-rows: 180px 1fr;
     overflow-y: auto;
 }
+.long-auto{
+    & auto-icem{
+        width: 400px;
+    }
+}
+.title-holder{
+    display: grid;
+    justify-content: start!important;
+    padding-top: 8px;
+}
+
+
 .header{
     display: grid;
-    grid-template-rows: 44px 1fr;
+    grid-template-rows: 72px 1fr;
     row-gap: 12px;
 }
 .sub-header{
@@ -26,8 +38,6 @@
 .search-view{
     width: 80px;
 }
-
-
 .bar{
     background-color: var(--main);
     height:78px;
@@ -41,7 +51,8 @@
 
 .filter-holder{
     display: grid;
-    grid-template-columns: 1fr 201px 201px 120px;
+    justify-content: end;
+    grid-template-columns: 300px 250px 250px 120px;
     column-gap: 16px;
 }
 

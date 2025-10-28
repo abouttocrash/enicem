@@ -40,11 +40,17 @@
           <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
           <td mat-cell *matCellDef="let row"> {{row.tipo}} </td>
         </ng-container>
+        <ng-container matColumnDef="isActive">
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Activo </th>
+          <td mat-cell *matCellDef="let row"> {{row.isActive}} </td>
+        </ng-container>
 
         <ng-container matColumnDef="editar">
         <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Editar</th>
         <td mat-cell *matCellDef="let row"> 
-            <mat-icon style="color:var(--blue);cursor:pointer">edit</mat-icon>
+          @if(isAdmin()){
+            <mat-icon (click)="editarProveedor(row)" style="color:var(--blue);cursor:pointer">edit</mat-icon>
+          }
           
         </td>
       </ng-container>

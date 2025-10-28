@@ -10,7 +10,7 @@
             <mat-form-field>
                 <mat-icon matPrefix>search</mat-icon>
                 <mat-label>Filter</mat-label>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Buscar rechazo" #input>
+                <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Buscar rechazo" #input>
             </mat-form-field>
             <div class="filter-holder center-ver">
                 <div >

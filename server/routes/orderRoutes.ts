@@ -6,6 +6,7 @@ import fs from 'fs'
 import { ObjectId } from 'mongodb';
 import { Salida } from '@shared-types/Salida.js';
 import moment from 'moment';
+import { Pieza } from '@shared-types/Pieza.js';
 const orderRouter = Router();
 const mongo = Mongo.instance
 const upload = multer({ dest: 'uploads/' });
@@ -15,8 +16,8 @@ orderRouter.get("/",async(req,res)=>{
     res.status(200).send({data:p})
 })
 orderRouter.put("/",async(req,res)=>{
-    await mongo.orders.updateOrden(req.body.orden,req.body.status)
-    res.status(200).send({data:{}})
+    const r = await mongo.orders.updateOrden(req.body.orden,req.body.status)
+    res.status(200).send({data:r})
 })
 orderRouter.put("/status",async(req,res)=>{
     await mongo.orders.updateStatus(req.body)
@@ -24,8 +25,39 @@ orderRouter.put("/status",async(req,res)=>{
 })
 orderRouter.get("/folio",async(req,res)=>{
     const p = await mongo.orders.getFolio()
-    console.log(p)
     res.status(200).send({data:p})
+})
+orderRouter.post("/verify",async(req,res)=>{
+    const p = await mongo.catalog.getCatalogo(req.body.id)
+    const inCatalog:Pieza[] = []
+    req.body.list.forEach((pi:Pieza)=>{
+        inCatalog.push(p!.logs.find((db:Pieza)=>{return db.title == pi.title}))
+    })
+    const body = req.body.list as Pieza[]
+    let todoBien = true;
+    inCatalog.forEach((pieza:Pieza)=>{
+        const sentPieza = body.find(p=>{return p.title == pieza.title })!
+        console.log(
+    //     JSON.stringify(sentPieza.cantidadManufactura) , JSON.stringify(pieza.cantidadManufactura),"&&",
+            //  JSON.stringify(sentPieza.cantidadDetalle) , JSON.stringify(pieza.cantidadDetalle),"&&",
+            //  JSON.stringify(sentPieza.cantidadRecibida) ,JSON.stringify(pieza.cantidadRecibida) ,"&&",
+            //  JSON.stringify(sentPieza.cantidadAlmacen) , JSON.stringify(pieza.cantidadAlmacen) ,"&&",
+            // JSON.stringify(sentPieza.stock) ,"==", JSON.stringify(pieza.stock) 
+        )
+        if( JSON.stringify(sentPieza.cantidadManufactura) == JSON.stringify(pieza.cantidadManufactura)&&
+             JSON.stringify(sentPieza.cantidadDetalle) == JSON.stringify(pieza.cantidadDetalle) &&
+             JSON.stringify(sentPieza.cantidadRecibida) == JSON.stringify(pieza.cantidadRecibida) &&
+             JSON.stringify(sentPieza.cantidadAlmacen) == JSON.stringify(pieza.cantidadAlmacen) &&
+            JSON.stringify(sentPieza.stock) == JSON.stringify(pieza.stock)
+        )
+            todoBien = true
+        else{
+            todoBien = false
+            return
+        }
+    })
+    
+    res.status(200).send({data:{db:inCatalog,sent:req.body.list,todoBien:todoBien}})
 })
 
 orderRouter.get("/all",async(req,res)=>{
@@ -129,6 +161,8 @@ orderRouter.post('/', async (req, res) => {
                     tipo:"Detalle",
                     fechaSalida:moment().endOf("D").toISOString(),
                     pieza:pieza.title,
+                    material:pieza.material,
+                    acabado:pieza.acabado,
                     folio:folio.Almacen,
                     folioOrden:req.body.folio,
                     piezas:Number(pieza.piezas),
@@ -150,27 +184,9 @@ orderRouter.post('/', async (req, res) => {
     }
 });
 
-function setImages(files:Express.Multer.File[],p:any[]){
-    let piezas:any[] = []
-    p.forEach((pieza:any)=>{
-        const ob = JSON.parse(pieza)
-        const filenames = files.map(f=>{return f.originalname}).filter(f=>{
-            return f.includes(ob.title)})!
-        piezas.push({piezas:ob.piezas,title:ob.title,imgs:filenames})
-    })
-    return {files,piezas}
-}
 
 
-// app.get("/order",async(req,res)=>{
-//     const p = await mongo.getOrder(req.query.orderId as string)
-//     p!.img = []
-//     const projectDir = path.join(process.cwd(), 'imagenes', `${p!.projectId}/${p!.id}`);
-//     fs.readdirSync(projectDir).forEach(f=>{
-//         p!.img.push(`http://localhost:3000/static/${p!.projectId}/${p!.id}/${f}`)
-//     })
-//     res.status(200).send({data:p})
-// })
+
 
 
 export default orderRouter;

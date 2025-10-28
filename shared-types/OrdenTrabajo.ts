@@ -14,6 +14,7 @@ export interface OrdenTrabajo {
     status:StatusOrden
     totalPiezas?:number
     cantidadRecibida:number
+    cantidadRechazada:number
     dateReal?:string
     missed?:number,
     notMissed?:number

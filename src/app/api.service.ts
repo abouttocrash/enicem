@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { User } from './users-module/User';
 import { ICEMDR, ICEMR } from '@shared-types/ICEMR';
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo';
 import { Bitacora, Milestone } from '@shared-types/Bitacora';
@@ -31,7 +30,7 @@ export type AllR ={
 })
 export class APIService {
   
-  BASE = "http://localhost:3000"
+  BASE = "http://localhost:3000/api"
   
   currentProject!:Proyecto
   currentUser!:Usuario
@@ -50,7 +49,7 @@ export class APIService {
       projectId:this.currentProject._id!,
       catalogId:this.currentProject.catalogId!
     }
-    const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/projectData",{params:body}))
+    const r = await firstValueFrom<ICEMR<AllR>>(this.http.get<ICEMR<AllR>>("http://localhost:3000/api/projectData",{params:body}))
     this.projects = r.data.proyectos
     this.users = []
     this.filteredUsuarios = []
@@ -59,34 +58,13 @@ export class APIService {
     this.rechazos = r.data.rechazos
     this.proveedores = r.data.proveedores
     
-    r.data.userData.p.forEach((u:User)=>{this.users.push({name:u.name,rol:u.rol!,color:u.color!,_id:u._id,short:u.short!,actions:this.roles.find(r=>{return r.rol == u.rol}).permisos})})
+    r.data.userData.p.forEach((u:Usuario)=>{this.users.push({name:u.name,rol:u.rol!,color:u.color!,_id:u._id,short:u.short!,actions:this.roles.find(r=>{return r.rol == u.rol}).permisos})})
     this.filteredUsuarios = structuredClone(this.users.filter(u=>{return u.active!}))
     return r;
   }
 
-  async readProject(dir:string){
-    const params = new HttpParams().append('dir', dir);
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/pdf",{params:params}))
-    return r
-  }
-  async downloadPDF(order:any){
-    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/pdf",order))
-    return r
-  }
-  async getCatalog(catalogId:string){
-    const params = new HttpParams().append('catalogId', catalogId);
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/catalog",{params:params}))
-    return r
-  }
-
-  async uploadImagenes(formData: FormData) {
-    await firstValueFrom(this.http.post("http://localhost:3000/order/images",formData));
-  }
-
-  
-
   async getFolio(){
-    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/order/folio"))
+    const r = await firstValueFrom<any>(this.http.get("http://localhost:3000/api/order/folio"))
     return r
   }
 
@@ -97,41 +75,12 @@ export class APIService {
     })
     return r
   }
-  async getOrder(orderId:string){
-    const params = new HttpParams().append('orderId', orderId);
-    const r = await this.GET<ICEMR<OrdenTrabajo>>("order",{attr:"orderId",value:orderId})
-    r.data.proveedor = this.proveedores.find(p=>{return p._id == r.data.idProveedor})!.name
-    return r
-  }
+ 
 
-  async addPieza(form:FormData,catalogId:string){
-    form.append("catalogId",catalogId)
-    form.append("projectId",this.currentProject._id!)
-    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/catalog/plano",form))
-    return r
-  }
+  
 
   async updateStock(body:any){
-     const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/catalog/stock",body))
-  }
-
-  async createCatalog(form:FormData,projectId:string){
-    form.append("projectId",projectId)
-    try{
-      const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/catalog",form))
-      this.currentProject.catalogId = r.log.insertedId
-      return {response:r}
-    }catch(e){
-      return {e,response:undefined}
-    }
-  }
-
-  async updateOrder(orden:OrdenTrabajo,action:"RECIBIDA"|"RECHAZADA"){
-    const body = {
-      status:action,
-      orden:orden
-    }
-    await this.PUT<ICEMR<OrdenTrabajo>>("order",body)
+     const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/catalog/stock",body))
   }
   
   async updateLog(milestone:Milestone){
@@ -139,16 +88,16 @@ export class APIService {
       milestone:milestone,
       projectId:this.currentProject._id
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/logs",body))
+    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/logs",body))
   }
-
+  //TODO mover al back
   async updateCatalogo(attr:string, piezas:Pieza[],catalogId:string){
     const body = {
       piezas:piezas,
       attr:attr,
       catalogId:catalogId
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/catalog",body))
+    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/catalog",body))
     return r
   }
 
@@ -162,7 +111,7 @@ export class APIService {
       projectId:this.currentProject._id!,
       count:count
     }
-    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/projects",ids,{headers:this.headers}))
+    const r = await firstValueFrom<any>(this.http.put("http://localhost:3000/api/projects",ids,{headers:this.headers}))
     return r
   }
 
@@ -171,31 +120,22 @@ export class APIService {
       proyecto:project,
       creador:this.currentUser
     }
-    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/projects",body,{headers:this.headers}))
+    const r = await firstValueFrom<any>(this.http.post("http://localhost:3000/api/projects",body,{headers:this.headers}))
     return project
   }
-  async createUser(form:FormGroup){
-    let body = {
-      name:form.get("username")?.value,
-      code:form.get("code")?.value,
-      rol:form.get("rol")?.value,
-      active:form.get('active')?.value,
-      
-    } 
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/user",body))
-  }
+  
   async createRechazo(form:FormGroup){
     let body = {
       name:form.get("name")?.value,
       active:form.get('active')?.value,
     } 
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/rechazo",body))
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/api/rechazo",body))
   }
   async editUser(usuario:Usuario){
-    await firstValueFrom<any>(this.http.put("http://localhost:3000/user",usuario))
+    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/user",usuario))
   }
   async editRechazo(rechazo:Rechazo){
-    await firstValueFrom<any>(this.http.put("http://localhost:3000/rechazo",rechazo))
+    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/rechazo",rechazo))
   }
   
   async createProveedor(form:FormGroup){
@@ -204,7 +144,16 @@ export class APIService {
       tipo:form.get("tipo")?.value,
       createdBy:this.currentUser._id
     }
-    await firstValueFrom<any>(this.http.post("http://localhost:3000/proveedor",body,{headers:this.headers}))
+    await firstValueFrom<any>(this.http.post("http://localhost:3000/api/proveedor",body,{headers:this.headers}))
+  }
+  async editProveedor(form:FormGroup,id:string){
+    const body = {
+      _id:id,
+      name:form.get("proveedor")?.value,
+      tipo:form.get("tipo")?.value,
+      active:form.get("active")?.value
+    }
+    await firstValueFrom<any>(this.http.put("http://localhost:3000/api/proveedor",body,{headers:this.headers}))
   }
 
   async getUsers(returnAdmin = true){
@@ -239,6 +188,9 @@ export class APIService {
     this.proveedores = []
     const r = await this.GET<ICEMDR<Proveedor>>("proveedor")
     this.proveedores = r.data
+    this.proveedores.forEach(p=>{
+      p.isActive = p.active? "Activo":"No Activo"
+    })
     return this.proveedores
   }
 
@@ -254,37 +206,7 @@ export class APIService {
     return this.projects
   }
 
-  async uploadPiezasConImagenes(piezas: any[],date:Date,p:string,tipo:string,folio:string) {
-    const body = {
-      idProject:this.currentProject._id!,
-      project:this.currentProject.name,
-      catalogId:this.currentProject.catalogId,
-      idProveedor:p,
-      dateEntrega:date.toISOString(),
-      tipo:tipo,
-      folio:folio,
-      piezas:piezas,
-      user:this.currentUser
-    }
-    // const formData = new FormData();
-    // formData.append("idProject",this.currentProject._id!)
-    // formData.append("idProveedor",p)
-    // formData.append("dateEntrega",date.toISOString())
-    // formData.append("tipo",tipo)
-    // formData.append("folio",folio)
-    // formData.append("piezas",piezas)
-    // piezas.forEach((pieza, i) => {
-      
-    //   formData.append(`piezas[${i}]`, JSON.stringify({ ...pieza, imagenes: undefined }));
-    //   if (pieza.imagenes) {
-    //     pieza.imagenes.forEach((img: File, j: number) => {
-    //       formData.append(`imagenes[${i}][]`, img, pieza.title+"_"+j);
-    //     });
-    //   }
-    // });
-    const r = await firstValueFrom(this.http.post("http://localhost:3000/order", body));
-    return r as any
-  }
+  
 
   private findUserbyId(id:string){
     return this.users.find(u=>{return u._id = id})!

@@ -29,7 +29,6 @@ export class DialogRecibirComponent {
     let value = ""
     if($event.key.length === 1)
       value = input.value + $event.key;
-    console.log(value)
     const isValid = this.isValid(plano,Number(value))
     if (!/^\d*$/.test(value) && $event.key.length === 1 || !isValid) {
       $event.preventDefault();

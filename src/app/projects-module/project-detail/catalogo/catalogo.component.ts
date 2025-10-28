@@ -41,23 +41,21 @@ export class CatalogoComponent {
   currentPieza = {} as any
   drawer!:MatDrawer
   textoPlanos = "Crear Bitácora"
+  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stockNumber', 'expand'];
+  
   constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){
     
   }
-   onDragStart(event: CdkDragStart) {
-    console.log('Drag started:', event);
-    // Perform any necessary actions when dragging begins
-  }
+  
   drop(event: CdkDragDrop<string[]>) {
-    console.log(event.currentIndex,event.previousIndex)
     if(
       event.currentIndex == 0 ||
       event.previousIndex == 0 ||
-      event.currentIndex == this.p.c.displayedColumns.length -1 ||
-      event.previousIndex == this.p.c.displayedColumns.length -1
+      event.currentIndex == this.displayedColumns.length -1 ||
+      event.previousIndex == this.displayedColumns.length -1
     )return
     
-    moveItemInArray(this.p.c.displayedColumns, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
   }
   init(data:Catalogo,drawer:MatDrawer){
     if(data.logs.length > 0)
@@ -81,13 +79,13 @@ async onPDFSelected(event: Event) {
       this._snackBar.open("❌ Este plano ya existe en el catálogo","OK")
     else{
       let what:Array<What> = []
-      const res = await this.api.addPieza(formData,this.api.currentProject.catalogId!)
+      const res = await this.p.c.addPieza(formData)
       let piezasToWhat:Pieza[] = []
-      piezasToWhat.push(...res.p.piezas)
+      piezasToWhat.push(...res.data)
       what = createWhat(piezasToWhat,"piezas")
-    const desc = res.p.piezas == 1? "Plano agregado al catálogo":"Planos agregados al catálogo"
-    await this.api.updateLog(createMilestone(desc,this.api.currentProject.catalogId!,this.api.currentUser._id!,what,""))
-      this._snackBar.open("Plano agregado al catálogo","OK")
+      const desc = res.data.length == 1? "Plano agregado al catálogo":"Planos agregados al catálogo"
+      await this.api.updateLog(createMilestone(desc,this.api.currentProject.catalogId!,this.api.currentUser._id!,what,""))
+      this._snackBar.open("Plano agregado al catálogo","OK",{duration:2000})
       await this.p.getAll()
     }
 
@@ -111,11 +109,11 @@ async onPDFSelected(event: Event) {
     if(r.bool){
       const ref = this._snackBar.open("Creando bitácora")
       r.data.forEach(file => formData.append('files', file, file.name));
-      const res = await this.api.createCatalog(formData,this.api.currentProject._id!)
+      const res = await this.p.c.createCatalog(formData)
     if(res.response){
       this.api.currentProject.piezasCount = files.length
       const r = await this.api.updateProject(files.length)
-      const milestone = createMilestone(MILESTONE_DESC.CATALOG_CREATED,res.response.log.insertedId,this.api.currentUser._id,[],"-",false)
+      const milestone = createMilestone(MILESTONE_DESC.CATALOG_CREATED,res.response.insertedId,this.api.currentUser._id,[],"-",false)
       milestone.expand =  false
       await this.api.updateLog(milestone)
       this.storage.setProject(this.api.currentProject)
@@ -179,10 +177,17 @@ async onPDFSelected(event: Event) {
         project:this.api.currentProject
       },
     });
-    dialog.afterClosed().subscribe(async(r:boolean)=>{
-      if(r){
-        this._snackBar.open("Orden creada con éxito","OK",{duration:1000})
-        await this.p.getAll()
+    dialog.afterClosed().subscribe(async(r:{close:boolean,todoBien:boolean})=>{
+      if(r.close){
+        if(r.todoBien){
+          this._snackBar.open("Orden creada con éxito","OK",{duration:1000})
+          await this.p.getAll()
+          this.tableChecked = false
+        }
+        else{
+          this._snackBar.open("Información de bitacora desactualizada, actualiza la información","OK",{duration:1000})
+        }
+        
       }
     })
   }
@@ -231,12 +236,12 @@ async onPDFSelected(event: Event) {
         case x.description.includes("Piezas recibidas para orden de Maquinado"):
         x.description = `Recibida en Maquinado #${x.description.split("#")[1]}`
         break;
-        case x.description.includes("solicitadas a almacen"):
+       
         case x.description.includes("Piezas recibidas para orden de Detalle"):
         x.description = `Recibida en Detallado #${x.description.split("#")[1]}`
         break;
         case x.description.includes("solicitadas a almacen"):
-        x.description = `Solicitada en almacen #${x.description.split("#")[1]}`
+        x.description = `Solicitada a almacen #${x.description.split("#")[1]}`
         break;
         case x.description.includes("rechazadas para orden de Detalle "):
         x.description = `Rechazada en Detallado #${x.description.split("#")[1].replace("Razón: ","➡️")}`
@@ -246,11 +251,11 @@ async onPDFSelected(event: Event) {
       return x
     })
     this.p.b.bitacoraPieza = bitacoraPieza
-    console.log(bitacoraPieza)
     this.drawer.open()
   }
 
-  toggle(row:Pieza){
+  toggle(row:Pieza,$event:Event){
+    $event.stopPropagation()
     this.currentPieza = row
     const idProyecto = this.api.currentProject._id!
     const actualTitle = row.title.replace("(ESPEJO)","").trim()

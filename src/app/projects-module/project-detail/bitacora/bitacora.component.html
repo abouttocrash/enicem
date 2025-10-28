@@ -1,20 +1,11 @@
  <div class="tab">
     <div class="bar">
       <mat-form-field>
-        <mat-label>Buscar</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <mat-icon matSuffix style="cursor: pointer;" (click)="clear($event)">clear</mat-icon>
-        <input #searchInput [matAutocomplete]="autoGroup" matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
-        <mat-autocomplete #autoGroup="matAutocomplete" >
-        @for (group of p.b.filteredFilters ; track group) {
-          <mat-optgroup [label]="group.filter">
-            @for (name of group.options; track name) {
-              <mat-option [value]="name" (click)="applyFilter(name)">{{name}}</mat-option>
-            }
-          </mat-optgroup>
-        }
-    </mat-autocomplete>
-      </mat-form-field>
+          <mat-icon matPrefix>search</mat-icon>
+          <mat-label>Buscar Plano</mat-label>
+          <input autocomplete="off" matInput (keyup)="applyFilter($event)" 
+          placeholder="Buscar en el historial" #input>
+        </mat-form-field>
     </div>
       <div style="height: 100%;overflow-y: scroll;">
         <table mat-table [dataSource]="p.b.dataSource" matSort multiTemplateDataRows>

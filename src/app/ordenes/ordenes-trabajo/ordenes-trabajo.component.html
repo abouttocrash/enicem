@@ -50,7 +50,7 @@
         </ng-container>
         <ng-container matColumnDef="cantidadRechazada">
           <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Rechazadas </th>
-          <td mat-cell style="color:var(--red)" *matCellDef="let row"> {{suma(row,"cantidadRechazada")}} </td>
+          <td mat-cell style="color:var(--red)" *matCellDef="let row"> {{row.cantidadRechazada}}</td>
         </ng-container>
         <ng-container matColumnDef="cantidadPendiente">
           <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Pendientes </th>

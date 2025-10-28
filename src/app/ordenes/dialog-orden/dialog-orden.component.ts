@@ -9,7 +9,6 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { APIService } from '../../api.service';
-import { User } from '../../users-module/User';
 import { Pieza } from '@shared-types/Pieza';
 import { ProyectoService } from '../../proyecto.service';
 import moment from 'moment';
@@ -32,8 +31,8 @@ export class DialogOrdenComponent {
   @ViewChildren('photoInput') photoInputs!: QueryList<ElementRef<HTMLInputElement>>;
   data = inject(MAT_DIALOG_DATA) as {list:Array<Pieza>};
   folio = "-"
-  proveedor!:User
-  proveedorObj!:User
+  proveedor!:Proveedor
+  proveedorObj!:Proveedor
   todayDate:Date = new Date();
   proveedores:Proveedor[] = []
   filteredProveedores:Proveedor[] = []
@@ -68,7 +67,7 @@ export class DialogOrdenComponent {
   
 
   close(){
-    this.ref.close(false)
+    this.ref.close({close:false,todoBien:true})
   }
   async setFolio(tipo:string){
     const r = await this.api.getFolio()
@@ -94,37 +93,25 @@ export class DialogOrdenComponent {
     return ""
   }
 
-  selectProveedor(p:User){
+  selectProveedor(p:Proveedor){
     this.proveedorObj = p
-  }
-  
-  onPhotoSelected(event: Event, plano: any) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const files = Array.from(input.files);
-      plano.imagenes = files;
-    }
   }
 
   async createOrder(){
     const tipo = this.form.get("tipo")!.value
-    await this.p.o.createOrder(tipo,this.folio,this.data.list,
-      moment(this.form.get("date")?.value!).endOf("day").toDate(),this.proveedorObj)
-    
-    await this.p.getAll()
-    this.ref.close(true)
+    const r = await this.api.getFolio()
+    this.folio = tipo == "Detalle"? r.data.Detalle : r.data.Maquinado
+    const todoBien = await this.p.o.createOrder(tipo,this.folio,this.data.list,
+    moment(this.form.get("date")?.value!).endOf("day").toDate(),this.proveedorObj)
+    if(todoBien)
+      await this.p.getAll()
+    this.ref.close({close:true,todoBien:todoBien})
   }
 
-  getImagePreviewUrl(img: any): string{
-    if (img.previewUrl) return img.previewUrl;
-    img.previewUrl = (window.URL || window.webkitURL).createObjectURL(img);
-    return img.previewUrl
-  }
 
   allPiezasAreFilled(){
     let valid = true
     this.data.list.forEach((p:Pieza) => {
-      console.log( p.cantidadInDialog!, ">", p.base!, this.form.get("tipo")!.value ,"==", "Detalle")
       if(p.piezas == ""  ||p.cantidadInDialog ==0 || ( p.cantidadInDialog! > p.base! && this.form.get("tipo")!.value == "Detalle")){
         valid = false;
         return

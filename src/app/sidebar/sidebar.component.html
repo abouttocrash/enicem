@@ -17,8 +17,8 @@
             <button matRipple [matRippleCentered]="centered" matTooltip="Salidas" (click)="goToSalidas()" ><mat-icon >assignment_return</mat-icon> </button>
             <div class="line"></div>
             @if(canCreateUsuario()){
-                <button matRipple [matRippleCentered]="centered" matTooltip="Nuevo Usuario" (click)="goToUsuarios()"><mat-icon>groups</mat-icon> </button>
-                <button matRipple [matRippleCentered]="centered" matTooltip="Nuevo Proveedor" (click)="goToProveedores()"><mat-icon >store</mat-icon> </button>
+                <button matRipple [matRippleCentered]="centered" matTooltip="Usuarios" (click)="goToUsuarios()"><mat-icon>groups</mat-icon> </button>
+                <button matRipple [matRippleCentered]="centered" matTooltip="Proveedores" (click)="goToProveedores()"><mat-icon >store</mat-icon> </button>
                 <button matRipple [matRippleCentered]="centered" matTooltip="Motivos de rechazo" (click)="goToRechazos()"><mat-icon >settings_alert</mat-icon> </button>
             }
         }

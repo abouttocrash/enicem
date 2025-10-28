@@ -4,6 +4,7 @@ import { OrdenesService } from './ordenes/ordenes.service';
 import { BitacoraService } from './bitacora.service';
 import { CatalogoService } from './catalogo.service';
 import { SalidaService } from './salida.service';
+import { FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class ProyectoService {
   c = inject(CatalogoService)
   s = inject(SalidaService)
   
+  private userRoute = "user"
   constructor(public api:APIService ) {}
 
   async getAll(){
@@ -22,5 +24,16 @@ export class ProyectoService {
     this.b.init(r.data.bitacora)
     this.c.init(r.data.catalogo)
     this.s.init(r.data.salidas)
+  }
+  
+  async createUser(form:FormGroup){
+    let body = {
+      name:form.get("username")?.value,
+      code:form.get("code")?.value,
+      rol:form.get("rol")?.value,
+      active:form.get('active')?.value,
+      
+    } 
+    await this.api.POST(this.userRoute,body)
   }
 }

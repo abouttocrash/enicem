@@ -1,1 +1,110 @@
-<p>vista-generica works!</p>
+<!-- <div class="ordenes">
+  <div class="header">
+    <h1>Salidas</h1>
+    <div class="bar">
+      <auto-icem (keyup)="keyup.emit($event)" [filters]="filters" [filteredFilters]="filteredFilters"></auto-icem>
+      <div class="filter-holder center-ver">
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>Ingresa un rango de fecha</mat-label>
+            <mat-date-range-input [rangePicker]="picker" >
+                <input matStartDate placeholder="Start date" [(ngModel)]="fecha1">
+                <input matEndDate placeholder="End date" [(ngModel)]="fecha2">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline" >
+          <mat-label>Tipo de orden</mat-label>
+          <mat-select [(ngModel)]="tipo">
+              <mat-option value="Ambas">Ambas</mat-option>
+              <mat-option value="Integración">Integración</mat-option>
+              <mat-option value="Detalle">Detalle</mat-option>
+          </mat-select>
+        </mat-form-field>
+      
+      <button class="main-cta" (click)="buscar()">
+          <mat-icon >history</mat-icon>
+          Buscar
+      </button>
+    </div>
+  
+  </div>
+  </div>
+  <div style="height: 100%;overflow-y: scroll;">
+    <table mat-table 
+      [dataSource]="dataSource" 
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="drop($event)"
+      matSort>
+
+      <ng-container matColumnDef="tipo">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de salida </th>
+        <td mat-cell *matCellDef="let row"> {{row.tipo}} </td>
+        
+      </ng-container>
+      <ng-container matColumnDef="fechaSalida">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de salida </th>
+        <td mat-cell *matCellDef="let row"> {{row.fechaSalida}} </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="folio">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Folio de salida</th>
+        <td mat-cell *matCellDef="let row"> {{row.folio}} </td>
+      </ng-container>
+      <ng-container matColumnDef="folioOrden">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Folio orden </th>
+        <td mat-cell *matCellDef="let row"> {{row.folioOrden || "-"}} </td>
+      </ng-container>
+      <ng-container matColumnDef="salidas">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header># Planos</th>
+        <td mat-cell *matCellDef="let row"> {{row.salidas.length}} </td>
+      </ng-container>
+      <ng-container matColumnDef="usuario">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Creada por</th>
+        <td mat-cell *matCellDef="let row"> {{row.usuario}} </td>
+      </ng-container>
+      <ng-container matColumnDef="project">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Proyecto</th>
+        <td mat-cell *matCellDef="let row"> {{row.project}} </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let row"> {{row.status}} </td>
+      </ng-container>
+      <ng-container matColumnDef="editar">
+                <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Editar</th>
+                <td mat-cell *matCellDef="let row">
+                    @if(row.tipo == "Integración"){
+                        <mat-icon matTooltip="Editar salida" (click)="editarSalida(row)" style="color:var(--blue);cursor: pointer;">edit</mat-icon>
+                    }
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+                <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Revisión</th>
+                <td mat-cell *matCellDef="let row"> 
+                @if(row.tipo == "Integración" && row.status == "ABIERTA" && canApprove()){
+                    <mat-icon (click)="abrirDialogoSalida(row)" style="color:var(--blue);cursor:pointer">edit_square</mat-icon>
+                }
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="pdf">
+                <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>PDF</th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-icon matTooltip="PDF salida" (click)="getPDF(row)" style="color:var(--blue);cursor: pointer;"fontSet="material-symbols-outlined">file_save</mat-icon>
+                    
+                </td>
+            </ng-container>
+    
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
+      <tr  mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4"></td>
+      </tr>
+    </table>
+  </div>
+
+</div> -->

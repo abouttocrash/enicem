@@ -20,7 +20,7 @@ import { ViewsImports, baseDialog } from '../../utils/Utils';
 export class VistaProveedoresComponent {
   @ViewChild(MatSort) sort!: MatSort;
   dialog = inject(MatDialog)
-  displayedColumns = ["name","tipo","editar"]
+  displayedColumns = ["name","tipo","isActive","editar"]
   dataSource!:MatTableDataSource<Proveedor>;
   tipo = "Ambos"
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
@@ -77,13 +77,31 @@ export class VistaProveedoresComponent {
   async nuevoProveedor(){
     const dialogRef = this.dialog.open(ProveedoresComponent,{...baseDialog,disableClose:true});
     const r = await firstValueFrom(dialogRef.afterClosed())
-    console.log(r)
     if(r){
       await this.buscar()
     }
   }
 
+  async editarProveedor(proveedor:Proveedor){
+      const dialogRef = this.dialog.open(
+      ProveedoresComponent,
+      {
+        ...baseDialog,
+        disableClose:true,
+        data:structuredClone(proveedor)
+      });
+    const r = await firstValueFrom(dialogRef.afterClosed())
+    if(r){
+      await this.buscar()
+    }
+    
+  }
+
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
+  }
+
+  isAdmin(){
+    return this.api.currentUser.rol == "ADMIN"
   }
 }

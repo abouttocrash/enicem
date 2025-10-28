@@ -155,7 +155,7 @@ openNativeImageDialog() {
      this.selectedImages.forEach(file => formData.append('imagenes', file.obj, file.name));
       formData.append('projectId', this.p.api.currentProject._id!);
       formData.append('ordenId',this.p.o.currentOrden!._id)
-      await this.p.api.uploadImagenes(formData)
+      await this.p.o.uploadImagenes(formData)
       const what:What[] = []
       this.selectedImages.forEach(f=>{
         let w:What = {

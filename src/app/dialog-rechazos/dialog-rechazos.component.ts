@@ -19,26 +19,24 @@ export class DialogRechazosComponent {
   disabled = true;
   title = "Crear Rechazo"
   constructor(private dialogRef:MatDialogRef<DialogRechazosComponent>,public api:APIService){
+    let activo = true
     if(this.data != null){
       this.title = "Editar Rechazo"
-      this.form = new FormGroup({
-        name: new FormControl(this.data.name || "", [Validators.required]),
-        active: new FormControl(this.data.active || true),
-      });
+      activo = this.data.active
     }
-    else{
       this.form = new FormGroup({
-        name: new FormControl("", [Validators.required]),
-        active: new FormControl(true),
+        name: new FormControl(this.data?.name || "", [Validators.required]),
+        active: new FormControl(activo),
       });
-    }
+
+    
+    
   }
   //TODO: Error state
   async createRechazo(){
     if(this.data){
       this.data.name = this.form.get("name")!.value
       this.data.active = this.form.get("active")!.value
-      console.log(this.data)
       this.api.editRechazo(this.data)
     }
     else

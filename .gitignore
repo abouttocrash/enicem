@@ -43,3 +43,4 @@ Thumbs.db
 server/imagenes/*
 server/data/*
 server/excel/*
+server/pdf-ordenes/*

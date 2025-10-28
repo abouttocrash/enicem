@@ -72,7 +72,6 @@ export class OrdenTrabajoMongo extends Mongoloid{
     }
 
     async getOrdersView(query:any){
-         console.log(query)
             
             const arr = [
                 { $gte: [ { $dateFromString: { dateString: "$createdAt" } }, new Date(query.fecha1) ] },

@@ -46,26 +46,25 @@ export class RechazosComponent {
   async nuevoRechazo(){
     const dialogRef = this.dialog.open(DialogRechazosComponent,{...baseDialog,disableClose:true});
     const r = await firstValueFrom(dialogRef.afterClosed())
-    console.log(r)
     if(r){
       await this.buscar()
     }
   }
 
-   async editarRechazo(rechazo:Rechazo){
-       const dialogRef = this.dialog.open(
-        DialogRechazosComponent,
-        {
-          ...baseDialog,
-          disableClose:true,
-          data:structuredClone(rechazo)
-        });
-      const r = await firstValueFrom(dialogRef.afterClosed())
-      if(r){
-        await this.buscar()
-      }
-      
+  async editarRechazo(rechazo:Rechazo){
+    const dialogRef = this.dialog.open(
+    DialogRechazosComponent,
+    {
+      ...baseDialog,
+      disableClose:true,
+      data:structuredClone(rechazo)
+    });
+    const r = await firstValueFrom(dialogRef.afterClosed())
+    if(r){
+      await this.buscar()
     }
+  
+  }
 
   
 }

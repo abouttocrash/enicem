@@ -36,7 +36,6 @@ export class StylesService {
 
   checkDevice(){
     var ua = navigator.userAgent;
-    console.log(ua)
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua))
       this.isMobile = true
 

@@ -10,14 +10,14 @@ import rechazoRouter from './RechazoRoutes.js';
 
 const apiRouter = Router();
 
-apiRouter.use('/projects', projectRouter);
-apiRouter.use('/catalog', catalogRouter);
-apiRouter.use('/logs', logRouter);
-apiRouter.use('/user', userRouter);
-apiRouter.use('/proveedor', providerRouter);
-apiRouter.use('/order', orderRouter);
-apiRouter.use('/out', salidaRouter);
-apiRouter.use('/rechazo', rechazoRouter);
+apiRouter.use('/api/projects', projectRouter);
+apiRouter.use('/api/catalog', catalogRouter);
+apiRouter.use('/api/logs', logRouter);
+apiRouter.use('/api/user', userRouter);
+apiRouter.use('/api/proveedor', providerRouter);
+apiRouter.use('/api/order', orderRouter);
+apiRouter.use('/api/out', salidaRouter);
+apiRouter.use('/api/rechazo', rechazoRouter);
 
 export default apiRouter;
 

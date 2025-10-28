@@ -1,4 +1,5 @@
 import { Component, ElementRef, input, output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +15,7 @@ export const _filter = (opt: string[], value: string): string[] => {
 
 @Component({
   selector: 'auto-icem',
-  imports: [MatFormFieldModule,MatAutocompleteModule,MatIconModule,MatInputModule],
+  imports: [MatFormFieldModule,MatAutocompleteModule,MatIconModule,MatInputModule,FormsModule],
   templateUrl: './auto-icem.component.html',
   styleUrl: './auto-icem.component.scss'
 })
@@ -22,6 +23,7 @@ export class AutoIcemComponent {
   @ViewChild('searchInput', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild(MatAutocomplete) autoComplete!:MatAutocomplete
   @ViewChild(MatAutocompleteTrigger) autoCompleteTrigger!: MatAutocompleteTrigger;
+  autoData = ""
   keyup = output<KeyboardEvent | string>()
   placeholder = input<string>("Buscar")
   filteredFilters = input.required<AutoFilter[]>()
@@ -29,6 +31,7 @@ export class AutoIcemComponent {
   appareance = input<MatFormFieldAppearance>()
 
   clear($event:MouseEvent){
+    this.autoData = ""
     this.autoCompleteTrigger!.closePanel()
     const inputEl = this.searchInput!.nativeElement
     this.autoCompleteTrigger?.setDisabledState(true)

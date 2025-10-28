@@ -30,38 +30,11 @@ export class BitacoraComponent {
     this.p.b.init(data,this.sort)
   }
 
-  clear($event:MouseEvent){
-    this.autoCompleteTrigger!.closePanel()
-    const inputEl = this.searchInput!.nativeElement
-    this.autoCompleteTrigger?.setDisabledState(true)
-    inputEl.value = '';
-    inputEl.blur(); // remove focus so autocomplete won't reopen
-    setTimeout(() => {
-       this.autoCompleteTrigger?.setDisabledState(false)
-       this.applyFilter('')
-    }, );
-    
-    
-  }
+  
 
-   applyFilter(event: Event | string) {
-    let filterValue = ""
-    if(typeof event == "string")
-      filterValue = event.trim().toLowerCase();
-    else
-      filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.p.b.dataSource.filterPredicate = (data: any, filter: string) => {
-        const f = filter.toLowerCase();
-        if(data.what == undefined){
-          data.what = []
-        }
-        const matchProveedor = data.proveedor.toLowerCase().includes(filter);
-        const matchcreador = data.usuario.toLowerCase().includes(filter);
-        const matchWhat = data.what.some((p: any) => p.plano?.toLowerCase().includes(filter))
-        return matchWhat ||  matchcreador  || matchProveedor;
-    };
-    this.p.b.dataSource.filter = filterValue;
-    this.p.b.filteredFilters = this._filterGroup(filterValue)
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.p.b.dataSource.filter = filterValue.trim().toLowerCase();
   }
   
   expandedElement: any | null;
@@ -69,17 +42,6 @@ export class BitacoraComponent {
   isExpanded(element: any) {
     return this.expandedElement === element;
   }
-
-  private _filterGroup(value: string): AutoFilter[] {
-      if (value) {
-        const x = this.p.b.filters
-          .map(group => ({filter: group.filter, options: _filter(group.options, value)}))
-          .filter(group => group.options.length > 0);
-        return x
-      }
-  
-      return this.p.b.filters
-    }
 
   toggle(element: any) {
     //if(element.expand)

@@ -7,6 +7,8 @@ import { APIService } from '../../api.service';
 import { MatSelectModule } from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { Usuario } from '@shared-types/Usuario';
+import { isNumber } from '../../utils/DialogUtils';
+import { ProyectoService } from '../../proyecto.service';
 @Component({
   selector: 'app-users-dialog',
   imports: [MatFormFieldModule,MatInputModule,ReactiveFormsModule,MatSelectModule,MatSlideToggleModule ],
@@ -18,25 +20,20 @@ export class UsersDialogComponent {
   data = inject(MAT_DIALOG_DATA) as Usuario;
   disabled = true;
   title = "Crear Usuario"
-  constructor(private dialogRef:MatDialogRef<UsersDialogComponent>,public api:APIService){
-   if(this.data != null){
-    this.title = "Editar Usuario"
+  isNumber = isNumber
+  constructor(private dialogRef:MatDialogRef<UsersDialogComponent>,public api:APIService,private p:ProyectoService){
+    if(this.data != null)
+      this.title = "Editar Usuario"
     this.form = new FormGroup({
-      username: new FormControl(this.data.name || "", [Validators.required]),
-      code: new FormControl(this.data.code || "", [Validators.required,Validators.min(4)]),
-      rol: new FormControl(this.data.rol || "", [Validators.required]),
-      activo: new FormControl(this.data.active || true),
+      username: new FormControl(this.data?.name || "", [Validators.required]),
+      code: new FormControl(this.data?.code || "", [Validators.required,Validators.min(4)]),
+      rol: new FormControl(this.data?.rol || "", [Validators.required]),
+      activo: new FormControl(this.data?.active || true),
     });
+  
   }
-  else{
-    this.form = new FormGroup({
-      username: new FormControl("", [Validators.required]),
-      code: new FormControl("", [Validators.required,Validators.min(4)]),
-      rol: new FormControl("", [Validators.required]),
-      activo: new FormControl(true),
-    });
-  }
-  }
+
+ 
   //TODO: Error state
   async createUser(){
     if(this.data){
@@ -47,23 +44,11 @@ export class UsersDialogComponent {
       this.api.editUser(this.data)
     }
     else
-      await this.api.createUser(this.form)
+      await this.p.createUser(this.form)
     this.dialogRef.close(true)
   }
 
   close(){
     this.dialogRef.close(false)
   }
-
-  isNumber($event:KeyboardEvent){
-      const input = $event.target as HTMLInputElement;
-      let value = ""
-      if($event.key.length === 1)
-        value = input.value + $event.key;
-      
-      if (!/^\d*$/.test(value) && $event.key.length === 1) {
-        $event.preventDefault();
-      }
-     
-    }
 }

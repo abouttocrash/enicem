@@ -36,7 +36,6 @@ export class SalidaMongo extends Mongoloid{
         return r
     }
     async getAllSalidas(query:any){
-        console.log(query)
         let obj = {}
         const arr = [
             { $gte: [ { $dateFromString: { dateString: "$fechaSalida" } }, new Date(query.fecha1) ] },

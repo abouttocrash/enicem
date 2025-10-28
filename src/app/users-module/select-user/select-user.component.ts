@@ -7,7 +7,7 @@ import { Usuario } from '@shared-types/Usuario';
 import { StorageService } from '../../storage.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
-import { HttpParams } from '@angular/common/http';
+import { isNumber } from '../../utils/DialogUtils';
 
 @Component({
   selector: 'app-select-user',
@@ -18,6 +18,7 @@ import { HttpParams } from '@angular/common/http';
 export class SelectUserComponent {
   form:FormGroup
   usuario!:Usuario
+  isNumber = isNumber
   constructor(public API:APIService,private storage:StorageService,public ref:MatDialogRef<SelectUserComponent>){
      this.form = new FormGroup({
       usuario: new FormControl("", [Validators.required]),
@@ -26,7 +27,7 @@ export class SelectUserComponent {
   }
   async ngAfterViewInit(){
     const getAdmin = this.storage.getUser() == null
-    // await this.API.getUsers(getAdmin)
+    await this.API.getUsers(getAdmin)
   }
 
   async selectUser(user:Usuario){
@@ -43,17 +44,6 @@ export class SelectUserComponent {
     else this.form.get('code')?.setValue("")
     
   }
-  //TODO: reutilizable
-  isNumber($event:KeyboardEvent){
-    const input = $event.target as HTMLInputElement;
-    let value = ""
-    if($event.key.length === 1)
-      value = input.value + $event.key;
-    
-    if (!/^\d*$/.test(value) && $event.key.length === 1) {
-      $event.preventDefault();
-    }
-    
-  }
+ 
 
 }

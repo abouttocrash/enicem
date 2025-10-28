@@ -77,8 +77,8 @@ export class OrdenesTrabajoComponent {
   async recibirPiezas(element:OrdenTrabajo){
     this.p.o.currentOrden = await this.p.o.getOrder(element._id)
     await this.p.o.getImages()
+    this.p.b.currentPieza = undefined
     this.p.o.piezasEnPanel = JSON.parse(JSON.stringify(this.p.o.currentOrden.piezas.slice())) || []
-    console.log(this.p.o.piezasEnPanel)
     this.drawer.open()
   }
 
