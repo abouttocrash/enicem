@@ -30,8 +30,8 @@ export type AllR ={
 })
 export class APIService {
   
-  BASE = "http://localhost:3000/api"
-  
+  BASE = "http://192.168.1.220:3000/api"
+  BASE_NO_API = "http://192.168.1.220:3000"
   currentProject!:Proyecto
   currentUser!:Usuario
   projects:Proyecto[] = []

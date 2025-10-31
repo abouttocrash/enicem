@@ -16,7 +16,7 @@ app.use('/static',express.static(path.join(process.cwd(), 'data')));
 app.use('/static',express.static(path.join(process.cwd(), 'excel')));
 app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
-export const ip = "http://localhost:3000"
+export const ip = "http://192.168.1.220:3000"
 app.use(express.static(browserDist));
 
 // tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)
