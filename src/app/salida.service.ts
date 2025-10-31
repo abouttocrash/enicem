@@ -33,7 +33,6 @@ export class SalidaService {
     await this.api.PUT<ICEMDR<Salida>>(`${this.route}/outview`,{salida:salida})
   }
   async updateCantidadSalida(salida:any){
-    console.log(salida)
     await this.api.PUT<ICEMDR<Salida>>(`${this.route}/outview/cantidad`,{salida:salida})
   }
 }

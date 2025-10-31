@@ -215,6 +215,9 @@ export class APIService {
   async POST<T>(route:string,body:Object){
     return await firstValueFrom<T>(this.http.post<T>(`${this.BASE}/${route}`, body));
   }
+  async DELETE<T>(route:string,params:HttpParams){
+    return await firstValueFrom<T>(this.http.delete<T>(`${this.BASE}/${route}`,{params:params}));
+  }
 
   async PUT<T>(route:string,body:Object){
     await firstValueFrom<T>(this.http.put<T>(`${this.BASE}/${route}`, body));

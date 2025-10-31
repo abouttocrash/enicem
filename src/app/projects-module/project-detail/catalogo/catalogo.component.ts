@@ -22,6 +22,7 @@ import {CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray, CdkDragStart} from '
 import { DialogoScrapComponent } from './dialogo-scrap/dialogo-scrap.component';
 import { MultiDialogComponent } from '../../../multi-dialog/multi-dialog.component';
 import { firstValueFrom } from 'rxjs';
+import { DialogConfirmComponent } from '../../../components/dialog-confirm/dialog-confirm.component';
 @Component({
   selector: 'catalogo',
   imports: [MatTableModule, MatIconModule, MatCheckboxModule, FormsModule,
@@ -41,7 +42,7 @@ export class CatalogoComponent {
   currentPieza = {} as any
   drawer!:MatDrawer
   textoPlanos = "Crear Bitácora"
-  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stockNumber', 'expand'];
+  displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stockNumber', 'expand','remove'];
   
   constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){
     
@@ -261,6 +262,28 @@ async onPDFSelected(event: Event) {
     const actualTitle = row.title.replace("(ESPEJO)","").trim()
     const url = `${this.api.BASE_NO_API}/static/${idProyecto}/${actualTitle}.pdf`;
     window.open(url, '_blank');
+  }
+
+  async deletePlano(row:Pieza,$event:Event){
+    $event.stopPropagation()
+    const d = this.dialog.open(DialogConfirmComponent,{
+      width:"340px",
+      height:"260px",
+      disableClose:false,
+      data:{accion:"ELIMINAR PLANO DE BITÁCORA "+row.title}
+    })
+    
+    const r = await firstValueFrom(d.afterClosed())
+    if(r){
+      const bool = await this.p.c.removePieza(row.title)
+      if(bool){
+        this._snackBar.open("Plano removido de la bitácora","OK",{duration:2000})
+        await this.p.getAll()
+      }
+      else{
+        this._snackBar.open("No se pudo remover el plano, cheque la consola","OK",{duration:5000})
+      }
+    }
   }
 
   applyFilter(event: Event) {

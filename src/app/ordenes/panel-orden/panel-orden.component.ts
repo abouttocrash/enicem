@@ -51,10 +51,15 @@ export class PanelOrdenComponent {
     this.imageInput.addEventListener('change', (event: Event) => this.onImagesSelected(event));
     document.body.appendChild(this.imageInput);
   }
-  async recibir(){
+
+  async recibirConScanner(){
+    await this.recibir([])
+  }
+  async recibir(emptyArray?:Pieza[]){
+    const piezasSelected = emptyArray == undefined? this.getPiezasSelected():[]
     const d = this.dialog.open(DialogRecibirComponent,{
       ...baseDialog,
-      data:this.getPiezasSelected()
+      data:piezasSelected
     })
     d.afterClosed().subscribe(async(result:any)=>{
       if(result.bool){
@@ -123,6 +128,7 @@ openNativeImageDialog() {
   this.imageInput.value = '';
   this.imageInput.click();
 }
+
 
   onImagesSelected(event: Event) {
     const input = event.target as HTMLInputElement;

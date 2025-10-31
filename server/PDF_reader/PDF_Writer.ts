@@ -21,13 +21,19 @@ var printer = new PdfPrinter(fonts);
 
 
 export function writePDF(orden:OrdenTrabajo){
-	const docDefinition = definePDF(orden)
-	var pdfDoc = printer.createPdfKitDocument(docDefinition as any);
-	const dir=path.join(process.cwd(), 'pdf-ordenes')
-	const pathricio = `${dir}/${orden.folio}_${orden.project}_${orden.proveedor}.pdf`
-	pdfDoc.pipe(fs.createWriteStream(pathricio));
-	pdfDoc.end();
-	return `${orden.folio}_${orden.project}_${orden.proveedor}.pdf`
+	try{
+		const docDefinition = definePDF(orden)
+		var pdfDoc = printer.createPdfKitDocument(docDefinition as any);
+		const dir=path.join(process.cwd(), 'pdf-ordenes')
+		const pathricio = `${dir}/${orden.folio}_${orden.idProject}_${orden.proveedor}.pdf`
+		pdfDoc.pipe(fs.createWriteStream(pathricio));
+		pdfDoc.end();
+		return `${orden.folio}_${orden.idProject}_${orden.proveedor}.pdf`
+	}catch(e){
+		console.log("EXCEPTION")
+		console.log(e)
+		return e as Error
+	}
 }
 
 function definePDF(orden:OrdenTrabajo){

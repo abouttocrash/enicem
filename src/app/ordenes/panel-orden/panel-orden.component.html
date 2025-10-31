@@ -42,10 +42,14 @@
         <div class="tab-holder">
             <mat-tab-group animationDuration="0ms">
       <mat-tab [label]="getPiezasLabel()">
-        <div class="piezas">
-                <div class="panel-top piezas">
+        <div class="piezas ">
+                <div class="panel-top piezas center-ver">
                     <h3>Piezas </h3>
                     <div class="icon-holder">
+                        <button class="scanner" (click)="recibirConScanner()">
+                            <mat-icon>barcode_reader</mat-icon>
+                            Recibir con Scanner
+                        </button>
                         <button class="update" [matMenuTriggerFor]="menu" [disabled]="piezasSelected()">Actualizar</button>
                     </div>
                     
@@ -164,7 +168,7 @@
             <div ></div>
         </div>
         <div class="mil-holder">
-            <div style="height: 100%;overflow-y: scroll;">
+            <div style="height: 100%;overflow-y: auto;">
 
                 @for(desc of p.b.bitacoraPieza;track desc){
                 <div class="milestone">

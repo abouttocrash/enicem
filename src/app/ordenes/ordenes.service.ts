@@ -13,6 +13,14 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { AutoFilter } from '../components/auto-icem/auto-icem.component';
 import { Proveedor } from '@shared-types/Proveedor';
 
+// Add a minimal declaration for the Web Serial API to satisfy TypeScript
+declare global {
+  interface Navigator {
+    serial?: any;
+    hid?:any
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })

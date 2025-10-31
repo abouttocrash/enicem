@@ -20,7 +20,19 @@ export class CatalogoMongo extends Mongoloid{
         return p
     }
 
-
+    async deletePieza(catalogId:string,logs:Array<any>){
+        const pc = await this.getCollection("catalog")
+        const r = await pc.updateOne(
+        { _id:new ObjectId(catalogId)},
+        {$set: 
+            {
+                [`logs`]:logs
+            }
+        }
+        )
+        return r 
+    
+    }
     async updateCatalog(body:{piezas:Pieza[],catalogId:string}){
         
             const responses:any[] = []

@@ -7,7 +7,7 @@
           placeholder="Buscar en el historial" #input>
         </mat-form-field>
     </div>
-      <div style="height: 100%;overflow-y: scroll;">
+      <div style="height: 100%;overflow-y: auto;">
         <table mat-table [dataSource]="p.b.dataSource" matSort multiTemplateDataRows>
           <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Milestone </th>

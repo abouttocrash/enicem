@@ -43,11 +43,25 @@ export class CatalogoService {
   }
 
   async addPieza(form:FormData){
-      form.append("catalogId",this.api.currentProject.catalogId!)
-      form.append("projectId",this.api.currentProject._id!)
-      const r =  await this.api.POST<ICEMDR<Pieza>>("catalog/plano",form)
-      return r
+    form.append("catalogId",this.api.currentProject.catalogId!)
+    form.append("projectId",this.api.currentProject._id!)
+    const r =  await this.api.POST<ICEMDR<Pieza>>("catalog/plano",form)
+    return r
+  }
+
+  async removePieza(plano:string){
+    let httpParams = new HttpParams()
+    .set("catalogId",this.api.currentProject.catalogId!)
+    .set("projectId",this.api.currentProject._id!)
+    .set("plano",plano)
+    try{
+    const r = await this.api.DELETE<ICEMDR<Pieza>>("catalog/plano",httpParams)
+    return true
+    }catch(e){
+      console.log(e)
+      return false
     }
+  }
 
   async createScrap(piezas:Pieza[]){
       const body = {
@@ -97,6 +111,7 @@ export class CatalogoService {
     const params = new HttpParams()
     .set("catalogId",this.api.currentProject.catalogId!)
     .set("project",this.api.currentProject.name)
+    .set("projectId",this.api.currentProject._id!)
     .set("clave",this.api.currentProject.noSerie)
     const r = await this.api.GET2<ICEMR<any>>(`${this.route}/reporte`,params)
     return r

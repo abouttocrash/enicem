@@ -112,7 +112,6 @@ app.get("/api/report/proveedor",async(req,res)=>{
     ) as any
     const excelPath  = path.join(process.cwd(), 'excel\\');
     fs.writeFileSync(`${excelPath}proveedor_${id}.xlsx`,buffer)
-    console.log(`${ip}/static/proveedor_${id}.xlsx`)
     res.status(200).send({
         data:{
             path:`${ip}/static/proveedor_${id}.xlsx`
@@ -123,46 +122,61 @@ app.get("/api/report/proveedor",async(req,res)=>{
 app.post("/api/pdf/orden",async(req,res)=>{
     req.body.orden.dateEntrega = moment(req.body.orden.dateEntrega).locale("es").format("DD MMMM YYYY")
     const r = writePDF(req.body.orden)
-    res.status(200).send({
-        data:{
-            path:`${ip}/static/${r}`
-        }
+    let data:any;
+    let status = 200
+    if(typeof r == "string")
+        data = { path:`${ip}/static/${r}` }
+    
+    else{
+        data = { error:r }
+        status = 500
+    }
+    res.status(status).send({
+        data:data
     })
 })
 app.post("/api/pdf/salida",async(req,res)=>{
     let orden:any
-    if(req.body.salida.tipo == "Detalle"){
-        orden = await mongo.orders.getOrdenDetalleByFolio(req.body.salida.folioOrden)
-       
-    }
-    else{
-        const salida = req.body.salida as any
-        const piezas:any[] = []
-        let total = 0 
-        salida.salidas.forEach((s:any)=>{
-            total += s.piezas
-           piezas.push({
-                title:s.pieza,
-                acabado:s.acabado || "-",
-                material:s.material || "-",
-                piezas:s.piezas
-
-            })
-        })
-        orden = {
-            project:salida.project,
-            folio:salida.folio,
-            proveedor:"-",
-            _id:salida._id,
-            piezas:piezas,
-            totalPiezas:total
+    try{
+        if(req.body.salida.tipo == "Detalle"){
+            orden = await mongo.orders.getOrdenDetalleByFolio(req.body.salida.folioOrden)
+        
         }
-    }
-     const r = writePDF(orden!)
+        else{
+            const salida = req.body.salida as any
+            const piezas:any[] = []
+            let total = 0 
+            salida.salidas.forEach((s:any)=>{
+                total += s.piezas
+            piezas.push({
+                    title:s.pieza,
+                    acabado:s.acabado || "-",
+                    material:s.material || "-",
+                    piezas:s.piezas
+
+                })
+            })
+            orden = {
+                project:salida.project,
+                folio:salida.folio,
+                idProject:salida.idProject,
+                proveedor:"-",
+                _id:salida._id,
+                piezas:piezas,
+                totalPiezas:total
+            }
+        }
+        const r = writePDF(orden!)
         res.status(200).send({
             data:{
                 path:`${ip}/static/${r}`
             }
         })
+    }catch(e){
+        res.status(500).send({
+            data:{error:e}
+        })
+    }
+     
     
 })

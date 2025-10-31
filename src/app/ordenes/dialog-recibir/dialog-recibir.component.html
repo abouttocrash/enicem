@@ -22,9 +22,12 @@
 
     </div>
     <div class="dialog-bottom">
+        <p class="msg">
+                <span>{{ultimoScan}}</span>
+            </p>
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button class="main-cta" [disabled]="!allPiezasAreFilled()" (click)="actualizar(true)">Guardar</button>
+            <button class="main-cta" [disabled]="!allPiezasAreFilled()" (click)="actualizar(true)">Recibir</button>
         </div>
     </div>
 </div>

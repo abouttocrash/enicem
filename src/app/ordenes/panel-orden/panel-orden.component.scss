@@ -1,13 +1,13 @@
 .panel{
     display: grid;
     height:100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     grid-template-rows: 150px 1fr;
 }
 .panel-pieza{
     display: grid;
     height:100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     grid-template-rows: 60px 1fr;
 }
 .pieza-item{
@@ -25,9 +25,24 @@
     }
 }
 
+.scanner{
+    background-color: transparent;
+    cursor: pointer;
+    color:var(--blue);
+    font-weight: 600;
+    height:38px;
+    border:none;
+    padding:0 12px 0 12px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;   /* Centra verticalmente */
+    justify-content: center; /* Opcional: centra horizontalmente */
+    gap: 0.5em;  
+   
+}
 .panel-top{
      display: grid;
-     grid-template-columns: 1fr 140px;
+     grid-template-columns: 1fr 340px;
      & .icon-holder{
         display: flex;
         justify-content: end;
@@ -58,11 +73,11 @@
     
     display: grid;
     overflow-y: auto;
-    grid-template-rows: 32px 1fr;
+    grid-template-rows: 42px 1fr;
     height:100%;
     & .list{
         height:100%;
-        overflow-y: scroll;
+        overflow-y: auto;
 
     }
 }

@@ -50,9 +50,23 @@ catalogRouter.post('/plano', upload.array('files'), async(req, res) => {
         res.status(200).send({data:p.piezas})
     }catch(e){
         console.log(e)
-        res.status(400).send({error:e})
+        res.status(500).send({error:e})
     }
 });
+catalogRouter.delete('/plano', async(req, res) => {
+    try{
+        console.log(`DELETE /catalog/plano ${req.query.plano} `)
+        const catalogo = await mongo.catalog.getCatalogo(req.query.catalogId as string) as Catalogo
+        const index = catalogo.logs.map(p=>{return p.title}).indexOf(req.query.plano as string)
+        catalogo.logs.splice(index,1)
+        const r = await mongo.catalog.deletePieza(req.query.catalogId as string,catalogo.logs)
+        res.status(200).send({data:r})
+    }catch(e){
+        console.log(e)
+        res.status(500).send({error:e})
+    }
+});
+
 catalogRouter.post('/almacen', async(req, res) => {
     try{
         const p = await mongo.createAlmacen(req.body)
@@ -129,18 +143,21 @@ catalogRouter.get("/",async(req,res)=>{
     res.status(200).send({data:p})
 })
 catalogRouter.get("/reporte",async(req,res)=>{
-    const reporter = new Reporter()
-    const p = await mongo.catalog.getCatalogo(req.query.catalogId as string) as unknown as Catalogo
-    const buffer = await reporter.buildCatalogo(p,{name:req.query.project as string,noSerie:req.query.clave as string}) as any
-    const excelPath  = path.join(process.cwd(), 'excel\\');
-   // fs.readdirSync(excelPath).forEach(file => {fs.unlinkSync(path.join(excelPath, file));});
-    fs.writeFileSync(`${excelPath}bitacora_${req.query.project}_${req.query.clave}.xlsx`,buffer)
-    
-    res.status(200).send({
+    try{
+        const reporter = new Reporter()
+        const p = await mongo.catalog.getCatalogo(req.query.catalogId as string) as unknown as Catalogo
+        const buffer = await reporter.buildCatalogo(p,{name:req.query.project as string,noSerie:req.query.clave as string}) as any
+        const excelPath  = path.join(process.cwd(), 'excel\\');
+        fs.writeFileSync(`${excelPath}bitacora_${req.query.projectId}.xlsx`,buffer)
+        res.status(200).send({
         data:{
-            path:`${ip}/static/bitacora_${req.query.project}_${req.query.clave}.xlsx`
+            path:`${ip}/static/bitacora_${req.query.projectId}.xlsx`
         }
     })
+    }catch(e){
+        console.log(e)
+    }
+    
 })
 
 

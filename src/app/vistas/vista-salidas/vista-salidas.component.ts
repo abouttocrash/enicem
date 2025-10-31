@@ -171,8 +171,10 @@ export class VistaSalidasComponent {
   }
   //TODO
   async getPDF(salida:Salida){
+    let x = salida as any
+    x.idProject = this.api.currentProject._id
     const body = {
-      salida:salida
+      salida:x
     }
     const r = await this.api.POST<any>("pdf/salida",body)
     window.open(r.data.path, '_blank');
