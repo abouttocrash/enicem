@@ -12,6 +12,7 @@ import { StorageService } from './storage.service';
 import { FormGroup } from '@angular/forms';
 import { Proveedor } from '@shared-types/Proveedor';
 import { Rechazo } from '@shared-types/Rechazo';
+import GET_IP from '@shared-types/APP_CONTS';
 export type AllR ={
   proyectos:Proyecto[]
   ordenes:OrdenTrabajo[]
@@ -30,8 +31,8 @@ export type AllR ={
 })
 export class APIService {
   
-  BASE = "http://192.168.1.220:3000/api"
-  BASE_NO_API = "http://192.168.1.220:3000"
+  BASE = `${GET_IP}/api`
+  BASE_NO_API = GET_IP
   currentProject!:Proyecto
   currentUser!:Usuario
   projects:Proyecto[] = []

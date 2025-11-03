@@ -27,7 +27,7 @@
         <mat-icon fontSet="material-symbols-outlined">assignment_add</mat-icon>
         Crear orden
       </button>
-      <button [disabled]="projectDisabled()" class="main-cta" (click)="textoPlanos === 'Crear Bitácora' ? getFolders():openPDFDialog()">
+      <button [disabled]="projectDisabled()" class="main-cta" (click)="textoPlanos === 'Crear Bitácora' ? getFolders():agregarPlanos()">
         <mat-icon fontSet="material-symbols-outlined">architecture</mat-icon>
         {{textoPlanos}}
       </button>
@@ -38,6 +38,7 @@
 
       <div style="height: 100%;overflow-y: auto;overflow-x: auto;width:100%">
          <table mat-table 
+         fixedLayout="true"
           [dataSource]="p.c.dataSource" 
           cdkDropList
           cdkDropListOrientation="horizontal"
@@ -153,6 +154,3 @@
  </div>
 
 
-<input #pdfInput type="file" accept="application/pdf" hidden (change)="onPDFSelected($event)">
-<input hidden accept="application/pdf" #folderInput type="file" id="files" name="files" multiple (change)="onFolderSelected($event)">
-<!-- <input #folderInput type="file" webkitdirectory multiple hidden (change)="onFolderSelected($event)"> -->

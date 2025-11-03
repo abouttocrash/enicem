@@ -29,6 +29,10 @@ export const longDialog = {
   ...baseDialog,
   width:"800px"
 } as MatDialogConfig<any[]>
+export const longerDialog = {
+  height:"820px",
+  width:"800px"
+} as MatDialogConfig<any[]>
 
 
 export function allPiezasAreFilled(list:Pieza[]){

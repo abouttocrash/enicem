@@ -46,3 +46,5 @@ server/excel/*
 server/pdf-ordenes/*
 package-lock.json
 package-lock.json
+server/mongo/ICEMTransactions.ts
+server/uploads/*

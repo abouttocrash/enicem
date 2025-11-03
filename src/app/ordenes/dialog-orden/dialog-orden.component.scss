@@ -53,5 +53,9 @@
         }
 
     }
+    & .input-buttons button:disabled{
+        color:var(--list);
+        cursor: default;
+    }
 }
 

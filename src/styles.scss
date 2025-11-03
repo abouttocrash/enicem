@@ -15,6 +15,7 @@
     --badge:#2e384a;
     --blue:#669bbc;
     --red:#ad2831;
+    --red-50:#ad283130;
     --green:#6a994e;
     
 }
@@ -125,9 +126,7 @@ p,span,button,h1,h2,h3{
     align-items: center;  
     justify-content: center; 
     gap: 0.5em;  
-    & .mat-icon{
-        color:var(--white);
-    }
+    
 }
 .main-cta{
     background-color: var(--primary);
@@ -187,4 +186,9 @@ tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
 }
 .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
   background-color: var(--blue)!important;
+}
+
+.should-overflow{
+    height:100%;
+    overflow-y: auto;
 }

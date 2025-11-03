@@ -8,6 +8,30 @@ export class CatalogoMongo extends Mongoloid{
         super("catalog",client)
     }
 
+    async updateWithClient(piezas:Pieza[],catalogId:string){
+        const nuevasPiezas = this.createCatalogo(piezas) as Catalogo
+        const c = await this.getCollection("catalog")
+        const catalogo = await c.findOne({ _id:new ObjectId(catalogId)}) as unknown as Catalogo
+        catalogo.logs.push(...nuevasPiezas.logs)
+        console.log(catalogo.logs.length)
+        const r = await c.updateOne( 
+            { _id:new ObjectId(catalogId)},
+            {$set: {
+                [`logs`]:catalogo.logs,
+                'piezasCount':catalogo.logs.length
+            }}
+        )
+        return {client:this.client,count:catalogo.logs.length,nuevas:nuevasPiezas.logs}
+    }
+
+    async createWithClient(piezas:Pieza[]){
+        const catalogo = this.createCatalogo(piezas)
+        const c = await this.getCollection("catalog")
+        const insertResult = await c.insertOne(catalogo as any);
+        const insertedId = insertResult.insertedId.toHexString()
+        return {client:this.client,catalogId:insertedId}
+    }
+
     async getCatalogo(id:string){
         if(id == undefined || id == "undefined"){
             const empty:Catalogo = {
@@ -60,4 +84,53 @@ export class CatalogoMongo extends Mongoloid{
             await this.client.close()
             return responses
         }
+
+    createCatalogo(piezas:Pieza[]){
+        const espejos:Pieza[] = []
+        let errored = false
+        piezas.forEach((p:Pieza)=>{
+            try{
+                const total = this.piezasAsNumber(p.piezas)
+                const isEspejo = p.piezas.toUpperCase().includes("ESPEJO")
+                p = this.fixPieza(p)
+                
+                if(total == 0 && isEspejo){
+                    p.piezas = p.piezas.split("+")[0]!.trim()
+                    const toPush = structuredClone(p)
+                    toPush.title = `${toPush.title} (ESPEJO)`
+                    toPush.isEspejo = true;
+                    espejos.push(toPush)
+                }
+            }
+            catch(e){
+                errored = true
+            }
+            
+        })
+        piezas.push(...espejos)
+        piezas = piezas.sort((a,b) => a.title.localeCompare(b.title));
+        const catalogo:Catalogo = {
+            logs:piezas,
+            createdAt:new Date().toISOString()
+        }
+        if(errored) return false
+        return catalogo
+    }
+
+    piezasAsNumber(val:string){
+        if(/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(val))return Number(val)
+        return 0
+    }
+
+    fixPieza(p:Pieza){
+        p.cantidadRechazada = []
+        p.cantidadDetalle = []
+        p.cantidadManufactura = []
+        p.cantidadAlmacen = []
+        p.cantidadRecibida = []
+        p.fechaRecibida = []
+        p.stock = []
+        return p
+    }
+        
 }

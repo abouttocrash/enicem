@@ -1,15 +1,16 @@
+import { Usuario } from "./Usuario";
 export declare enum MILESTONE_DESC {
-    PROJECT_CREATED = "PROYECTO CREADO",
-    CATALOG_CREATED = "CATALOGO CREADO",
-    CATALOG_UPDATED = "CATALOGO ACTUALIZADO",
-    ORDER_MAQUI_CREATED = "ORDEN MAQUINADO CREADA",
-    ORDER_DETAIL_CREATED = "ORDEN DETALLE CREADA",
-    ORDER_MAQUI_UPDATED = "ORDEN MAQUINADO ACTUALIZADA",
-    ORDER_DETAIL_UPDATED = "ORDEN DETALLE ACTUALIZADA",
-    ORDER_MAQUI_CLOSED = "ORDEN MAQUINADO CERRADA",
-    ORDER_MAQUI_CANCELED = "ORDEN MAQUINADO CANCELADA",
-    ORDER_DETAIL_CLOSED = "ORDEN DETALLE CERRADA",
-    ORDER_DETAIL_CANCELED = "ORDEN DETALLE CANCELADA"
+    PROJECT_CREATED = "Proyecto creado",
+    CATALOG_CREATED = "Bit\u00E1cora creada",
+    CATALOG_UPDATED = "Cat\u00E1logo Actualizado",
+    ORDER_MAQUI_CREATED = "Orden de Maquinado Creada",
+    ORDER_DETAIL_CREATED = "Orden de Detalle Creada",
+    ORDER_MAQUI_UPDATED = "Orden de Maquinado Actualizada",
+    ORDER_DETAIL_UPDATED = "Orden DETALLE Actualizada",
+    ORDER_MAQUI_CLOSED = "Orden de Maquinado Cerrada",
+    ORDER_MAQUI_CANCELED = "Orden de Maquinado Cancelada",
+    ORDER_DETAIL_CLOSED = "Orden de Detalle Cerrada",
+    ORDER_DETAIL_CANCELED = "Orden de Detalle Cancelada"
 }
 export type Milestone = {
     description: string;
@@ -19,7 +20,8 @@ export type Milestone = {
     updatedAt?: string;
     createdBy?: string;
     updatedBy?: string;
-    what?: Array<any>;
+    what?: Array<What>;
+    proveedor?: Usuario;
 };
 export interface Bitacora {
     _id?: string | undefined;
@@ -29,10 +31,18 @@ export interface Bitacora {
     createdAt: string;
     updatedAt: string;
 }
-export declare function createMilestone(description: string, generalId: string, createdBy: string, what: Array<any>, expand?: boolean): {
+export interface What {
+    cantidad: number;
+    plano: string;
+    material: string;
+    acabado: string;
+    razon?: string;
+}
+export declare function createMilestone(description: string, generalId: string, createdBy: string, what: Array<What>, p: any, expand?: boolean): {
     description: string;
     generalId: string;
     createdBy: string;
     expand: boolean;
-    what: any[];
+    what: What[];
+    proveedor: any;
 };

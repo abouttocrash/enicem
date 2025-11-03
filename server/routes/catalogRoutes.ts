@@ -1,17 +1,20 @@
-import { Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import { Mongo } from '../Mongo.js';
 import multer from 'multer';
 import { PDF } from '../PDF_reader/PDF.js';
 import path from 'path';
-import fs from 'fs';
+import fs, { mkdirSync } from 'fs';
 import { Salida } from '@shared-types/Salida.js';
 import moment from 'moment';
 import { Reporter } from '../Reporter.js';
 import { Catalogo } from '@shared-types/Pieza.js';
-import { ip } from '../App.js';
+import { ip, UPLOADS_PATH } from '../App.js';
+import { actualizarBitacora, crearBitacora } from '../mongo/ICEMTransactions.js';
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(process.cwd(), 'uploads'));
+        const p = `${UPLOADS_PATH}/${req.body.projectId}`
+        if(!fs.existsSync(p)) mkdirSync(p)
+        cb(null, path.join(process.cwd(), 'uploads/'+req.body.projectId+"/"));
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);
@@ -21,22 +24,51 @@ const upload = multer({ storage });
 const catalogRouter = Router();
 const mongo = Mongo.instance
 const pdf = new PDF();
-//catalog
-catalogRouter.post('/', upload.array('files'), async(req, res) => {
+
+catalogRouter.delete('/clear', async(req, res) => {
     try{
-        const pdfs = await pdf.readFolder()
+        const p = `${UPLOADS_PATH}/${req.query.projectId}`
+        let exists = fs.existsSync(p)
+        console.log(`DELETE /clear ${p} ${exists} `)
+        if(fs.existsSync(p))
+            pdf.emptyUploads(req.query.projectId as string,false)
+        res.status(200).send({data:true})
+    }catch(e){
+        console.log(e)
+        res.status(500).send({error:e})
+    }
+});
+
+
+catalogRouter.post("/verify",upload.array('files'), async(req, res) => {
+    try{
+        const pdfs = await pdf.readFolder(req.body.projectId)
         if(pdfs.length == 0) {
             pdf.emptyUploads(req.body.projectId,false)
             return res.status(400).send({error:"Error al leer un PDF."})
         }
-
-        const p = await mongo.createCatalogo(pdfs)
-        if(p == false){
-             pdf.emptyUploads(req.body.projectId,false)
-            return res.status(400).send({error:"Error al obtener info de un PDF"})
-        }
+        return res.status(200).send({data:pdfs})
+    }catch(e){
+        console.log(e)
+        res.status(400).send({error:e})
+    }
+});
+//catalog
+catalogRouter.post('/', async(req, res) => {
+    try{
+        const response = await crearBitacora(req.body.projectId,req.body.userId,req.body.milestone)
         pdf.emptyUploads(req.body.projectId)
-        res.status(200).send({data:p})
+        res.status(200).send({data:response})
+    }catch(e){
+        console.log(e)
+        res.status(400).send({error:e})
+    }
+});
+catalogRouter.post('/add', async(req, res) => {
+    try{
+        const response = await actualizarBitacora(req.body.projectId,req.body.catalogId,req.body.milestone,req.body.userId)
+        pdf.emptyUploads(req.body.projectId)
+        res.status(200).send({data:response})
     }catch(e){
         console.log(e)
         res.status(400).send({error:e})
@@ -44,7 +76,7 @@ catalogRouter.post('/', upload.array('files'), async(req, res) => {
 });
 catalogRouter.post('/plano', upload.array('files'), async(req, res) => {
     try{
-        const pdfs = await pdf.readFolder()
+        const pdfs = await pdf.readFolder(req.body.projectId)
         pdf.emptyUploads(req.body.projectId)
         const p = await mongo.createPieza(pdfs[0]!,req.body.catalogId)
         res.status(200).send({data:p.piezas})

@@ -28,7 +28,12 @@ projectRouter.put("/",async(req,res)=>{
 })
 
 projectRouter.put("/status",async(req,res)=>{
-    const p = await mongo.projects.updateProject({status:req.body.status},"_id",new ObjectId(req.body.projectId))
+    let p :any
+    if(req.body.status == "ELIMINADO")
+        p = await mongo.projects.deleteProject(req.body.projectId)
+
+    else
+        p = await mongo.projects.updateProject({status:req.body.status},"_id",new ObjectId(req.body.projectId))
     res.status(200).send({data:p})
 })
 

@@ -1,4 +1,9 @@
-<div class="vista-icem">
+<mat-drawer-container class="example-container" hasBackdrop="false">
+<mat-drawer #drawer mode="over" position="end" >
+  <app-panel-orden></app-panel-orden>
+</mat-drawer>
+<mat-drawer-content >
+  <div class="vista-icem">
   <div class="header">
     <div class="sub-header">
       <div class="title-holder">
@@ -97,7 +102,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="recibirPiezas(row)"></tr>
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell" colspan="4"></td>
@@ -106,3 +111,6 @@
     </div>
 
 </div>
+</mat-drawer-content>
+</mat-drawer-container>
+

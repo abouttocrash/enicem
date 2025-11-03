@@ -59,6 +59,11 @@ export class Mongoloid{
         const collection = db.collection(c);
         return collection
     }
+    protected async getCollectionWithClient(c:Collection,client:MongoClient){
+        const db = client.db(this.dbName);
+        const collection = db.collection(c);
+        return collection
+    }
 
     protected async getAllItems<T>(col:Collection):Promise<T[]>{
         const c = await this.getCollection(col)

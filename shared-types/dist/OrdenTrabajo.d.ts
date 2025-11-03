@@ -9,7 +9,13 @@ export interface OrdenTrabajo {
     dateEntrega: string;
     tipo: "Maquinado" | "Detalle";
     idProject: string;
+    project?: string;
     createdAt: string;
     status: StatusOrden;
     totalPiezas?: number;
+    cantidadRecibida: number;
+    cantidadRechazada: number;
+    dateReal?: string;
+    missed?: number;
+    notMissed?: number;
 }

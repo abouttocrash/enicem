@@ -14,7 +14,7 @@ import { ProyectoService } from '../../../proyecto.service';
 import { SalidaAlmacenComponent } from './salida-almacen/salida-almacen.component';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { baseDialog, createWhat, longDialog, projectDisabled } from '../../../utils/Utils';
+import { baseDialog, createWhat, longDialog, longerDialog, projectDisabled } from '../../../utils/Utils';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,8 +31,6 @@ import { DialogConfirmComponent } from '../../../components/dialog-confirm/dialo
   styleUrl: './catalogo.component.scss'
 })
 export class CatalogoComponent {
-  @ViewChild('folderInput') folderInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('pdfInput') pdfInput!: ElementRef<HTMLInputElement>;
 
   @ViewChild(MatSort) sort!: MatSort;
   private _snackBar = inject(MatSnackBar);
@@ -49,6 +47,7 @@ export class CatalogoComponent {
   }
   
   drop(event: CdkDragDrop<string[]>) {
+    
     if(
       event.currentIndex == 0 ||
       event.previousIndex == 0 ||
@@ -64,59 +63,47 @@ export class CatalogoComponent {
     this.drawer = drawer
     this.p.c.init(data,this.sort)
   }
-  openPDFDialog() {
-    this.pdfInput.nativeElement.value = '';
-    this.pdfInput.nativeElement.click();
-  }
+  
 
-async onPDFSelected(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    const  files = Array.from(input.files);
-    const formData = new FormData();
-     files.forEach(file => formData.append('files', file, file.name));
-    const found = this.p.c.dataSource.data.find(d=>{return d.title == files[0].name.replace(".pdf","")})
-    if(found)
-      this._snackBar.open("❌ Este plano ya existe en el catálogo","OK")
-    else{
-      let what:Array<What> = []
-      const res = await this.p.c.addPieza(formData)
-      let piezasToWhat:Pieza[] = []
-      piezasToWhat.push(...res.data)
-      what = createWhat(piezasToWhat,"piezas")
-      const desc = res.data.length == 1? "Plano agregado al catálogo":"Planos agregados al catálogo"
-      await this.api.updateLog(createMilestone(desc,this.api.currentProject.catalogId!,this.api.currentUser._id!,what,""))
-      this._snackBar.open("Plano agregado al catálogo","OK",{duration:2000})
+async agregarPlanos() {
+  const dialog = this.dialog.open(MultiDialogComponent,{
+      ...longerDialog,
+      disableClose:true,
+      data:{
+        action:"EDITAR",
+        planos:this.p.c.dataSource.data
+      }
+    });
+    const r = await firstValueFrom(dialog.afterClosed())
+    if(r.bool){
+      const ref = this._snackBar.open("actualizando bitácora")
+      const milestone = createMilestone("Planos agregados al catálogo",this.api.currentProject.catalogId!,this.api.currentUser._id!,[],"")
+      const res = await this.p.c.updateCatalog(milestone)
+      this._snackBar.open("Bitácora actualizada","OK",{duration:2000})
       await this.p.getAll()
     }
 
-  }
+  
 }
-  getFolders() {
-    this.folderInput.nativeElement.value = '';
-    this.folderInput.nativeElement.click();
-  }
-
-  async onFolderSelected(event: Event) {
-    const formData = new FormData();
-    let files:any[] = []
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) 
-      files = Array.from(input.files);
-      
+  async getFolders() {
+    const r = await this.validarPlanos()
     
-   
-    const r = await this.validarPlanos(files)
+  }
+  async validarPlanos(){
+    const dialog = this.dialog.open(MultiDialogComponent,{
+      ...longerDialog,
+      disableClose:true,
+      data:{
+        action:"AGREGAR",
+        planos:[]
+      }
+    });
+    const r = await firstValueFrom(dialog.afterClosed())
     if(r.bool){
       const ref = this._snackBar.open("Creando bitácora")
-      r.data.forEach(file => formData.append('files', file, file.name));
-      const res = await this.p.c.createCatalog(formData)
+      const milestone = createMilestone(MILESTONE_DESC.CATALOG_CREATED,"X",this.api.currentUser._id,[],"-",false)
+      const res = await this.p.c.createCatalog(milestone)
     if(res.response){
-      this.api.currentProject.piezasCount = files.length
-      const r = await this.api.updateProject(files.length)
-      const milestone = createMilestone(MILESTONE_DESC.CATALOG_CREATED,res.response.insertedId,this.api.currentUser._id,[],"-",false)
-      milestone.expand =  false
-      await this.api.updateLog(milestone)
       this.storage.setProject(this.api.currentProject)
       await this.p.getAll()
       this.textoPlanos = "Agregar planos adicionales"
@@ -126,15 +113,6 @@ async onPDFSelected(event: Event) {
     else
       this._snackBar.open("Ha ocurrido un error, inténtelo nuevamente","OK",{duration:5000})
     }
-   
-  }
-
-  async validarPlanos(files:any[]){
-    const dialog = this.dialog.open(MultiDialogComponent,{
-      ...baseDialog,
-      data: files
-    });
-    const r = await firstValueFrom(dialog.afterClosed())
     return r as {bool:boolean,data:any[]}
   }
 

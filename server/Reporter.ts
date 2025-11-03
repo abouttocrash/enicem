@@ -15,7 +15,6 @@ export class Reporter{
         this.worksheet.addRow([`Rango: ${f1} - ${f2}` ,"Reporte creado: "+moment().locale("es").format("DD MMMM YYYY")])
         const headerRow = this.worksheet.addRow(["Proyecto",	"Proveedor",	"Órdenes en el periodo", 
             "Piezas solicitadas","Pendientes por recibir"])
-            console.log(ordenes.length)
         const proyectoSet = Array.from(new Set(ordenes.map(o => {return o.idProject })))
          headerRow.eachCell(cell => {
             cell.font = Object.assign({}, cell.font, { bold: true });

@@ -54,6 +54,18 @@ export class Mongo{
         await this.client.close()
         return r
     }
+    async updateLogWithClient(body:Milestone,client:MongoClient,projectId:string){
+        const date = new Date()
+        const milestone:Milestone = body
+        milestone.createdAt = date.toISOString()
+        milestone.updatedAt =  date.toISOString()
+        milestone.generalId = milestone.generalId!
+        const pc = await this.getCollectionWitchClient("logs",client)
+        const r = await pc.updateOne(
+        { projectId:projectId},
+        { $push: { milestones: milestone as any } })
+        return r
+    }
 
     async updateStock(body:any){
         const responses:any[] = []
@@ -124,6 +136,11 @@ export class Mongo{
     async createLog(log:any){
         const c = await this.getCollection("logs")
         const insertResult = await c.insertOne(log);
+        return insertResult
+    }
+    async createLogwithClient(log:any,client:MongoClient){
+        const c = await this.getCollectionWitchClient("logs",client)
+        const insertResult = await c.insertOne(log);
         await this.client.close()
         return insertResult
     }
@@ -168,44 +185,7 @@ export class Mongo{
         return {r,piezas}
         
     }
-    async createCatalogo(piezas:Pieza[]){
-        const espejos:Pieza[] = []
-        let errored = false
-        piezas.forEach((p:Pieza)=>{
-            try{
-                const total = this.piezasAsNumber(p.piezas)
-                p.cantidadRechazada = []
-                p.cantidadDetalle = []
-                p.cantidadManufactura = []
-                p.cantidadAlmacen = []
-                p.cantidadRecibida = []
-                p.stock = []
-                if(total == 0){
-                    p.piezas = p.piezas.split("+")[0]!.trim()
-                    const toPush = structuredClone(p)
-                    toPush.title = `${toPush.title} (ESPEJO)`
-                    toPush.isEspejo = true;
-                    espejos.push(toPush)
-                }
-            }
-            catch(e){
-                errored = true
-            }
-            
-        })
-        piezas.push(...espejos)
-        piezas = piezas.sort((a,b) => a.title.localeCompare(b.title));
-        const catalogo:Catalogo = {
-            logs:piezas,
-            createdAt:new Date().toISOString()
-        }
-        if(errored) return false
-        const c = await this.getCollection("catalog")
-        const insertResult = await c.insertOne(catalogo as any);
-        await this.client.close()
-        return insertResult
-    }
-
+    
     piezasAsNumber(val:string){
         if(/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(val)){
         return Number(val)
@@ -251,4 +231,11 @@ export class Mongo{
         const collection = db.collection(c);
         return collection
     }
+    private async getCollectionWitchClient(c:Collection,client:MongoClient){
+        const db = this.client.db(this.dbName);
+        const collection = db.collection(c);
+        return collection
+    }
+
+   
 }

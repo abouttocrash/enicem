@@ -40,12 +40,15 @@
                 <div class="number-input">
                     <mat-form-field appearance="outline">
                         <mat-label>Equipos</mat-label>
-                        <input autocomplete="off" (keydown)="disableInput($event)" matInput formControlName="equipos">
+                        <input  autocomplete="off" (keydown)="isNumber($event)" (keyup)="changeEquipo($event)" matInput formControlName="equipos" >
+                        @if (!form.get("equipos")!.valid) {
+                        <mat-error>Campo requerido</mat-error>
+                        }
                     </mat-form-field>
                     <div class="center-ver-flex">
                         <div class="input-buttons">
-                        <button (click)="changeEquipo(1)">+</button>
-                        <button (click)="changeEquipo(-1)">-</button>
+                        <button [disabled]="!form.get('tipo')!.valid" (click)="changeEquipo(1)">+</button>
+                        <button [disabled]="!form.get('tipo')!.valid" (click)="changeEquipo(-1)">-</button>
                     </div>
                     </div>
                 </div>
@@ -60,9 +63,9 @@
                 <div class="item">
                 <div class="center-ver">
                     <input type="text" 
-                        [disabled]="form.get('equipos')?.value > 1"
+                        [disabled]="form.get('equipos')?.value > 1 || !form.get('tipo')!.valid "
                         [(ngModel)]="plano.cantidadInDialog"
-                        (keydown)="isNumber($event,plano)"
+                        (keydown)="isNumber($event)"
                         (keyup)="keyup($event,plano)">
                 </div>
                 <div class="center-ver">

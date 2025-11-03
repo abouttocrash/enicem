@@ -1,27 +1,38 @@
 
-import fs from 'fs'
+import fs, { mkdir, mkdirSync } from 'fs'
 import pdfParse from "pdf-parse";
 import path from 'path';
 import { PDFDocument, PDFImage, PageSizes, StandardFonts, rgb } from 'pdf-lib'
 import { Pieza } from '@shared-types/Pieza.js';
-import { ip } from '../App.js';
+import { ip, UPLOADS_PATH } from '../App.js';
 export class PDF{
     constructor(){}
-    private getUploadsFolder() {
-        return path.join(process.cwd(), 'uploads\\');
+    private getUploadsFolder(idProject:string) {
+        
+        return `${UPLOADS_PATH}/${idProject}`
     }
     
-    async readFolder(folder?:string){
-        const dir = folder? folder: this.getUploadsFolder()
+    async readFolder(idProject:string){
+        const dir = this.getUploadsFolder(idProject)
+
         let errored = false
         let arr:Pieza[] = []
+        let i = 0;
         try{
             const files = fs.readdirSync(dir)
-            for(let i = 0;i <files.length;i++){
-            const b = fs.readFileSync(`${dir}${files[i]}`)
-            const data = await pdfParse(b) as any;
-            
-            arr.push( this.extractObject(data.pageData[0],data.metadata._metadata))
+            for(i = 0;i <files.length;i++){
+                const b = fs.readFileSync(`${dir}/${files[i]}`)
+                const data = await pdfParse(b) as any;
+                if(data.metadata == null || data.metadata == undefined){
+                    data.metadata = {
+                        _metadata:{
+                            "dc:creator":"INVALID",
+                            "dc:title":"INVALID"
+                        }
+                    }
+                    console.log(`Plano Inválido ${files[i]}`)
+                }
+                arr.push(this.extractObject(data.pageData[0],data.metadata._metadata))
             }
         }catch(e){
             errored = true
@@ -34,7 +45,7 @@ export class PDF{
     }
 
     emptyUploads(projectId:string,create = true){
-        const dir = this.getUploadsFolder()
+        const dir = `${UPLOADS_PATH}/${projectId}`
         const dataDir = path.join(process.cwd(), 'data',projectId)
         fs.mkdirSync(dataDir, { recursive: true });
         fs.readdirSync(dir).forEach(file => {
@@ -46,6 +57,7 @@ export class PDF{
         
             fs.unlinkSync(path.join(dir, file));
         });
+        return true
     }
 
     extractObject(text: string,metadata:any){

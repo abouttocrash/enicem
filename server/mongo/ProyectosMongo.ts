@@ -36,6 +36,18 @@ export class ProyectosMongo extends Mongoloid{
         const r = await this.updateOne(updateObject,by,id)
         return r
     }
+    async deleteProject(projectId:string){
+        const c = await this.getCollection("projects")
+        const r = await c.deleteOne({"_id":new ObjectId(projectId)})
+        await this.client.close()
+        return r
+    }
+    async updateCatalogInProject(updateObject:any,by:string,id:ObjectId,client:MongoClient){
+        const byObj = {[by]:id}
+        const pc = await this.getCollectionWithClient("projects",client)
+        const r = await pc.updateOne(byObj,{ $set:updateObject})
+        return r
+    }
 
    
 }

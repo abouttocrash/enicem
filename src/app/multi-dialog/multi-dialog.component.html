@@ -1,23 +1,42 @@
 <div class="dialog">
-    <div> <h2>Verificar planos</h2> </div>
-    <div style="height: 100%;overflow-y: scroll;">
+    <div class="dialog-header center-ver">
+        <h2>{{title}}</h2>
+        <div class="center-ver-flex" style="justify-content: end;">
+            <button [disabled]="data.length ==0" (click)="verificarPlanos()" matRipple class="secondary-cta"><mat-icon fontSet="material-symbols-outlined">sweep</mat-icon>
+                Verificar planos
+            </button>
+            <button (click)="agregarPlanos()" matRipple class="secondary-cta"><mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+                {{getTextoBoton()}}
+            </button>
+            
+        </div>
+    </div>
+    <div class="should-overflow">
 
         @for(plano of data;track plano;let i = $index){
             <div class="list">
-                <div class="item">
+                <div class="item"  [class.item-invalid]="plano.material == null">
                     <div class="center-ver">
-                        <input [disabled]="true"  type="text" value ="-">
+                        <input [disabled]="true" type="text" [value]="plano.piezas || ''">
                     </div>
                 <div class="center-ver">
                     <div>
                         <p style="font-weight: 600;">{{plano.name}}</p>
-                        <p>-</p>
+                        <p>{{plano.material || "-"}} {{plano.acabado || "-"}}</p>
                     </div>
                 </div>
                 <div class="center-ver">
-                    <mat-icon matTooltip="Remover" 
-                    (click)="remove(i)" 
-                    style="cursor: pointer;color:var(--blue)" fontSet="material-symbols-outlined">delete</mat-icon>
+                    <div>
+                        @if(isVerified){
+                        <mat-icon matTooltip="Ver Plano" style="cursor: pointer;color:var(--blue);margin-right: 12px;" (click)="toggle(plano)" fontSet="material-symbols-outlined">docs</mat-icon>
+                        }
+                        <mat-icon matTooltip="Remover" 
+                        (click)="remove(i)" 
+                        style="cursor: pointer;color:var(--red)"
+                        fontSet="material-symbols-outlined">
+                        delete
+                    </mat-icon>
+                    </div>
                 </div>
             </div>
                 
@@ -32,8 +51,9 @@
             </p>
             <div>
                 <button class="secondary-cta" (click)="actualizar(false)" >Cancelar</button>
-                <button  class="main-cta" (click)="actualizar(true)">Crear</button>
+                <button [disabled]="!isValid"  class="main-cta" (click)="actualizar(true)">{{button}}</button>
             </div>
         </div>
     </div>
 </div>
+<input hidden accept="application/pdf" #folderInput2 type="file" id="files" name="files" multiple (change)="onFolderSelected($event)">

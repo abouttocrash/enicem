@@ -5,4 +5,21 @@
     display: grid;
     margin-bottom: 16px;
 }
+.item{
+    grid-template-columns: 50px 1fr 60px;
+}
+
+.dialog-header{
+    display: grid;
+    grid-template-columns: 1fr 400px;
+}
+
+.item-invalid{
+    background-color: var(--red-50)
+}
+
+.secondary-cta:disabled{
+    background-color: transparent;
+    color:var(--list);
+}
 

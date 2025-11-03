@@ -3,9 +3,10 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { APIService } from './api.service';
 import {  ICEMDR, ICEMR } from '@shared-types/ICEMR';
-import { Catalogo, Pieza } from '@shared-types/Pieza';
+import { Catalogo, CatalogoResponse, Pieza } from '@shared-types/Pieza';
 import { HttpParams } from '@angular/common/http';
 import { createWhat, sum } from './utils/Utils';
+import { Milestone } from '@shared-types/Bitacora';
 
 @Injectable({
   providedIn: 'root'
@@ -31,11 +32,29 @@ export class CatalogoService {
     
   }
 
-  async createCatalog(form:FormData){
+  async createCatalog(milestone:Milestone){
     try{
-      form.append("projectId",this.api.currentProject._id!)
-      const r = await this.api.POST<ICEMR<any>>("catalog",form)
-      this.api.currentProject.catalogId = r.data.insertedId
+      let body = {
+        projectId:this.api.currentProject._id,
+        userId:this.api.currentUser._id,
+        milestone:milestone
+      }
+      const r = await this.api.POST<ICEMR<CatalogoResponse>>("catalog",body)
+      this.api.currentProject.catalogId = r.data.catalogId
+      return {response:r.data}
+    }catch(e){
+      return {e,response:undefined}
+    }
+  }
+  async updateCatalog(milestone:Milestone){
+    try{
+      let body = {
+        projectId:this.api.currentProject._id,
+        userId:this.api.currentUser._id!,
+        catalogId:this.api.currentProject.catalogId!,
+        milestone:milestone
+      }
+      const r = await this.api.POST<ICEMR<CatalogoResponse>>("catalog/add",body)
       return {response:r.data}
     }catch(e){
       return {e,response:undefined}
@@ -47,6 +66,16 @@ export class CatalogoService {
     form.append("projectId",this.api.currentProject._id!)
     const r =  await this.api.POST<ICEMDR<Pieza>>("catalog/plano",form)
     return r
+  }
+
+  async verificarPlanos(form:FormData){
+    try{
+      
+      const r = await this.api.POST<ICEMDR<Pieza>>("catalog/verify",form)
+      return r.data
+    }catch(e){
+      return {e,response:undefined}
+    }
   }
 
   async removePieza(plano:string){

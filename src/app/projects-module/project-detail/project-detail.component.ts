@@ -63,11 +63,12 @@ export class ProjectDetailComponent {
   }
   
   async actualizarProyecto(status:string){
+    const s = status == "ELIMINADO"? "ELIMINAR PROYECTO":"ACTUALIZAR PROYECTO A "+ status
     const d = this.dialog.open(DialogConfirmComponent,{
       width:"340px",
       height:"260px",
       disableClose:false,
-      data:{accion:"ACTUALIZAR PROYECTO A "+status}
+      data:{accion:s}
     })
     d.afterClosed().subscribe(async(result:boolean)=>{
       if(result){

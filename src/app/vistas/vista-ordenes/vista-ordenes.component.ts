@@ -16,19 +16,22 @@ import { HttpParams } from '@angular/common/http';
 import { ICEMDR } from '@shared-types/ICEMR';
 import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
 import { OrdenesService } from '../../ordenes/ordenes.service';
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
+import { PanelOrdenComponent } from '../../ordenes/panel-orden/panel-orden.component';
 @Component({
   selector: 'app-vista-ordenes',
   providers:[
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ],
   imports: [MatTableModule, MatIconModule, MatSortModule, MatTooltipModule,
-    MatSelectModule,FormsModule,AutoIcemComponent,
+    MatSelectModule,FormsModule,AutoIcemComponent,MatSidenavModule,PanelOrdenComponent,
     MatFormFieldModule,MatInputModule,CdkDropList, CdkDrag,MatDatepickerModule],
   templateUrl: './vista-ordenes.component.html',
   styleUrl: './vista-ordenes.component.scss'
 })
 export class VistaOrdenesComponent {
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatDrawer) drawer!:MatDrawer
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
   dataSource!:MatTableDataSource<OrdenTrabajo>;
@@ -123,7 +126,16 @@ export class VistaOrdenesComponent {
     this.createDataSource(r)
   }
   createDataSource(r:ICEMDR<OrdenTrabajo>){
-      this.dataSource = new MatTableDataSource(r.data)
-      this.dataSource.sort = this.sort
-    }
+    this.dataSource = new MatTableDataSource(r.data)
+    this.dataSource.sort = this.sort
+  }
+
+  async recibirPiezas(element:OrdenTrabajo){
+    console.log(element)
+    this.o.currentOrden = await this.o.getOrder(element._id)
+    await this.o.getImages()
+    this.o.piezasEnPanel = JSON.parse(JSON.stringify(this.o.currentOrden.piezas.slice())) || []
+    this.o.drawer  =this.drawer;
+    this.drawer.open()
+  }
 }

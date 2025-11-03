@@ -4,4 +4,8 @@ export interface Usuario {
     color: string;
     short: string;
     rol?: string;
+    actions: string[];
+    code?: string;
+    active?: boolean;
+    isActive?: string;
 }

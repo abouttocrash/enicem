@@ -86,8 +86,8 @@ export class OrdenesService {
 
   async getImages(){
     const params = new HttpParams()
-    .set('projectId', this.api.currentProject._id!)
-    .set('ordenId', this.currentOrden!!._id);
+    .set('projectId', this.currentOrden?.idProject!)
+    .set('ordenId', this.currentOrden!._id);
     const r = await this.api.GET2<any>(`${this.route}/images`,params)
     this.images = r.data
   }
@@ -106,6 +106,9 @@ export class OrdenesService {
   }
 
   async getOrder(_id:string){
+    if(this.api.proveedores.length == 0){
+      await this.api.getProveedores()
+    }
     const r = await this.api.GET<ICEMR<OrdenTrabajo>>("order/",{attr:"orderId",value:_id!})
     r.data.proveedor = this.api.proveedores.find(p=>{return p._id == r.data.idProveedor})!.name
     

@@ -4,19 +4,22 @@ import path from 'path';
 import fs, { mkdirSync } from 'fs'
 import apiRouter from './routes/index.js'; 
 import { Mongo } from './Mongo.js';
+import GET_IP  from '@shared-types/APP_CONTS.js';
 import { Catalogo } from '@shared-types/Pieza.js';
 import { Reporter } from './Reporter.js';
 import { writePDF } from './PDF_reader/PDF_Writer.js';
 import moment from 'moment';
 const app = express();
+export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
 app.use(express.json())
 app.use(cors())
 app.use('/static',express.static(path.join(process.cwd(), 'imagenes')));
 app.use('/static',express.static(path.join(process.cwd(), 'data')));
 app.use('/static',express.static(path.join(process.cwd(), 'excel')));
 app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
+app.use('/static',express.static(UPLOADS_PATH));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
-export const ip = "http://192.168.1.220:3000"
+export const ip = GET_IP
 app.use(express.static(browserDist));
 
 // tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)

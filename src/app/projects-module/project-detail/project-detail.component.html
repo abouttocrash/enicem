@@ -64,10 +64,19 @@
 </mat-drawer-content>
 </mat-drawer-container>
 <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="actualizarProyecto('CERRADO')">
-            <span>Finalizar proyecto</span>
-        </button>
-         <button mat-menu-item (click)="actualizarProyecto('CANCELADO')">
-            <span>Cancelar proyecto</span>
-        </button>
-    </mat-menu>
+  <button mat-menu-item (click)="actualizarProyecto('CERRADO')">
+    <mat-icon>done_all</mat-icon>
+      <span>Finalizar proyecto</span>
+  </button>
+  <button mat-menu-item (click)="actualizarProyecto('CANCELADO')">
+    <mat-icon>cancel</mat-icon>
+    <span>Cancelar proyecto</span>
+  </button>
+  @if(api.currentProject.piezasCount == undefined){
+    <button mat-menu-item (click)="actualizarProyecto('ELIMINADO')">
+    <mat-icon>delete</mat-icon>
+    <span>Eliminar proyecto</span>
+  </button>
+  }
+  
+</mat-menu>

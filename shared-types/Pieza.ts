@@ -1,4 +1,3 @@
-import { OrdenTrabajo } from "./OrdenTrabajo"
 
 export interface Pieza{
     material:string
@@ -25,6 +24,14 @@ export interface Pieza{
     stock:Array<{c:number,t:string}>
     stockNumber?:number
     
+}
+
+export interface CatalogoResponse {
+    catalogId:string,
+    projectId:string,
+    userId:string
+    logId:string
+    piezasAdded:number,
 }
 
 export interface Catalogo {

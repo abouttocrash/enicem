@@ -25,6 +25,7 @@ import { Proveedor } from '@shared-types/Proveedor';
   styleUrl: './dialog-orden.component.scss'
 })
 export class DialogOrdenComponent {
+  
   form!:FormGroup
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -51,13 +52,32 @@ export class DialogOrdenComponent {
     })
     this.proveedores = api.proveedores
     this.filteredProveedores = structuredClone(api.proveedores)
+    this.form.get("equipos")?.disable()
+//     document.addEventListener('keydown', e => {
+//       console.log(e)
+//     })
+//     document.addEventListener('input', e => {
+//       console.log(e)
+//     })
+//     document.addEventListener('textInput', function (e){
+   
+//         console.log('IR scan textInput', e)
+    
+// });
   }
 
-  changeEquipo(val:number){
-    let current = this.form.get("equipos")!.value as number
-    if(current == 1 && val == -1)
+  changeEquipo(val:number | Event){
+    const stringVal = this.form.get("equipos")!.value 
+    let current = Number(stringVal)
+    console.log(current)
+    if(current == 1 && val == -1) return
+    if(typeof val == "number") current += val
+    if(this.form.get("equipos")!.value == "") {
+      this.data.list.forEach(p=>{
+        p.cantidadInDialog = (Number(p.base) * 1)
+      })
       return
-    current += val
+    }
     this.form.get("equipos")?.setValue(current)
     this.data.list.forEach(p=>{
       p.cantidadInDialog = (Number(p.base) * current)
@@ -70,6 +90,7 @@ export class DialogOrdenComponent {
     this.ref.close({close:false,todoBien:true})
   }
   async setFolio(tipo:string){
+    this.form.get("equipos")?.enable()
     const r = await this.api.getFolio()
     this.folio = tipo == "Detalle"? r.data.Detalle : r.data.Maquinado
     this.filteredProveedores = this.proveedores.filter(p=>{return p.tipo == tipo || p.tipo == "Ambos"})
@@ -119,20 +140,21 @@ export class DialogOrdenComponent {
     });
     return valid
   }
-  isNumber($event:KeyboardEvent,plano:Pieza){
+  isNumber($event:KeyboardEvent){
     const input = $event.target as HTMLInputElement;
     let value = input.value;
     if ($event.key.length === 1) {
       value += $event.key;
     }
     // Permite números decimales (solo un punto)
-    if (!/^\d*\.?\d*$/.test(value) && $event.key.length === 1) 
+    if (!/^\d*$/.test(value) && $event.key.length === 1) 
       $event.preventDefault();
   }
 
   keyup($event:KeyboardEvent,plano:Pieza){
     const input = $event.target as HTMLInputElement;
     let value = Number(input.value)
+    plano.base = Number(value)
   }
 
   disableForm(){
@@ -140,6 +162,7 @@ export class DialogOrdenComponent {
   }
 
   disableInput($event:KeyboardEvent){
+    
     $event.preventDefault()
   }
 
