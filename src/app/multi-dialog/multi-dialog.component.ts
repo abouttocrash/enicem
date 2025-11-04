@@ -25,6 +25,7 @@ export class MultiDialogComponent {
   inj = inject<{action:"EDITAR"|"AGREGAR",planos:Array<Pieza>}>(MAT_DIALOG_DATA);
   title = "Crear Bitácora"
   button = "Crear"
+  verifying = false
   constructor(
     private dialog:MatDialogRef<MultiDialogComponent>,
     private c:CatalogoService,
@@ -60,12 +61,24 @@ export class MultiDialogComponent {
       this.dialog.close(false)
     }
   }
-
+  async sleep(time:number){
+     await new Promise(resolve => setTimeout(resolve, time));
+  }
+  disableValidate(){
+    return this.data.length == 0 || this.verifying == true
+  }
   async verificarPlanos(){
     this.isVerified = false
-    this.snackbar.open("Verificando servidor...")
-    const r = await this.clearUploads()
     this.isValid = false
+    this.verifying = true
+    let ref = this.snackbar.open("Validando planos...","Cancelar")
+    ref.onAction().subscribe(()=>{
+      this.actualizar(false)
+    })
+    const time = Math.ceil((this.data.length /50))
+    console.log(time)
+    //await this.sleep(time*1000)
+  
     const formData = new FormData();
     formData.append("projectId",this.api.currentProject._id!)
     this.data.forEach(file => {
@@ -73,9 +86,10 @@ export class MultiDialogComponent {
     formData.append('files', file, file.name)});
     formData.append("sesion",this.sesion+"")
     const response = await this.c.verificarPlanos(formData)
-    this.snackbar.open("Validando planos...")
-    console.log(response)
+    this.snackbar.dismiss()
+   
     this.isVerified = true
+    this.verifying = false
     let map:any[] = []
     let invalid = 0
     if(response instanceof Array){
@@ -141,7 +155,7 @@ export class MultiDialogComponent {
         dup += 1
     })
     if(dup == 0)
-    this.snackbar.open(`${noDup} Planos agregados`,"OK",{duration:2000})
+    this.snackbar.open(`${noDup} Planos agregados`,"OK",{duration:1000})
     else
     this.snackbar.open(`${noDup} Planos agregados, ${dup} planos duplicados ignorados`,"OK",{duration:2000})
     console.log(this.data)
@@ -152,6 +166,10 @@ export class MultiDialogComponent {
     window.open(url, '_blank');
   }
   actualizar(bool:boolean){
+    if(!bool){
+    const r = this.clearUploads()
+
+    }
     return this.dialog.close({bool:bool,data:this.data})
   }
 

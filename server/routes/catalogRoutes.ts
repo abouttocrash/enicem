@@ -30,8 +30,10 @@ catalogRouter.delete('/clear', async(req, res) => {
         const p = `${UPLOADS_PATH}/${req.query.projectId}`
         let exists = fs.existsSync(p)
         console.log(`DELETE /clear ${p} ${exists} `)
-        if(fs.existsSync(p))
+        if(fs.existsSync(p)){
             pdf.emptyUploads(req.query.projectId as string,false)
+            console.log("DELETED")
+        }
         res.status(200).send({data:true})
     }catch(e){
         console.log(e)

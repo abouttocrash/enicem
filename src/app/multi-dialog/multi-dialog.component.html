@@ -2,7 +2,7 @@
     <div class="dialog-header center-ver">
         <h2>{{title}}</h2>
         <div class="center-ver-flex" style="justify-content: end;">
-            <button [disabled]="data.length ==0" (click)="verificarPlanos()" matRipple class="secondary-cta"><mat-icon fontSet="material-symbols-outlined">sweep</mat-icon>
+            <button [disabled]="disableValidate()" (click)="verificarPlanos()" matRipple class="secondary-cta"><mat-icon fontSet="material-symbols-outlined">sweep</mat-icon>
                 Verificar planos
             </button>
             <button (click)="agregarPlanos()" matRipple class="secondary-cta"><mat-icon fontSet="material-symbols-outlined">add</mat-icon>

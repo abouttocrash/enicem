@@ -11,7 +11,7 @@ import { writePDF } from './PDF_reader/PDF_Writer.js';
 import moment from 'moment';
 const app = express();
 export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
-app.use(express.json())
+app.use(express.json({ limit: '100mb' }))
 app.use(cors())
 app.use('/static',express.static(path.join(process.cwd(), 'imagenes')));
 app.use('/static',express.static(path.join(process.cwd(), 'data')));
