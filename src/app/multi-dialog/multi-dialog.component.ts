@@ -46,8 +46,9 @@ export class MultiDialogComponent {
     this.folderInput.nativeElement.value = '';
     this.folderInput.nativeElement.click();
   }
-  remove(index:number){
+  async remove(index:number,plano:any){
     this.data.splice(index,1)
+    await this.c.removePlano(plano.name)
   }
 
   async clearUploads(){
@@ -75,16 +76,13 @@ export class MultiDialogComponent {
     ref.onAction().subscribe(()=>{
       this.actualizar(false)
     })
-    const time = Math.ceil((this.data.length /50))
-    console.log(time)
-    //await this.sleep(time*1000)
   
     const formData = new FormData();
     formData.append("projectId",this.api.currentProject._id!)
     this.data.forEach(file => {
       
     formData.append('files', file, file.name)});
-    formData.append("sesion",this.sesion+"")
+    console.log(formData)
     const response = await this.c.verificarPlanos(formData)
     this.snackbar.dismiss()
    
@@ -146,7 +144,6 @@ export class MultiDialogComponent {
         found = this.data.find(d=>{return d.name == f.name})
         found2 = undefined
       }
-      console.log(found,found2)
       if(!found && !found2){
         this.data.push(f)
         noDup += 1

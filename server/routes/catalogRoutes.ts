@@ -25,6 +25,21 @@ const catalogRouter = Router();
 const mongo = Mongo.instance
 const pdf = new PDF();
 
+catalogRouter.delete('/clear/one', async(req, res) => {
+    try{
+        const p = `${UPLOADS_PATH}/${req.query.projectId}`
+        
+        console.log(`DELETE /clear/one ${p} `)
+        if(fs.existsSync(p)){
+            pdf.emptyOne(req.query.projectId as string,req.query.filename as string)
+            console.log("DELETED")
+        }
+        res.status(200).send({data:true})
+    }catch(e){
+        console.log(e)
+        res.status(500).send({error:e})
+    }
+});
 catalogRouter.delete('/clear', async(req, res) => {
     try{
         const p = `${UPLOADS_PATH}/${req.query.projectId}`

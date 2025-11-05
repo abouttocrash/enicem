@@ -19,7 +19,7 @@ app.use('/static',express.static(path.join(process.cwd(), 'excel')));
 app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
 app.use('/static',express.static(UPLOADS_PATH));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
-export const ip = GET_IP
+export const ip = GET_IP.GET_IP
 app.use(express.static(browserDist));
 
 // tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)
@@ -127,6 +127,7 @@ app.post("/api/pdf/orden",async(req,res)=>{
     const r = writePDF(req.body.orden)
     let data:any;
     let status = 200
+    console.log(ip)
     if(typeof r == "string")
         data = { path:`${ip}/static/${r}` }
     

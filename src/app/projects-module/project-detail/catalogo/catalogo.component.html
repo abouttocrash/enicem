@@ -93,7 +93,7 @@
           <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadManufactura")}}</td>
         </ng-container>
         <ng-container matColumnDef="cantidadDetalle">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Detalladas</th>
+          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Con Acabado</th>
           <td mat-cell *matCellDef="let row"> {{sum(row.cantidadDetalle)}} </td>
           <td mat-footer-cell *matFooterCellDef>{{sumAttr("cantidadDetalle")}}</td>
         </ng-container>
