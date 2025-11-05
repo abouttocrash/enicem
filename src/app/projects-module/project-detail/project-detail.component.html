@@ -72,7 +72,7 @@
     <mat-icon>cancel</mat-icon>
     <span>Cancelar proyecto</span>
   </button>
-  @if(api.currentProject.piezasCount == undefined){
+  @if(api.currentProject.catalogId == undefined){
     <button mat-menu-item (click)="actualizarProyecto('ELIMINADO')">
     <mat-icon>delete</mat-icon>
     <span>Eliminar proyecto</span>

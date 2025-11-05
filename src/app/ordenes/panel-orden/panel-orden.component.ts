@@ -189,8 +189,9 @@ openNativeImageDialog() {
   }
 
   async getPDF(){
-    this.o.currentOrden!.project = this.api.currentProject.name
+    //this.o.currentOrden!.project = this.api.currentProject.name
     const r = await this.api.POST<any>("pdf/orden",{orden:this.o.currentOrden})
+    console.log(r.data)
     window.open(r.data.path, '_blank');
   }
 }

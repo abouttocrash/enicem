@@ -91,6 +91,18 @@ export class CatalogoService {
       return false
     }
   }
+  async removePlano(plano:string){
+    let httpParams = new HttpParams()
+    .set("filename",plano)
+    .set("projectId",this.api.currentProject._id!)
+    try{
+    const r = await this.api.DELETE<ICEMDR<Pieza>>("catalog/clear/one",httpParams)
+    return true
+    }catch(e){
+      console.log(e)
+      return false
+    }
+  }
 
   async createScrap(piezas:Pieza[]){
       const body = {

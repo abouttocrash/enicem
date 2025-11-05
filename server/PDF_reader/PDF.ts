@@ -43,7 +43,15 @@ export class PDF{
         
       
     }
-
+    emptyOne(projectId:string,filename:string){
+        const dir = `${UPLOADS_PATH}/${projectId}`
+        try{
+            console.log(`${dir}/${filename}`)
+            fs.unlinkSync(`${dir}/${filename}`)
+        }catch(e){
+            console.log("NOT FOUND")
+        }
+    }
     emptyUploads(projectId:string,create = true){
         const dir = `${UPLOADS_PATH}/${projectId}`
         const dataDir = path.join(process.cwd(), 'data',projectId)

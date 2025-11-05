@@ -133,6 +133,7 @@ export class VistaOrdenesComponent {
   async recibirPiezas(element:OrdenTrabajo){
     console.log(element)
     this.o.currentOrden = await this.o.getOrder(element._id)
+    console.log(this.o.currentOrden)
     await this.o.getImages()
     this.o.piezasEnPanel = JSON.parse(JSON.stringify(this.o.currentOrden.piezas.slice())) || []
     this.o.drawer  =this.drawer;
