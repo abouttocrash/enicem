@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Mongo } from '../Mongo.js';
+import { Pieza } from '@shared-types/Pieza.js';
 
 const salidaRouter = Router();
 const mongo = Mongo.instance
@@ -22,6 +23,16 @@ salidaRouter.get("/outview",async(req,res)=>{
 })
 salidaRouter.put("/outview",async(req,res)=>{
     const p = await mongo.salida.updateSalida(req.body.salida)
+    const aux = req.body.salida.salidas
+    const piezas:Pieza[] = []
+    aux.forEach((p:any)=>{
+        let pieza = {
+            title:p.pieza,
+            cantidadInDialog : p.piezas
+        }as Pieza
+        piezas.push(pieza)
+    })
+    const resp = await mongo.catalog.updateCatalog({catalogId:req.body.salida.catalogId,piezas:piezas})
     res.status(200).send({data:p})
 })
 salidaRouter.put("/outview/cantidad",async(req,res)=>{

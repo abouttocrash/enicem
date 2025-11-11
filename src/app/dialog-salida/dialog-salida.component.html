@@ -37,7 +37,7 @@
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button [disabled]="revision == 'RECHAZADA' && razon == '' " class="main-cta" (click)="actualizar(true)">Guardar</button>
+            <button [disabled]="(revision == 'RECHAZADA' && razon == '') || revision == '' " class="main-cta" (click)="actualizar(true)">Guardar</button>
         </div>
     </div>
 </div>

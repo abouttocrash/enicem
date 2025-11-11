@@ -119,7 +119,6 @@ catalogRouter.delete('/plano', async(req, res) => {
 catalogRouter.post('/almacen', async(req, res) => {
     try{
         const p = await mongo.createAlmacen(req.body)
-        const resp = await mongo.catalog.updateCatalog(req.body)
         const folio = await mongo.orders.getFolio()
         const prevFolio = folio.Almacen
          let salidas:{
@@ -168,7 +167,7 @@ catalogRouter.post('/almacen', async(req, res) => {
         }
         await mongo.salida.createSalida(salidas)
         await mongo.salida.incrementFolio("Almacen")
-        res.status(200).send({data:true,inserted:{p,resp,prevFolio}})
+        res.status(200).send({data:true,inserted:{p,prevFolio}})
     }catch(e){
         console.log(e)
         res.status(400).send({error:e})
