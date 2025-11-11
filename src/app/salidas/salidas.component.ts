@@ -12,24 +12,27 @@ import { createMilestone } from '@shared-types/Bitacora';
 import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { DialogSalidaComponent } from '../dialog-salida/dialog-salida.component';
-import { longDialog, createWhat, baseDialog, projectDisabled } from '../utils/Utils';
+import { longDialog, createWhat, baseDialog, projectDisabled, pad, getStatusClass } from '../utils/Utils';
 import { DialogEditarSalidaComponent } from '../dialog-editar-salida/dialog-editar-salida.component';
 import { APIService } from '../api.service';
 import { ProyectoService } from '../proyecto.service';
 import { MatTooltip } from "@angular/material/tooltip";
 import { AutoFilter, AutoIcemComponent } from '../components/auto-icem/auto-icem.component';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'salidas',
   imports: [
     MatTableModule, MatIconModule, MatFormFieldModule,
     MatDialogModule,AutoIcemComponent,
     MatInputModule, CdkDropList, CdkDrag, MatSortModule,
-    MatTooltip
+    MatTooltip,CommonModule
 ],
   templateUrl: './salidas.component.html',
   styleUrl: './salidas.component.scss'
 })
 export class SalidasComponent {
+  pad = pad
+  getStatusClass = getStatusClass
   readonly dialog = inject(MatDialog);
   projectDisabled = projectDisabled
   @ViewChild(MatSort) sort!: MatSort;
@@ -146,7 +149,7 @@ export class SalidasComponent {
           r.data.modifiedById = this.api.currentUser._id
           r.data.modifiedDate = moment().endOf("D").toISOString()
           await this.s.updateSalida(r.data)
-          const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name}`
+          const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name} Razón: ${r.data.razon}`
           const what = createWhat(r.data.salidas,"piezas")
           await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
           

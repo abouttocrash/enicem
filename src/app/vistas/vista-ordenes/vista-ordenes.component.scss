@@ -16,3 +16,11 @@ mat-drawer-content{
 mat-drawer{
     padding: 16px;
 }
+
+.bar{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+.filter-holder{
+   grid-template-columns: 1fr 1fr 1fr 120px;
+}

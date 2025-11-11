@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use './styles//dialog.scss';
+
 :root{
     // --bg-light:#ededed;
     --bg-light:#dfdfdf;
@@ -17,6 +18,7 @@
     --red:#ad2831;
     --red-50:#ad283130;
     --green:#6a994e;
+    --padding:3px 8px 3px 8px;
     
 }
 html, body { 
@@ -191,4 +193,33 @@ tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
 .should-overflow{
     height:100%;
     overflow-y: auto;
+}
+
+.tabla-status-abierta{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: #21375f;
+}
+.tabla-status-cerrada{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: #212121;
+}
+.tabla-status-cancelada{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: var(--red);
+}
+.tabla-status-aprobada{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: #31572c;
 }

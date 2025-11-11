@@ -12,6 +12,7 @@ import { createWhat } from '../utils/Utils';
 import { MatDrawer } from '@angular/material/sidenav';
 import { AutoFilter } from '../components/auto-icem/auto-icem.component';
 import { Proveedor } from '@shared-types/Proveedor';
+import moment from 'moment';
 
 // Add a minimal declaration for the Web Serial API to satisfy TypeScript
 declare global {
@@ -58,6 +59,7 @@ export class OrdenesService {
 
   init(data:OrdenTrabajo[],drawer?:MatDrawer,sort?:MatSort){
     data.forEach(d=>{
+      
       d.cantidadRecibida = 0 
       d.cantidadRechazada = 0
       d.piezas.forEach(p=>{
@@ -110,6 +112,8 @@ export class OrdenesService {
       await this.api.getProveedores()
     }
     const r = await this.api.GET<ICEMR<OrdenTrabajo>>("order/",{attr:"orderId",value:_id!})
+    // if(r.data.tipo == "Detalle")
+    //   r.data.tipo = "Acabado"
     r.data.proveedor = this.api.proveedores.find(p=>{return p._id == r.data.idProveedor})!.name
     
     return r.data
@@ -173,14 +177,23 @@ export class OrdenesService {
     }
     await this.api.PUT<ICEMR<OrdenTrabajo>>(this.route,body)
   }
+  async editarFechaOrder(date:Date,razon:string){
+    const body = {
+      dateEntrega:moment(date).endOf("day").toDate(),
+      razonCambio:razon,
+      id:this.currentOrden?._id!
+    }
+    await this.api.PUT<ICEMR<OrdenTrabajo>>(`${this.route}/date`,body)
+  }
   
 
   async aprobar(result:{razon:string,bool:boolean,piezas:Pieza[]},idCatalogo:string){
-    this.currentOrden!!.piezas = this.piezasEnPanel
+    this.currentOrden!.piezas = this.piezasEnPanel
     let recibidas = 0
     let what:What[] = []
     let piezasToWhat:Pieza[] = []
-    this.currentOrden!!.piezas.forEach(p=>{
+    const toUpload:Pieza[] = []
+    this.currentOrden!.piezas.forEach(p=>{
       const pieza = result.piezas.find(pi=>{return p.title == pi.title}) 
       if(pieza != undefined){
         piezasToWhat.push(pieza)
@@ -188,18 +201,18 @@ export class OrdenesService {
         p.razonRechazo = result.razon
         p.cantidadRecibida.push(pieza.cantidadInDialog!)
         p.fechaRecibida.push({c:pieza.cantidadInDialog!,fecha:new Date().toISOString()})
-        
+        toUpload.push(p)
       }
     })
     what = createWhat(piezasToWhat,"cantidadInDialog")
-
+    
     await this.updateOrder(this.currentOrden!,"RECIBIDA")
     const cual = this.currentOrden!.tipo == "Detalle" ? "cantidadDetalle":"cantidadManufactura"
-    await this.api.updateCatalogo(cual,this.currentOrden!.piezas,idCatalogo)
+    await this.api.updateCatalogo(cual,toUpload,idCatalogo)
     
        const body = {
         piezas:what,
-        catalogId:this.api.currentProject.catalogId!,
+        catalogId:idCatalogo,
         razon:`ENTRADA ${this.currentOrden!!.tipo}`
       }
       await this.api.updateStock(body)
@@ -219,6 +232,7 @@ export class OrdenesService {
     let recibidas = 0
     let what:What[] = []
     let piezasToWhat:Pieza[] = []
+    const toUpload:Pieza[] = []
     this.currentOrden!.piezas.forEach(p=>{
       const pieza = result.piezas.find(pi=>{return p.title == pi.title}) 
       
@@ -227,12 +241,13 @@ export class OrdenesService {
         recibidas += pieza.cantidadInDialog!
         p.razonRechazo = result.razon
         p.cantidadRechazada?.push(pieza.cantidadInDialog!)
+        toUpload.push(p)
       }
     })
     what = createWhat(piezasToWhat,"cantidadInDialog")
     await this.updateOrder(this.currentOrden!,"RECHAZADA")
     const desc =  `(${recibidas}) Piezas rechazadas para orden de ${this.currentOrden!.tipo} #${this.currentOrden!.folio} Razón: ${result.razon}`
-    await this.api.updateCatalogo("cantidadRechazada",this.currentOrden!.piezas,idCatalogo)
+    await this.api.updateCatalogo("cantidadRechazada",toUpload,idCatalogo)
     await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor))
     const r = await this.getOrder(this.currentOrden!._id)
     this.currentOrden! = r

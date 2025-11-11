@@ -18,6 +18,9 @@ import { ProyectoService } from '../../proyecto.service';
 import { SalidasComponent } from '../../salidas/salidas.component';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NewProjectDialog } from '../projects/dialog-project/dialog-project';
+import { firstValueFrom } from 'rxjs';
+import { DialogCancelComponent } from '../../dialog-cancel/dialog-cancel.component';
 @Component({
   selector: 'app-project-detail',
   imports: [FormsModule,
@@ -50,6 +53,30 @@ export class ProjectDetailComponent {
     this.salidas.init(response.data.salidas)
   }
 
+  async editProject(){
+    const dialogRef = this.dialog.open(NewProjectDialog,
+      {width:"860px",height:"620px",disableClose:true,data:"EDIT"}
+    );
+    const dialogResponse = await firstValueFrom(dialogRef.afterClosed())
+    if(dialogResponse.bool){
+
+      const r = await this.p.editProyecto(dialogResponse.p)
+      console.log(r)
+      if(r){
+        this.api.currentProject.name = dialogResponse.p.name
+        this.api.currentProject.noSerie = dialogResponse.p.noSerie
+        this.api.currentProject.designer = dialogResponse.p.designer
+        this.storage.setProject(this.api.currentProject)
+        this.snackBar.open("Proyecto editado","OK",{duration:2000})
+      }
+      else{
+        this.snackBar.open("Ocurrió un error","OK",{duration:2000})
+      }
+    }
+    console.log(dialogResponse)
+      
+  }
+
   async goBack(event:MouseEvent){
     const el = document.getElementById("renew")!
     el.classList.remove('spin');         // reinicia si ya tenía clase
@@ -61,7 +88,24 @@ export class ProjectDetailComponent {
     el.addEventListener('animationend', onEnd);
     const response = await this.p.getAll()
   }
-  
+  async cancelarProyecto(){
+    const d = this.dialog.open(DialogCancelComponent,{
+      width:"440px",
+      height:"360px",
+      disableClose:false,
+    })
+    const r = await firstValueFrom(d.afterClosed())
+    if(r.bool){
+      await this.p.cancelProyecto({
+        status:"CANCELADO",
+        razon:r.razon,
+        canceladoDate:new Date(),
+        canceladoBy:this.api.currentUser._id
+      })
+      this.router.navigate([""])
+      this.snackBar.open(`Proyecto Cancelado`,"OK",{duration:5000})
+    }
+  }
   async actualizarProyecto(status:string){
     const s = status == "ELIMINADO"? "ELIMINAR PROYECTO":"ACTUALIZAR PROYECTO A "+ status
     const d = this.dialog.open(DialogConfirmComponent,{

@@ -26,12 +26,18 @@
                 <mat-option value="RECHAZADA">Rechazar</mat-option>
             </mat-select>
         </mat-form-field>
+        @if(revision == "RECHAZADA"){
+            <mat-form-field appearance="outline">
+            <mat-label>Razón de rechazo</mat-label>
+            <textarea [(ngModel)]="razon" matInput lines="3"></textarea>        
+            </mat-form-field>
+        }
 
     </div>
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+            <button [disabled]="revision == 'RECHAZADA' && razon == '' " class="main-cta" (click)="actualizar(true)">Guardar</button>
         </div>
     </div>
 </div>

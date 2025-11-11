@@ -26,6 +26,30 @@ projectRouter.put("/",async(req,res)=>{
     const p = await mongo.projects.updateProject(updateObject, "_id",new ObjectId(req.body.projectId))
     res.status(200).send({data:p})
 })
+projectRouter.put("/edit",async(req,res)=>{
+    try{
+        const p = await mongo.projects.updateProject(req.body.pData, "_id",new ObjectId(req.body.projectId))
+        res.status(200).send({data:true})
+    }
+    catch(e){
+        res.status(500).send({data:false})
+    }
+})
+projectRouter.put("/cancel",async(req,res)=>{
+    try{
+        const p = await mongo.projects.updateProject(req.body.pData, "_id",new ObjectId(req.body.projectId))
+        const o = await mongo.orders.getOrders(req.body.projectId)
+        for(let i = 0;i < o.length;i++){
+            if(o[i]?.status == "ABIERTA"){
+                await mongo.orders.updateStatus({status:"CANCELADA",id:o[i]?._id!})
+            }
+        }
+        res.status(200).send({data:true})
+    }
+    catch(e){
+        res.status(500).send({data:false})
+    }
+})
 
 projectRouter.put("/status",async(req,res)=>{
     let p :any

@@ -26,7 +26,7 @@
 <mat-form-field appearance="outline">
     <mat-label>Proveedor</mat-label>
     <mat-select [(ngModel)]="proveedorObj">
-        @for(p of api.proveedores;track p){
+        @for(p of api.proveedores;track p._id!){
             <mat-option (click)="selectProveedor(p)" [value]="p">{{p.name}}</mat-option>
         }
     </mat-select>

@@ -3,7 +3,12 @@
         <h1>Proyectos</h1>
         <div class="bar">
             <div>
-                <!-- <auto-icem (keyup)="applyFilter($event)" [filters]="filters" [filteredFilters]="filteredFilters"></auto-icem> -->
+                <mat-form-field style="width: 500px;" appearance="outline"> 
+                    <mat-icon matPrefix>search</mat-icon>
+                    <mat-label>Filtrar</mat-label>
+                    <input autocomplete="off" matInput (keyup)="applyFilter($event)" placeholder="Nombre del proyecto" #input>
+                </mat-form-field>
+
             </div>
             <div></div>
             <div class="filter-holder center-ver">
@@ -23,7 +28,7 @@
         </div>
     </div>
     <div class="projects-list">
-        @for(p of API.projects;track p.name;let i = $index){
+        @for(p of filteredProjects;track p.name;let i = $index){
             <project-card
                 (click)="seeDetails(p)"
                 [project]="p">

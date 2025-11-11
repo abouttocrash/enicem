@@ -1,16 +1,18 @@
 <form class="dialog" [formGroup]="form">
-    <h2>Nuevo proyecto</h2>
+    <h2>{{title}}</h2>
     <div>
         <mat-form-field appearance="outline">
             <mat-label>Nombre del proyecto</mat-label>
-            <input autocomplete="off" matInput placeholder="Nombre del proyecto" formControlName="nombreProyecto">
+            <textarea rows="2" autocomplete="off" matInput placeholder="Nombre del proyecto" formControlName="nombreProyecto">
+            </textarea>
             @if (!form.get("nombreProyecto")!.valid) {
                 <mat-error>Nombre del proyecto requerido</mat-error>
             }
         </mat-form-field>
         <mat-form-field appearance="outline">
             <mat-label>Clave del proyecto</mat-label>
-            <input autocomplete="off" matInput placeholder="Clave del proyecto" formControlName="claveProyecto">
+            <textarea rows="3" autocomplete="off" matInput placeholder="Clave del proyecto" formControlName="claveProyecto">
+            </textarea>
             @if (!form.get("claveProyecto")!.valid) {
                 <mat-error>Clave del proyecto requerida</mat-error>
             }
@@ -19,7 +21,9 @@
             <mat-label>Diseñador</mat-label>
             <mat-select formControlName="designer">
                 @for(u of API.users;track u._id){
-                    <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
+                    @if(u.active){
+                        <mat-option (click)="selectUser(u)" [value]="u.name">{{u.name}}</mat-option>
+                    }
                 }
             </mat-select>
             @if (!form.get("designer")!.valid) {
@@ -30,7 +34,7 @@
     <div class="dialog-bottom">
         <div >
             <button  (click)="close()" class="secondary-cta">Cancelar</button>
-            <button [disabled]="!form.valid" class="main-cta" (click)="createProject()">Crear</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createProject()">{{boton}}</button>
         </div>
     </div>
 </form>

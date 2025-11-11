@@ -18,14 +18,18 @@ import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-i
 import { OrdenesService } from '../../ordenes/ordenes.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { PanelOrdenComponent } from '../../ordenes/panel-orden/panel-orden.component';
+import { APIService } from '../../api.service';
+import { fixAcabado, getStatusClass, pad } from '../../utils/Utils';
+import { CommonModule } from '@angular/common';
+import { ProyectoService } from '../../proyecto.service';
 @Component({
   selector: 'app-vista-ordenes',
   providers:[
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ],
   imports: [MatTableModule, MatIconModule, MatSortModule, MatTooltipModule,
-    MatSelectModule,FormsModule,AutoIcemComponent,MatSidenavModule,PanelOrdenComponent,
-    MatFormFieldModule,MatInputModule,CdkDropList, CdkDrag,MatDatepickerModule],
+    MatSelectModule, FormsModule, AutoIcemComponent, MatSidenavModule, PanelOrdenComponent,
+    MatFormFieldModule, MatInputModule, CdkDropList, CdkDrag, MatDatepickerModule,CommonModule],
   templateUrl: './vista-ordenes.component.html',
   styleUrl: './vista-ordenes.component.scss'
 })
@@ -36,8 +40,10 @@ export class VistaOrdenesComponent {
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
   dataSource!:MatTableDataSource<OrdenTrabajo>;
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
-  displayedColumns = ["createdAt","dateEntrega","status", "dateReal","folio","totalPiezas","proveedor","tipo","project"]
-  
+  displayedColumns = ["folio","tipo","createdAt","dateEntrega","status", "dateReal","totalPiezas","proveedor","project"]
+  pad = pad
+  fixAcabado = fixAcabado
+  getStatusClass = getStatusClass
   tipo = "Ambas"
   status = "Todos"
   fecha1:Date
@@ -61,7 +67,7 @@ export class VistaOrdenesComponent {
     },
   ]
   filteredFilters:Array<AutoFilter> = []
-  constructor(public o:OrdenesService){
+  constructor(public o:OrdenesService,private api:APIService,private p:ProyectoService){
     this.fecha1 = moment().startOf("month").toDate()
     this.fecha2 = moment().endOf("month").toDate()
   }
@@ -131,12 +137,17 @@ export class VistaOrdenesComponent {
   }
 
   async recibirPiezas(element:OrdenTrabajo){
-    console.log(element)
+    this.p.b.currentPieza = undefined
     this.o.currentOrden = await this.o.getOrder(element._id)
-    console.log(this.o.currentOrden)
+    if(this.api.projects.length == 0){
+      await this.api.getProjects("ABIERTO")
+      this.api.currentProject = this.api.projects.find(p=>{return p._id! == this.o.currentOrden?.idProject})!
+    }
     await this.o.getImages()
     this.o.piezasEnPanel = JSON.parse(JSON.stringify(this.o.currentOrden.piezas.slice())) || []
-    this.o.drawer  =this.drawer;
+    this.o.drawer  = this.drawer;
     this.drawer.open()
   }
+  
 }
+

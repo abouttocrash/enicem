@@ -20,6 +20,10 @@ orderRouter.put("/",async(req,res)=>{
     const r = await mongo.orders.updateOrden(req.body.orden,req.body.status)
     res.status(200).send({data:r})
 })
+orderRouter.put("/date",async(req,res)=>{
+    const r = await mongo.orders.updateDate(req.body)
+    res.status(200).send({data:r})
+})
 orderRouter.put("/status",async(req,res)=>{
     await mongo.orders.updateStatus(req.body)
     res.status(200).send({data:{}})

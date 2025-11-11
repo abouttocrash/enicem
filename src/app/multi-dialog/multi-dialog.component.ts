@@ -59,7 +59,6 @@ export class MultiDialogComponent {
     }
     catch(e){
       return false
-      this.dialog.close(false)
     }
   }
   async sleep(time:number){

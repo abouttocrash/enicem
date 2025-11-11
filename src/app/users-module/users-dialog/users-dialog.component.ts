@@ -20,15 +20,22 @@ export class UsersDialogComponent {
   data = inject(MAT_DIALOG_DATA) as Usuario;
   disabled = true;
   title = "Crear Usuario"
+  boton = "Crear"
   isNumber = isNumber
+  
   constructor(private dialogRef:MatDialogRef<UsersDialogComponent>,public api:APIService,private p:ProyectoService){
-    if(this.data != null)
+    let activo = true
+    if(this.data != null){
       this.title = "Editar Usuario"
+      this.boton = "Editar"
+      activo = this.data.active!
+    }
+    console.log(activo)
     this.form = new FormGroup({
       username: new FormControl(this.data?.name || "", [Validators.required]),
       code: new FormControl(this.data?.code || "", [Validators.required,Validators.min(4)]),
       rol: new FormControl(this.data?.rol || "", [Validators.required]),
-      activo: new FormControl(this.data?.active || true),
+      activo: new FormControl(activo , [Validators.required]),
     });
   
   }

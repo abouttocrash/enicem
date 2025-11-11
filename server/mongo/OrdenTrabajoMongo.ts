@@ -4,13 +4,12 @@ import { OrdenTrabajo } from '../../shared-types/OrdenTrabajo.js';
 import { Pieza } from "@shared-types/Pieza.js";
 import moment from "moment";
 import { Proyecto } from "@shared-types/Proyecto.js";
-import { Proveedor } from "@shared-types/Proveedor.js";
 import { Usuario } from "@shared-types/Usuario.js";
 export class OrdenTrabajoMongo extends Mongoloid{
     constructor(client:MongoClient){
         super("orders",client)
     }
-
+    //TODO
     async updateStatus(body:{status:string,id:string}){
         const dateReal = body.status == "CERRADA" ? new Date().toISOString():"-"
         const r = await this.updateOne({'status':body.status,'dateReal':dateReal},"_id",new ObjectId(body.id))
@@ -21,6 +20,15 @@ export class OrdenTrabajoMongo extends Mongoloid{
             p.status = status
         })
         const r = await this.updateOne({'piezas':orden.piezas},"_id",new ObjectId(orden._id))
+        await this.client.close()
+        return r
+    }
+    async updateDate(body:any){
+        const r = await this.updateOne(
+            {   dateEntrega:body.dateEntrega,
+                razon:body.razon
+            }
+            ,"_id",new ObjectId(body.id))
         await this.client.close()
         return r
     }

@@ -4,11 +4,18 @@
 </mat-drawer>
 <mat-drawer-content >
   <div class="details">
-    <div class="header">
-      <div class="back center-ver-flex" (click)="goBack($event)">
+    <div class="back center-ver-flex" (click)="goBack($event)">
         <mat-icon id="renew" class="autorenew">autorenew</mat-icon>
         <span>Refrescar Info</span>
       </div>
+      <div class="info">
+        <button class="secondary-cta" [matMenuTriggerFor]="menu" [disabled]="api.currentProject.status != 'ABIERTO'">
+          <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
+          Editar
+        </button>
+      </div>
+    <div class="header">
+      
       <div>
         <div class="header-details">
           <div class="icon-detail">
@@ -17,17 +24,22 @@
           <div class="project-detail">
             <h1 class="center-ver-flex">
               {{api.currentProject.name}}
-              &nbsp;&nbsp;
-              <button class="icon-button-app" [matMenuTriggerFor]="menu" [disabled]="api.currentProject.status != 'ABIERTO'">
-                <mat-icon >more_horiz</mat-icon>
-              </button>
-              
             </h1>
-            <h2>{{api.currentProject.noSerie}} | {{api.currentProject.status}}</h2>
+            <h2>{{api.currentProject.noSerie}}</h2>
           </div>
         </div>
-        <div class="designer-holder">
-          <p class="design-name">Diseñador</p>
+        <div class="detail-info-holder">
+          <div class="designer-holder">
+            <p class="design-name">Status</p>
+          <div class="name-holder center-ver-flex">
+            <section class="user-holder">
+              
+            </section>
+            <p>{{api.currentProject.status}}</p>
+          </div>
+          </div>
+          <div class="designer-holder">
+            <p class="design-name">Diseñador</p>
           <div class="name-holder center-ver-flex">
             <section class="user-holder">
               <div class="circle" [ngStyle]="{'backgroundColor':api.currentProject.designer?.color}">
@@ -37,6 +49,8 @@
             </section>
             <p style="margin-left: 8px;">{{api.currentProject.designer?.name}}</p>
           </div>
+          </div>
+         
         </div>
         
       </div>
@@ -68,9 +82,13 @@
     <mat-icon>done_all</mat-icon>
       <span>Finalizar proyecto</span>
   </button>
-  <button mat-menu-item (click)="actualizarProyecto('CANCELADO')">
+  <button mat-menu-item (click)="cancelarProyecto()">
     <mat-icon>cancel</mat-icon>
     <span>Cancelar proyecto</span>
+  </button>
+  <button mat-menu-item (click)="editProject()">
+    <mat-icon>edit</mat-icon>
+    <span>Modificar proyecto</span>
   </button>
   @if(api.currentProject.catalogId == undefined){
     <button mat-menu-item (click)="actualizarProyecto('ELIMINADO')">

@@ -17,6 +17,7 @@ export class SalidaMongo extends Mongoloid{
     async updateSalida(salida:any){
         const r = await this.updateOne({
             status:salida.status,
+            razon:salida.razon,
             modifiedBy:salida.modifiedBy,
             modifiedDate: salida.modifiedDate
         },"_id",new ObjectId(salida._id))

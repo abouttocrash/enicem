@@ -1,0 +1,37 @@
+<div class="dialog" >
+    <div>
+        <h2>Editar orden</h2>
+    </div>
+    <div class="content">
+        <form [formGroup]="form">
+           <mat-form-field appearance="outline">
+                <mat-label>Fecha estimada de entrega</mat-label>
+                <input autocomplete="off" matInput [min]="todayDate" [matDatepicker]="picker" formControlName="date" placeholder="DD/MM/AAAA">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                @if (!form.get("date")!.valid) {
+                    <mat-error>Fecha estimada requerida DD/MM/AAAA</mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Razón de cambio</mat-label>
+                <textarea formControlName="razon" matInput lines="3"></textarea>
+                @if (!form.get("razon")!.valid) {
+                    <mat-error>Campo requerido</mat-error>
+                }
+            </mat-form-field>
+        
+        </form>
+        
+        
+    </div>
+    <div class="dialog-bottom">
+        <div style="width: 100%;display: grid;grid-template-columns: 1fr 230px;">
+            <div></div>
+            <div>
+                <button class="secondary-cta" (click)="close(false)" >Cancelar</button>
+                <button [disabled]="!form.valid"  class="main-cta" (click)="close(true)">Editar</button>
+            </div>
+        </div>
+    </div>
+</div>

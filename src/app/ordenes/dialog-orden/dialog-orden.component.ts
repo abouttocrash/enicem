@@ -12,7 +12,7 @@ import { APIService } from '../../api.service';
 import { Pieza } from '@shared-types/Pieza';
 import { ProyectoService } from '../../proyecto.service';
 import moment from 'moment';
-import { sum } from '../../utils/Utils';
+import { pad, sum } from '../../utils/Utils';
 import { Proveedor } from '@shared-types/Proveedor';
 @Component({
   selector: 'app-dialog-orden',
@@ -25,7 +25,7 @@ import { Proveedor } from '@shared-types/Proveedor';
   styleUrl: './dialog-orden.component.scss'
 })
 export class DialogOrdenComponent {
-  
+  pad = pad
   form!:FormGroup
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
@@ -47,12 +47,13 @@ export class DialogOrdenComponent {
       equipos:new FormControl(1)
     });
     this.data.list.forEach((d:Pieza)=>{
-      d.piezas = this.piezasAsNumber(d.piezas)
-      d.base = Number(d.piezas)
+      d.piezas = this.piezasAsNumber(d.piezas) || "1"
+      d.base = Number(d.piezas) || 1
     })
     this.proveedores = api.proveedores
     this.filteredProveedores = structuredClone(api.proveedores)
     this.form.get("equipos")?.disable()
+    this.form.get("proveedor")?.disable()
 //     document.addEventListener('keydown', e => {
 //       console.log(e)
 //     })
@@ -66,12 +67,12 @@ export class DialogOrdenComponent {
 // });
   }
 
-  changeEquipo(val:number | Event){
+  changeEquipo(val:number | Event, add = true){
     const stringVal = this.form.get("equipos")!.value 
     let current = Number(stringVal)
     console.log(current)
     if(current == 1 && val == -1) return
-    if(typeof val == "number") current += val
+    if(typeof val == "number" && add) current += val
     if(this.form.get("equipos")!.value == "") {
       this.data.list.forEach(p=>{
         p.cantidadInDialog = (Number(p.base) * 1)
@@ -89,8 +90,12 @@ export class DialogOrdenComponent {
   close(){
     this.ref.close({close:false,todoBien:true})
   }
+  
   async setFolio(tipo:string){
     this.form.get("equipos")?.enable()
+    this.form.get("proveedor")?.enable()
+    this.form.get("equipos")!.setValue(1)
+    this.changeEquipo(1,false)
     const r = await this.api.getFolio()
     this.folio = tipo == "Detalle"? r.data.Detalle : r.data.Maquinado
     this.filteredProveedores = this.proveedores.filter(p=>{return p.tipo == tipo || p.tipo == "Ambos"})
@@ -103,7 +108,7 @@ export class DialogOrdenComponent {
       this.data.list.forEach((d:Pieza)=>{
         d.piezas = this.piezasAsNumber(d.piezas)
         d.base = Number(d.piezas)
-        d.cantidadInDialog = d.base
+        d.cantidadInDialog = d.base == 0 ? 1:d.base
       })
   }
 
@@ -128,12 +133,19 @@ export class DialogOrdenComponent {
       await this.p.getAll()
     this.ref.close({close:true,todoBien:todoBien})
   }
-
+  print(){
+    this.data.list.forEach((p:Pieza) => {
+     
+      console.log(( p.cantidadInDialog! > this.sumStock(p)!), p.cantidadInDialog! ,">", this.sumStock(p)!)
+    })
+  }
 
   allPiezasAreFilled(){
     let valid = true
     this.data.list.forEach((p:Pieza) => {
-      if(p.piezas == ""  ||p.cantidadInDialog ==0 || ( p.cantidadInDialog! > p.base! && this.form.get("tipo")!.value == "Detalle")){
+      if(p.piezas == ""  || 
+        p.cantidadInDialog == 0 
+        || ( p.cantidadInDialog! > this.sumStock(p)! && this.form.get("tipo")!.value == "Detalle")){
         valid = false;
         return
       }

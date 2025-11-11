@@ -7,7 +7,7 @@ export interface OrdenTrabajo {
     idProveedor:string
     proveedor:string
     dateEntrega:string
-    tipo:"Maquinado" | "Detalle"
+    tipo:"Maquinado" | "Detalle" | "Acabado"
     idProject:string
     project?:string
     createdAt:string

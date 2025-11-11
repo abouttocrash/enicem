@@ -12,7 +12,7 @@ import { Pieza } from '@shared-types/Pieza';
 })
 export class BitacoraService {
   currentPieza!:Pieza | undefined
-  bitacoraPieza!:any[]
+  bitacoraPieza!:any[] 
   filters:Array<AutoFilter>=[
     // {
     //   filter:"Milestone",

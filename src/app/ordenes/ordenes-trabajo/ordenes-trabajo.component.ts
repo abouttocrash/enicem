@@ -11,16 +11,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
-import { _filter, AutoFilter, AutoIcemComponent } from '../../components/auto-icem/auto-icem.component';
+import { _filter, AutoIcemComponent } from '../../components/auto-icem/auto-icem.component';
+import { fixAcabado, getStatusClass, pad } from '../../utils/Utils';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'ordenes-trabajo',
-  imports: [MatIconModule,MatTableModule,MatSortModule,AutoIcemComponent,
-    MatSidenavModule,MatFormFieldModule,MatInputModule,MatAutocompleteModule,CdkDropList, CdkDrag],
+  imports: [MatIconModule, MatTableModule, MatSortModule, AutoIcemComponent,CommonModule,
+    MatSidenavModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, CdkDropList, CdkDrag],
   templateUrl: './ordenes-trabajo.component.html',
   styleUrl: './ordenes-trabajo.component.scss'
 })
 export class OrdenesTrabajoComponent {
+  pad = pad
+  fixAcabado = fixAcabado
+  getStatusClass = getStatusClass
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
   readonly dialog = inject(MatDialog);
   @ViewChild(MatSort) sort!: MatSort;

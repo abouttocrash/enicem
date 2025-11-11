@@ -20,11 +20,11 @@
             
             <ng-container matColumnDef="folio">
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Folio salida </th>
-                <td mat-cell *matCellDef="let row"> {{row.folio}} </td>
+                <td mat-cell *matCellDef="let row"> {{pad(row.folio,"salida")}} </td>
             </ng-container>
             <ng-container matColumnDef="folioOrden">
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Orden asociada</th>
-                <td mat-cell *matCellDef="let row"> {{row.folioOrden || "-"}} </td>
+                <td mat-cell *matCellDef="let row"> {{pad(row.folioOrden,row.tipo) || "-"}} </td>
             </ng-container>
             <ng-container matColumnDef="salidas">
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> # Planos</th>
@@ -42,6 +42,12 @@
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de salida</th>
                 <td mat-cell *matCellDef="let row"> {{row.fechaSalida}} </td>
             </ng-container>
+            <ng-container matColumnDef="status">
+                <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                <td mat-cell *matCellDef="let row"  > 
+                <span [ngClass]="getStatusClass(row.status)"> {{row.status}}</span>
+                </td>
+            </ng-container>
             <ng-container matColumnDef="editar">
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Editar</th>
                 <td mat-cell *matCellDef="let row">
@@ -53,7 +59,7 @@
             <ng-container matColumnDef="action">
                 <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Revisión</th>
                 <td mat-cell *matCellDef="let row"> 
-                @if(row.tipo == "Integración" && row.status == "ABIERTA" && canApprove()){
+                @if(row.tipo == "Integración" && row.status == "ABIERTA" && canApprove() && !projectDisabled()){
                     <mat-icon (click)="abrirDialogoSalida(row)" style="color:var(--blue);cursor:pointer">edit_square</mat-icon>
                 }
                 </td>

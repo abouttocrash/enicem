@@ -34,7 +34,7 @@
               (click)="toggle(element); $event.stopPropagation()"
               class="example-toggle-button"
               [class.example-toggle-button-expanded]="isExpanded(element)">
-              @if(element.expand){
+              @if(element.expand || element.expand == null){
                 <mat-icon>keyboard_arrow_down</mat-icon>
               }
               <!-- @if(element.expand){

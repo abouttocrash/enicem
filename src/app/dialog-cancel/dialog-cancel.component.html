@@ -1,0 +1,18 @@
+<div class="dialog" >
+    <h2>Cancelar Proyecto</h2>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Razón</mat-label>
+            <textarea  autocomplete="off" matInput placeholder="Nombre del proyecto" [(ngModel)]="razon">
+            </textarea>
+            
+        </mat-form-field>
+        
+    </div>
+    <div class="dialog-bottom">
+        <div >
+            <button (click)="close(false)" class="secondary-cta">Cerrar</button>
+            <button [disabled]="razon == ''" class="main-cta" (click)="close(true)">Confirmar</button>
+        </div>
+    </div>
+</div>

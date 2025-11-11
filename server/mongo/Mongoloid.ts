@@ -89,6 +89,14 @@ export class Mongoloid{
         return r
     
     }
+    protected async updateOneWithClient(client:MongoClient,obj:any,by:string,id:string|ObjectId,collection = this.collection){
+        const byObj = {[by]:id}
+        const pc = await this.getCollection(collection)
+        const r = await pc.updateOne(byObj,{ $set:obj})
+        await this.client.close()
+        return r
+    
+    }
 
     protected async pushToArray(by:string,id:string, arrName:string, body:any){
         const arrObj = {[arrName]:body}

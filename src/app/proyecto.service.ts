@@ -25,7 +25,31 @@ export class ProyectoService {
     this.c.init(r.data.catalogo)
     this.s.init(r.data.salidas)
   }
-  
+
+  async editProyecto(pData:any){
+    const body = {
+      pData:pData,
+      projectId : this.api.currentProject._id
+    }
+    try{
+      await this.api.PUT("projects/edit",body)
+      return true
+    }catch(e){
+      return false
+    }
+  }
+  async cancelProyecto(pData:any){
+    const body = {
+      pData:pData,
+      projectId : this.api.currentProject._id
+    }
+    try{
+      await this.api.PUT("projects/cancel",body)
+      return true
+    }catch(e){
+      return false
+    }
+  }
   async createUser(form:FormGroup){
     let body = {
       name:form.get("username")?.value,

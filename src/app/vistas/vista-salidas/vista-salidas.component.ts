@@ -16,25 +16,28 @@ import { DialogEditarSalidaComponent } from '../../dialog-editar-salida/dialog-e
 import { DialogSalidaComponent } from '../../dialog-salida/dialog-salida.component';
 import { ProyectoService } from '../../proyecto.service';
 import { SalidaService } from '../../salida.service';
-import { ViewsImports, longDialog, createWhat, baseDialog } from '../../utils/Utils';
+import { ViewsImports, longDialog, createWhat, baseDialog, pad, getStatusClass } from '../../utils/Utils';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-vista-salidas',
   providers:[
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ],
-  imports: [...ViewsImports,AutoIcemComponent],
+  imports: [...ViewsImports,AutoIcemComponent,CommonModule],
   templateUrl: './vista-salidas.component.html',
   styleUrl: './vista-salidas.component.scss'
 })
 export class VistaSalidasComponent {
   dialog = inject(MatDialog)
+  pad = pad
+  getStatusClass = getStatusClass
   @ViewChild(MatSort) sort!: MatSort;
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
   dataSource!:MatTableDataSource<Salida>;
-  displayedColumns = ["tipo","fechaSalida","folio","folioOrden","salidas","usuario","project","status","editar",'action', 'pdf']
+  displayedColumns = ["folio","tipo","fechaSalida","folioOrden","salidas","usuario","project","status","editar",'action', 'pdf']
   
 
   tipo = "Ambas"
@@ -101,8 +104,10 @@ export class VistaSalidasComponent {
         r.data.modifiedById = this.api.currentUser._id
         r.data.modifiedDate = moment().endOf("D").toISOString()
         await this.s.updateSalida(r.data)
-        const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name}`
+        const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name} Razón: ${r.data.razon}`
         const what = createWhat(r.data.salidas,"piezas")
+        await this.api.getProjects("ABIERTO")
+        this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})!
         await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
         
         if(r.data.status == "APROBADA"){
@@ -161,7 +166,7 @@ export class VistaSalidasComponent {
     .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString());
     const r = await this.s.getAllSalidas(httpParams)
     this.createDataSource(r)
-     this.initFilters(r.data)
+    this.initFilters(r.data)
   }
 
   //TODO
@@ -172,7 +177,7 @@ export class VistaSalidasComponent {
   //TODO
   async getPDF(salida:Salida){
     let x = salida as any
-    x.idProject = this.api.currentProject._id
+    x.idProject = salida.projectId
     const body = {
       salida:x
     }
@@ -193,8 +198,12 @@ export class VistaSalidasComponent {
         await this.s.updateCantidadSalida(r.data)
         const desc = `(Nuevas cantidades) Salida con Folio ${r.data.folio} Modificada por ${this.api.currentUser.name}`
         const what = createWhat(r.data.salidas,"piezas")
+        await this.api.getProjects("ABIERTO")
+        this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})! 
+        console.log(this.api.currentProject)
+        console.log(salida)
         await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
-        await this.p.getAll()
+        await this.buscar()
       }
   }
   

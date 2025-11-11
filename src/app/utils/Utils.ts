@@ -76,3 +76,33 @@ export function isF(eventKey:string){
 export function isArrow(eventKey:string){
   return eventKey.includes("Arrow")
 }
+
+export function pad(folio:string,tipo:string){
+  let p = ""
+  switch(tipo){
+    case "Maquinado":p = "M00"+folio;break;
+    case "Detalle":p = "A00"+folio;break;
+    case "salida":p = "I00"+folio;break;
+    case "":p = "";break;
+  }
+  return p;
+}
+
+export function fixAcabado(tipo:string){
+  if(tipo == "Detalle")
+    return "Acabado"
+  return tipo
+}
+
+export function getStatusClass(status:string){
+    let c = ""
+    switch(status){
+      case "ABIERTA": c = 'tabla-status-abierta';break;
+      case "CERRADA":c = "tabla-status-cerrada";break;
+      case "CANCELADA":c = "tabla-status-cancelada";break;
+      case "RECHAZADA":c = "tabla-status-cancelada";break;
+      case "APROBADA":c = "tabla-status-aprobada";break;
+      default:c = "";break
+    }
+    return c
+  }

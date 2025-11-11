@@ -10,7 +10,7 @@ import { HttpParams } from '@angular/common/http';
   providedIn: 'root'
 })
 export class SalidaService {
-  displayedColumns = ["folio","folioOrden","salidas", "tipo","fechaSalida","usuario","editar",'action', 'pdf']
+  displayedColumns = ["folio","folioOrden","salidas", "tipo","fechaSalida","usuario","status", "editar",'action', 'pdf']
   dataSource!:MatTableDataSource<Salida>
   private sort!:MatSort
   private route = "out"

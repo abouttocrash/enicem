@@ -14,7 +14,11 @@ salidaRouter.get("/",async(req,res)=>{
 })
 salidaRouter.get("/outview",async(req,res)=>{
     const p = await mongo.salida.getAllSalidas(req.query)
-    res.status(200).send({data:p})
+    const proyectos = await mongo.projects.getAll("ABIERTO")
+    const salidasValidas = p.filter(s=>{
+       return proyectos.find(pr=>{return pr._id! == s.projectId && pr.status == "ABIERTO"}) != null
+    })
+    res.status(200).send({data:salidasValidas})
 })
 salidaRouter.put("/outview",async(req,res)=>{
     const p = await mongo.salida.updateSalida(req.body.salida)

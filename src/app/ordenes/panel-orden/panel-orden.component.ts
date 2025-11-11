@@ -12,7 +12,7 @@ import { StatusOrden } from '@shared-types/OrdenTrabajo';
 import { ProyectoService } from '../../proyecto.service';
 import { Pieza } from '@shared-types/Pieza';
 import { DialogRecibirComponent } from '../dialog-recibir/dialog-recibir.component';
-import { baseDialog, projectDisabled, sum } from '../../utils/Utils';
+import { baseDialog, fixAcabado, pad, projectDisabled, sum } from '../../utils/Utils';
 import { DialogConfirmComponent } from '../../components/dialog-confirm/dialog-confirm.component';
 import { firstValueFrom } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -20,6 +20,8 @@ import { createMilestone, What } from '@shared-types/Bitacora';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { APIService } from '../../api.service';
+import { CambioFechaComponent } from '../../cambio-fecha/cambio-fecha.component';
+import moment from 'moment';
 export type IMG_OBJ = {
   URL:string,
   name:string,
@@ -36,6 +38,8 @@ export class PanelOrdenComponent {
   readonly dialog = inject(MatDialog);
   projectDisabled = projectDisabled
   imageInput!: HTMLInputElement;
+  fixAcabado = fixAcabado
+  pad = pad
   selectedImages: IMG_OBJ[] = [];
   constructor(public o:OrdenesService,public p:ProyectoService,private snack:MatSnackBar,
     private api:APIService
@@ -55,6 +59,22 @@ export class PanelOrdenComponent {
   async recibirConScanner(){
     await this.recibir([])
   }
+
+  async cambioFecha(){
+    const d = this.dialog.open(CambioFechaComponent,{
+      ...baseDialog
+    })
+    const r = await firstValueFrom(d.afterClosed())
+    if(r.bool){
+      await this.o.editarFechaOrder(r.body.date,r.body.razon)
+      const desc = `Orden con Folio #${pad(this.o.currentOrden?.folio!,this.o.currentOrden?.tipo!)} - Cambio de fecha de ${moment(this.o.currentOrden?.dateEntrega!).locale("es").format("DD MMM YYYY")} a ${moment(r.body.date).locale("es").format("DD MMM YYYY")} Razón: ${r.body.razon}`
+      this.o.currentOrden!.dateEntrega = r.body.date!
+      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,[],"",false))
+      
+      await this.p.getAll()
+    }
+  }
+
   async recibir(emptyArray?:Pieza[]){
     const piezasSelected = emptyArray == undefined? this.getPiezasSelected():[]
     const d = this.dialog.open(DialogRecibirComponent,{
@@ -63,7 +83,8 @@ export class PanelOrdenComponent {
     })
     d.afterClosed().subscribe(async(result:any)=>{
       if(result.bool){
-        await this.o.aprobar(result,this.p.api.currentProject.catalogId!)
+        const p = this.api.projects.find(pr=>{return pr._id == this.o.currentOrden?.idProject!})!
+        await this.o.aprobar(result,p.catalogId!)
         await this.p.getAll()
         let suma = 0
         this.o.currentOrden!.piezas.forEach(pieza=>{
@@ -85,7 +106,8 @@ export class PanelOrdenComponent {
     })
     d.afterClosed().subscribe(async(result:any)=>{
       if(result.bool){
-        await this.o.rechazar(result,this.p.api.currentProject.catalogId!)
+        const p = this.api.projects.find(pr=>{return pr._id == this.o.currentOrden?.idProject!})!
+        await this.o.rechazar(result,p.catalogId!)
         await this.p.getAll()
         
       }
@@ -189,9 +211,7 @@ openNativeImageDialog() {
   }
 
   async getPDF(){
-    //this.o.currentOrden!.project = this.api.currentProject.name
     const r = await this.api.POST<any>("pdf/orden",{orden:this.o.currentOrden})
-    console.log(r.data)
     window.open(r.data.path, '_blank');
   }
 }

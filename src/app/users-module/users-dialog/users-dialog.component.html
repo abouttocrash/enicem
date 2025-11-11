@@ -20,7 +20,7 @@
         <mat-form-field appearance="outline">
             <mat-label>Rol</mat-label>
             <mat-select formControlName="rol">
-                @for(rol of api.roles;track rol){
+                @for(rol of api.roles;track rol._id){
                     <mat-option [value]="rol.rol">{{rol.rol}}</mat-option> 
                 }
                 
@@ -39,7 +39,7 @@
     <div class="dialog-bottom">
         <div>
             <button  class="secondary-cta" (click)="close()">Cancelar</button>
-            <button [disabled]="!form.valid" class="main-cta" (click)="createUser()">Crear</button>
+            <button [disabled]="!form.valid" class="main-cta" (click)="createUser()">{{boton}}</button>
         </div>
     </div>
 </form>

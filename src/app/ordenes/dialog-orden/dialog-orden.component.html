@@ -1,6 +1,6 @@
 <div class="dialog" >
     <div>
-        <h2>Crear orden de trabajo <span>#{{folio}}</span></h2>
+        <h2>Crear orden de trabajo <span>#{{pad(folio,"")}}</span></h2>
     </div>
     <div class="content">
         <form [formGroup]="form">
@@ -9,17 +9,19 @@
                     <mat-label>Tipo de orden</mat-label>
                     <mat-select formControlName="tipo">
                         <mat-option (click)="setFolio('Maquinado')" value="Maquinado">Maquinado</mat-option>
-                        <mat-option (click)="setFolio('Detalle')" value="Detalle">Detalle</mat-option>
+                        <mat-option (click)="setFolio('Detalle')" value="Detalle">Acabado</mat-option>
                     </mat-select>
                     @if (!form.get("tipo")!.valid) {
                         <mat-error>Tipo de orden requerida</mat-error>
                     }
                 </mat-form-field>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" >
                     <mat-label>Proveedor</mat-label>
-                    <mat-select formControlName="proveedor">
-                        @for(p of filteredProveedores;track p){
-                            <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+                    <mat-select  formControlName="proveedor">
+                        @for(p of filteredProveedores;track p._id){
+                            @if(p.active){
+                                <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+                            }
                         }
                     </mat-select>
                     @if (!form.get("proveedor")!.valid) {
@@ -40,7 +42,7 @@
                 <div class="number-input">
                     <mat-form-field appearance="outline">
                         <mat-label>Equipos</mat-label>
-                        <input  autocomplete="off" (keydown)="isNumber($event)" (keyup)="changeEquipo($event)" matInput formControlName="equipos" >
+                        <input autocomplete="off" (keydown)="isNumber($event)" (keyup)="changeEquipo($event)" matInput formControlName="equipos" >
                         @if (!form.get("equipos")!.valid) {
                         <mat-error>Campo requerido</mat-error>
                         }

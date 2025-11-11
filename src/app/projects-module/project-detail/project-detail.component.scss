@@ -19,36 +19,71 @@ mat-drawer-content{
     padding:0 24px 0 24px;
 }
 .header{
-    padding:24px 0 0 24px;
+    padding:24px 0 0 8px;
     display: grid;
     position:relative;
 }
+
 .back{
     position:absolute;
+    z-index: 100;
     cursor: pointer;
-    top:16px;
-    right:0px;
+    top:8px;
+    right:16px;
     color:var(--blue);
+   
+    font-size: 14px;
+    height:28px;
+    & mat-icon{
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+    
+}
+.info{
+    position:absolute;
+    cursor: pointer;
+    top:8px;
+    z-index:100;
+    left:22px;
+    color:var(--blue);
+    & button{
+        font-size: 12px;
+        height:28px;
+        gap:0;
+        & mat-icon{
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+        }
+    }
+}
+.detail-info-holder{
+    display: grid;
+    grid-template-columns: 90px 320px 1fr;
 }
 .designer-holder{
     display: grid;
+    height:38px;
     & .name-holder{
         display: flex;
+        font-size: 14px;
         & p{
             color: var(--gray);
         }
     }
     & .design-name{
+        font-size: 14px;
         color:var(--text);
         font-weight: 600;
-        margin-bottom: 4px;
     }
 }
 .header-details{
     display: grid;
     height:52px;
     margin-top: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     grid-template-columns: 52px 1fr;
     & .icon-detail{
         display: grid;
@@ -66,13 +101,18 @@ mat-drawer-content{
     }
 
     & h1{
-        font-size: 24px;
+        font-size: 20px;
         color:var(--text);
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
         
     }
     & h2{
-        font-size: 18px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 400;
     }
 }
 
@@ -101,7 +141,12 @@ mat-drawer{
 }
 
 h2{
-    color:var(--gray)
+    color:var(--gray);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 :host ::ng-deep .mat-mdc-tab-group{
@@ -110,8 +155,8 @@ h2{
 }
 
 .circle{
-    height: 32px;
-    width: 32px;
+    height: 28px;
+    width: 28px;
     background-color: red;
     border-radius: 50%;
     position:relative;
@@ -120,7 +165,7 @@ h2{
         position:absolute;
         top:50%;
         left:50%;
-        font-size: 14px;
+        font-size: 10px;
         font-weight: 600;
         transform: translate(-50%,-50%);
     }
