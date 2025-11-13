@@ -200,8 +200,6 @@ export class VistaSalidasComponent {
         const what = createWhat(r.data.salidas,"piezas")
         await this.api.getProjects("ABIERTO")
         this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})! 
-        console.log(this.api.currentProject)
-        console.log(salida)
         await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
         await this.buscar()
       }

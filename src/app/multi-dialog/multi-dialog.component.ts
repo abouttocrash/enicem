@@ -81,7 +81,6 @@ export class MultiDialogComponent {
     this.data.forEach(file => {
       
     formData.append('files', file, file.name)});
-    console.log(formData)
     const response = await this.c.verificarPlanos(formData)
     this.snackbar.dismiss()
    
@@ -154,7 +153,6 @@ export class MultiDialogComponent {
     this.snackbar.open(`${noDup} Planos agregados`,"OK",{duration:1000})
     else
     this.snackbar.open(`${noDup} Planos agregados, ${dup} planos duplicados ignorados`,"OK",{duration:2000})
-    console.log(this.data)
   }
 
   toggle(row:any){

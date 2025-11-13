@@ -1,6 +1,6 @@
 
 <div class="separator">
-    <h2>Reporte 1</h2>
+    <h2>Reporte Cumplimiento de entrega de proveedores</h2>
     <mat-form-field appearance="outline">
     <mat-label>Ingresa un rango de fecha</mat-label>
     <mat-date-range-input [rangePicker]="picker" >
@@ -10,29 +10,60 @@
     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-date-range-picker #picker></mat-date-range-picker>
     </mat-form-field>
-    <button class="main-cta" (click)="reporter1()">Crear reporte 1</button>
+    <button class="main-cta" (click)="reporter1(true)">Crear reporte 1</button>
 </div>
 <div class="separator">
-    <h2>Reporte 2</h2>
-<mat-form-field appearance="outline">
+    <h2>Reporte Rechazos de proveedores</h2>
+    <mat-form-field appearance="outline">
     <mat-label>Ingresa un rango de fecha</mat-label>
-    <mat-date-range-input [rangePicker]="picker2" >
+    <mat-date-range-input [rangePicker]="picker4" >
         <input matStartDate placeholder="Start date" [(ngModel)]="fecha1">
         <input matEndDate placeholder="End date" [(ngModel)]="fecha2">
     </mat-date-range-input>
-    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker2></mat-date-range-picker>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker4></mat-date-range-picker>
     </mat-form-field>
-<mat-form-field appearance="outline">
-    <mat-label>Proveedor</mat-label>
-    <mat-select [(ngModel)]="proveedorObj">
-        @for(p of api.proveedores;track p._id!){
-            <mat-option (click)="selectProveedor(p)" [value]="p">{{p.name}}</mat-option>
-        }
-    </mat-select>
-    
-    
-</mat-form-field>
-
-<button class="main-cta" (click)="reporteProveedor()">Crear reporte 2</button>
+    <button class="main-cta" (click)="reporter1(false)">Crear reporte 1</button>
+</div>
+<div class="separator">
+    <h2>Reporte Cumplimiento de entrega de proveedor</h2>
+    <mat-form-field appearance="outline">
+        <mat-label>Ingresa un rango de fecha</mat-label>
+        <mat-date-range-input [rangePicker]="picker2" >
+            <input matStartDate placeholder="Start date" [(ngModel)]="fecha1">
+            <input matEndDate placeholder="End date" [(ngModel)]="fecha2">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker2></mat-date-range-picker>
+        </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Proveedor</mat-label>
+        <mat-select [(ngModel)]="proveedorObj">
+            @for(p of api.proveedores;track p._id!){
+                <mat-option (click)="selectProveedor(p)" [value]="p">{{p.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <button class="main-cta" (click)="reporteProveedor(true)">Crear reporte 2</button>
+</div>
+<div class="separator">
+    <h2>Reporte # rechazos de proveedor</h2>
+    <mat-form-field appearance="outline">
+        <mat-label>Ingresa un rango de fecha</mat-label>
+        <mat-date-range-input [rangePicker]="picker3" >
+            <input matStartDate placeholder="Start date" [(ngModel)]="fecha1">
+            <input matEndDate placeholder="End date" [(ngModel)]="fecha2">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker3></mat-date-range-picker>
+        </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Proveedor</mat-label>
+        <mat-select [(ngModel)]="proveedorObj">
+            @for(p of api.proveedores;track p._id!){
+                <mat-option (click)="selectProveedor(p)" [value]="p">{{p.name}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <button class="main-cta" (click)="reporteProveedor(false)">Crear reporte 3</button>
 </div>

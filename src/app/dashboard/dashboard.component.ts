@@ -39,20 +39,22 @@ export class DashboardComponent {
   selectProveedor(p:Proveedor){
     this.proveedorObj = p
   }
-  async reporter1(){
+  async reporter1(bool:boolean){
     const httpParams = new HttpParams()
     .set("fecha1", moment( this.fecha1.toISOString()).startOf("D").toISOString())
-    .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString());
+    .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString())
+    .set("isPositive", bool);
     const r = await this.api.GET2("report",httpParams) as any
     const url = r.data.path;
     window.open(url, '_blank');
   }
 
-   async reporteProveedor(){
+   async reporteProveedor(isPositive:boolean){
     const params = new HttpParams()
     .set("proveedor",this.proveedorObj._id!)
     .set("fecha1", moment( this.fecha1.toISOString()).startOf("D").toISOString())
-    .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString());
+    .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString())
+    .set("isPositive", isPositive);
     const r = await this.api.GET2(`report/proveedor`,params) as any
     const url = r.data.path;
     window.open(url, '_blank');

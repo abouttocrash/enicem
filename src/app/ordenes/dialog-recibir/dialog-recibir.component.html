@@ -1,12 +1,12 @@
 <div class="dialog">
-    <div> <h2>Recibir piezas</h2> </div>
+    <div> <h2 id="dialogh2">Recibir piezas</h2> </div>
     <div>
 
         @for(plano of piezas;track plano;let i = $index){
             <div class="list">
                 <div class="item">
                     <div class="center-ver">
-                        <input [placeholder]="max(plano)" type="text" (keydown)="checkAmount($event,plano)">
+                        <input (focus)="inInput = true" (blur)="inInput = false" [placeholder]="max(plano)" type="text" (keydown)="checkAmount($event,plano)">
                     </div>
                 <div class="center-ver">
                     <div>

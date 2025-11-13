@@ -105,7 +105,6 @@ async agregarPlanos() {
       const res = await this.p.c.createCatalog(milestone)
     if(res.response){
       this.api.currentProject.catalogId = res.response.catalogId
-      console.log(res.response)
       this.storage.setProject(this.api.currentProject)
       await this.p.getAll()
       this.textoPlanos = "Agregar planos adicionales"

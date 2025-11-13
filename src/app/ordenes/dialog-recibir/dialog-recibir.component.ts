@@ -14,10 +14,13 @@ import { OrdenesService } from '../ordenes.service';
 export class DialogRecibirComponent {
   piezas:Pieza[] = []
   cantidad!:number
-  device!:any
   data = inject<Pieza[]>(MAT_DIALOG_DATA);
   ultimoScan = ""
   piezasEnOrden:Pieza[] = []
+  listener:any
+  currentScan = ""
+  enterFound = false
+  inInput = false
   constructor(private dialog:MatDialogRef<DialogRecibirComponent>,private o:OrdenesService){
     if(this.data.length == 0){
       this.piezasEnOrden = o.currentOrden!.piezas
@@ -34,41 +37,61 @@ export class DialogRecibirComponent {
   async ngAfterViewInit(){
     if(this.data.length == 0)
       await this.initSerial()
-    else
-      this.device = undefined
   }
 
   async initSerial() {
-    [this.device] = await navigator.hid.requestDevice({
-      filters: []
-    });
-    if(this.device == undefined)
-      return await this.actualizar(false)
-    await this.device.open();
-    this.device.addEventListener("inputreport", (event:any) => {
-      const { data } = event;
-      const value = data as DataView
-      const decoder = new TextDecoder('utf-8');
-      const myString = decoder.decode(value, {});
-      console.log("Lectura: "+myString)
-      const cleaned = myString.replace(/[\x00-\x1F\x7F]/g, '');
-      this.ultimoScan = cleaned.replace("&","").replace(/\/H/g, "(").replace(/\/I/g, ")").trim();
-      console.log("Clean: "+this.ultimoScan);
-      const pieza = this.o.currentOrden?.piezas.find(p=>{
-        return p.title == this.ultimoScan
+    this.listener = (e: KeyboardEvent) => {
+      if(this.inInput && e.key == "Shift"){
+        document.getElementById("dialogh2")?.focus()
+        this.inInput = false
+      }
+      if(!this.inInput)
+        e.preventDefault()
+      if(this.enterFound){
+        this.currentScan = ""
+        this.enterFound = false
+      }
+      if(e.key != "Shift" && e.key != "Enter" && !this.inInput && this.isValidKey(e.key))
+        this.currentScan += e.key
+
+      if(e.key == "Enter"){
+        this.enterFound = true;
+        this.ultimoScan = this.currentScan.replace("&","").replace(/\/H/g, "(").replace(/\/I/g, ")").trim().toUpperCase();
+        const pieza = this.o.currentOrden?.piezas.find(p=>{
+        return p.title.toUpperCase() == this.ultimoScan
       })
-      if(pieza){
-        this.piezas.push(pieza)
+      let piezaExists = false
+      if(pieza)
+      piezaExists = this.piezas.find(p=>{return p.title == pieza!.title}) != undefined
+      if(pieza && !piezaExists){
+        if(pieza.max == 0){
+          this.ultimoScan = `Plano ${this.ultimoScan} ya recibida`
+        }
+        else
+          this.piezas.push(pieza)
       }
       else{
-        this.ultimoScan = `Plano ${cleaned} no encontrado`
+        if(piezaExists)
+          this.ultimoScan = `Plano ${this.ultimoScan} duplicada`
+          else
+        this.ultimoScan = `Plano ${this.ultimoScan} no encontrado`
       }
-    });
+        console.log("Clean: "+this.ultimoScan);
+        console.log("Found: "+this.currentScan)
+
+      }
+      
+    };
+    document.addEventListener('keydown', this.listener as EventListener);
+
   }
 
   async actualizar(bool:boolean){
-    if(this.device != undefined)
-      await this.device.close()
+    
+    if (this.listener) {
+      document.removeEventListener('keydown', this.listener as EventListener);
+      this.listener = null;
+    }
     this.dialog.close({razon:"RECIBIR",piezas:this.piezas,bool:bool})
   }
 
@@ -120,5 +143,23 @@ export class DialogRecibirComponent {
 
   getMax(){
     return "Max "+this.max
+  }
+  isValidKey(key:string){
+    let isValid = true
+    switch(key){
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "Escape":
+      case "BackSpace":
+      case "ContextMenu":
+      case "Alt":
+      case "Tab":
+      case "Esc":
+      case "Meta":
+      case "Control": isValid = false;break;
+    }
+    return isValid
   }
 }

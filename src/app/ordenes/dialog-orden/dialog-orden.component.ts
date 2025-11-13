@@ -54,23 +54,12 @@ export class DialogOrdenComponent {
     this.filteredProveedores = structuredClone(api.proveedores)
     this.form.get("equipos")?.disable()
     this.form.get("proveedor")?.disable()
-//     document.addEventListener('keydown', e => {
-//       console.log(e)
-//     })
-//     document.addEventListener('input', e => {
-//       console.log(e)
-//     })
-//     document.addEventListener('textInput', function (e){
-   
-//         console.log('IR scan textInput', e)
-    
-// });
+
   }
 
   changeEquipo(val:number | Event, add = true){
     const stringVal = this.form.get("equipos")!.value 
     let current = Number(stringVal)
-    console.log(current)
     if(current == 1 && val == -1) return
     if(typeof val == "number" && add) current += val
     if(this.form.get("equipos")!.value == "") {
@@ -132,12 +121,6 @@ export class DialogOrdenComponent {
     if(todoBien)
       await this.p.getAll()
     this.ref.close({close:true,todoBien:todoBien})
-  }
-  print(){
-    this.data.list.forEach((p:Pieza) => {
-     
-      console.log(( p.cantidadInDialog! > this.sumStock(p)!), p.cantidadInDialog! ,">", this.sumStock(p)!)
-    })
   }
 
   allPiezasAreFilled(){

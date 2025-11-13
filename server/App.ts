@@ -9,6 +9,7 @@ import { Catalogo } from '@shared-types/Pieza.js';
 import { Reporter } from './Reporter.js';
 import { writePDF } from './PDF_reader/PDF_Writer.js';
 import moment from 'moment';
+import { Proveedor } from '@shared-types/Proveedor.js';
 const app = express();
 export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
 app.use(express.json({ limit: '100mb' }))
@@ -84,8 +85,13 @@ app.get("/api/report",async(req,res)=>{
     const fechaFinal = req.query.fecha2 as string
     const ordenes = await mongo.orders.getOrdersbyFecha(fechaInicial,fechaFinal)
     const proveedores = await mongo.provider.getProvedores()
+    const isPositive = req.query.isPositive
     const reporter = new Reporter()
-    const buffer = await reporter.build(ordenes,moment(fechaInicial).locale("es").format("DD MMM YYYY"),moment(fechaFinal).locale("es").format("DD MMM YYYY"),proveedores) as any
+    let buffer
+    if(isPositive == "true")
+        buffer = await reporter.build(ordenes,moment(fechaInicial).locale("es").format("DD MMM YYYY"),moment(fechaFinal).locale("es").format("DD MMM YYYY"),proveedores) as any
+    else
+        buffer = await reporter.buildRechazos(ordenes,moment(fechaInicial).locale("es").format("DD MMM YYYY"),moment(fechaFinal).locale("es").format("DD MMM YYYY"),proveedores as unknown[] as Proveedor[]) as any
     const excelPath  = path.join(process.cwd(), 'excel\\');
     fs.readdirSync(excelPath).forEach(file => {fs.unlinkSync(path.join(excelPath, file));});
     const filename = Date.now()
@@ -102,17 +108,28 @@ app.get("/api/report/proveedor",async(req,res)=>{
     const id = req.query.proveedor as string
     const f1 = req.query.fecha1 as string
     const f2 = req.query.fecha2 as string
+    const isPositive = req.query.isPositive
     const o = await mongo.orders.getOrdersbyProveedor(id,f1,f2)
     const proveedores = await mongo.provider.getProvedores()
     const proyectos = await mongo.projects.getAllNoFilter()
-    const buffer = await reporter.buildByProveedor(
-        o,
-        moment(f1).locale("es").format("DD MMM YYYY"),
-        moment(f2).locale("es").format("DD MMM YYYY"),
-        proveedores,
-        proyectos,
-        id
-    ) as any
+    let buffer
+    if(isPositive == "true")
+        buffer = await reporter.buildByProveedor(
+            o,
+            moment(f1).locale("es").format("DD MMM YYYY"),
+            moment(f2).locale("es").format("DD MMM YYYY"),
+            proveedores,
+            proyectos,
+            id,
+        ) as any
+    else
+        buffer = await reporter.buildByProveedorRechazos(
+            o,
+            moment(f1).locale("es").format("DD MMM YYYY"),
+            moment(f2).locale("es").format("DD MMM YYYY"),
+            proveedores,
+            id,
+        ) as any
     const excelPath  = path.join(process.cwd(), 'excel\\');
     fs.writeFileSync(`${excelPath}proveedor_${id}.xlsx`,buffer)
     res.status(200).send({

@@ -30,7 +30,6 @@ export class UsersDialogComponent {
       this.boton = "Editar"
       activo = this.data.active!
     }
-    console.log(activo)
     this.form = new FormGroup({
       username: new FormControl(this.data?.name || "", [Validators.required]),
       code: new FormControl(this.data?.code || "", [Validators.required,Validators.min(4)]),

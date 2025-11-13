@@ -124,6 +124,11 @@ h2{
     color:var(--blue);
     font-weight: 600;
 }
+.scanner:disabled{
+    cursor: default;
+    color:var(--gray);
+}
+
 .update:disabled{
     color:var(--gray);
    

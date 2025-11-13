@@ -1,5 +1,6 @@
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo.js'
-import { Catalogo } from '@shared-types/Pieza.js'
+import { Catalogo, Pieza } from '@shared-types/Pieza.js'
+import { Proveedor } from '@shared-types/Proveedor.js'
 import { Proyecto } from '@shared-types/Proyecto.js'
 import { Usuario } from '@shared-types/Usuario.js'
 import ExcelJS from 'exceljs'
@@ -54,6 +55,38 @@ export class Reporter{
         const buffer = await this.workbook.xlsx.writeBuffer()
         return buffer
     }
+    async buildByProveedorRechazos(ordenes:OrdenTrabajo[],f1:string,f2:string,proveedores:Usuario[],idProveedor:string){
+        this.worksheet.addRow([`Rango: ${f1} - ${f2}` ,"Reporte creado: "+moment().locale("es").format("DD MMMM YYYY")])
+        const headerRow = this.worksheet.addRow(["Proveedor",	"# Orden", "Fecha esperada de entrega","Fecha real de entrega",
+            "Piezas solicitadas","Piezas recibidas", "Piezas rechazadas" ,"% de rechazos"])
+        headerRow.eachCell(cell => {
+            cell.font = Object.assign({}, cell.font, { bold: true });
+        });
+        
+        ordenes.forEach(o=>{
+            let piezasRecibidas = 0;
+            let piezasRechazadas = 0
+            o.piezas.forEach(p=>{
+                piezasRechazadas += p.cantidadRechazada.reduce((sum: number, p: any) => sum + Number(p), 0);
+                piezasRecibidas += p.cantidadRecibida.reduce((sum: number, p: any) => sum + Number(p), 0);
+            })
+            this.worksheet.addRow([
+                proveedores.find(pr=>{return pr._id == idProveedor})!.name,
+                this.pad(o.folio,o.tipo),
+                moment(o.dateEntrega).locale("es").format("DD MMM YYYY"),
+                o.dateReal!,
+                o.totalPiezas!,
+                piezasRecibidas,
+                piezasRechazadas,
+                `${(piezasRechazadas * 100 / o.totalPiezas!).toFixed(1)}%`
+            ])
+            
+        })
+            
+        
+        const buffer = await this.workbook.xlsx.writeBuffer()
+        return buffer
+    }
     async build(ordenes:Array<OrdenTrabajo>,f1:string,f2:string,proveedores:Usuario[]){
         this.worksheet.addRow([`Rango: ${f1} - ${f2}` ,"Reporte creado: "+moment().locale("es").format("DD MMMM YYYY")])
         const headerRow = this.worksheet.addRow(["Nombre de proveedor",	"# de ordenes en el periodo",	"Piezas solicitadas", 
@@ -93,6 +126,58 @@ export class Reporter{
                 piezasNotMissed,
                 piezasMissed,
                 `${(piezasNotMissed * 100 / piezasSolicitadas).toFixed(1)}%`
+            ])
+        })
+        const buffer = await this.workbook.xlsx.writeBuffer()
+        return buffer
+
+    }
+    async buildRechazos(ordenes:Array<OrdenTrabajo>,f1:string,f2:string,proveedores:Proveedor[]){
+        this.worksheet.addRow([`Rango: ${f1} - ${f2}` ,"Reporte creado: "+moment().locale("es").format("DD MMMM YYYY")])
+        const headerRow = this.worksheet.addRow(["Nombre de proveedor","Tipo",	"# de ordenes en el periodo",	"Piezas solicitadas", 
+            "Piezas recibidas","Piezas rechazadas",	"% rechazos proveedor"])
+        const proveedoresSet = Array.from(new Set(ordenes.map(o => {return o.idProveedor })))
+        headerRow.eachCell(cell => {
+            cell.font = Object.assign({}, cell.font, { bold: true });
+        });
+        proveedoresSet.forEach(p=>{
+            const filteredOrdenes = ordenes.filter(o=>{return o.idProveedor == p})
+            let piezasSolicitadas = 0;
+            let piezasRecibidas = 0;
+            let piezasRechazadas = 0;
+            let piezasMissed = 0;
+            let piezasNotMissed = 0
+            filteredOrdenes.forEach(o=>{
+                const dateEntrega = moment(o.dateEntrega)
+                o.missed = 0;
+                o.notMissed = 0;
+                o.piezas.forEach(p=>{
+                    piezasRechazadas += p.cantidadRechazada.reduce((sum: number, p: any) => sum + Number(p), 0);
+                    piezasRecibidas += p.cantidadRecibida.reduce((sum: number, p: any) => sum + Number(p), 0);
+                    p.fechaRecibida.forEach(pr=>{
+                        const fechaRecibida = moment(pr.fecha)
+                        if(fechaRecibida.isAfter(dateEntrega))
+                            o.missed! += pr.c
+                        else
+                            o.notMissed! += pr.c
+                    })
+                    if(o.status == "ABIERTA")
+                        o.missed! += Number(p.piezas) - o.notMissed!
+                    
+                })
+                piezasSolicitadas += o.piezas.reduce((sum: number, p: any) => sum + Number(p.piezas), 0);
+                piezasMissed += o.missed!
+                piezasNotMissed += o.notMissed!
+            })
+            const proveedor = proveedores.find(pr=>{return pr._id == p})!
+            this.worksheet.addRow([
+                proveedor.name,
+                proveedor.tipo,
+                filteredOrdenes.length,
+                piezasSolicitadas,
+                piezasRecibidas,
+                piezasRechazadas,
+                `${(piezasRechazadas * 100 / piezasRecibidas).toFixed(1)}%`
             ])
         })
         const buffer = await this.workbook.xlsx.writeBuffer()
@@ -139,5 +224,16 @@ export class Reporter{
             })
         })
         return aTiempo
+    }
+
+    pad(folio:string,tipo:string){
+        let p = ""
+        switch(tipo){
+            case "Maquinado":p = "M00"+folio;break;
+            case "Detalle":p = "A00"+folio;break;
+            case "salida":p = "I00"+folio;break;
+            case "":p = "";break;
+        }
+        return p;
     }
 }
