@@ -57,6 +57,9 @@ export class PanelOrdenComponent {
   }
 
   async recibirConScanner(){
+    this.o.piezasEnPanel.forEach(p=>{
+      p.checked = false
+    })
     await this.recibir([])
   }
 
