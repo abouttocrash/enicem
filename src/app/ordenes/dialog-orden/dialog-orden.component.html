@@ -1,6 +1,6 @@
 <div class="dialog" >
     <div>
-        <h2>Crear orden de trabajo <span>#{{pad(folio,"")}}</span></h2>
+        <h2>Crear orden de trabajo <span>#{{pad(folio,form.get("tipo")!.value! || "")}}</span></h2>
     </div>
     <div class="content">
         <form [formGroup]="form">

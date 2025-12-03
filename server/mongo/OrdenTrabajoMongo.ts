@@ -26,7 +26,7 @@ export class OrdenTrabajoMongo extends Mongoloid{
     async updateDate(body:any){
         const r = await this.updateOne(
             {   dateEntrega:body.dateEntrega,
-                razon:body.razon
+                razon:body.razonCambio
             }
             ,"_id",new ObjectId(body.id))
         await this.client.close()
