@@ -4,14 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { DialogRechazoComponent } from '../dialog-rechazo/dialog-rechazo.component';
+import { DialogRechazoComponent } from '../../modulo-recibir/dialog-rechazo/dialog-rechazo.component';
 import { DatePipe } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { OrdenesService } from '../ordenes.service';
 import { StatusOrden } from '@shared-types/OrdenTrabajo';
 import { ProyectoService } from '../../proyecto.service';
 import { Pieza } from '@shared-types/Pieza';
-import { DialogRecibirComponent } from '../dialog-recibir/dialog-recibir.component';
+import { DialogRecibirComponent } from '../../modulo-recibir/dialog-recibir/dialog-recibir.component';
 import { baseDialog, fixAcabado, pad, projectDisabled, sum } from '../../utils/Utils';
 import { DialogConfirmComponent } from '../../components/dialog-confirm/dialog-confirm.component';
 import { firstValueFrom } from 'rxjs';
@@ -20,7 +20,7 @@ import { createMilestone, What } from '@shared-types/Bitacora';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { APIService } from '../../api.service';
-import { CambioFechaComponent } from '../../cambio-fecha/cambio-fecha.component';
+import { CambioFechaComponent } from '../../modulo-recibir/cambio-fecha/cambio-fecha.component';
 import moment from 'moment';
 export type IMG_OBJ = {
   URL:string,

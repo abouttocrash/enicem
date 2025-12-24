@@ -3,7 +3,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { APIService } from '../../api.service';
+import { APIService } from '../../../api.service';
 import { MatSelectModule } from '@angular/material/select';
 import { Proveedor } from '@shared-types/Proveedor';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';

@@ -216,10 +216,32 @@ tbody > tr.mat-mdc-row:not(:has(.example-element-detail-wrapper)):hover {
     color:var(--white);
     background-color: var(--red);
 }
+.tabla-status-maquinado{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: #5f2e50
+}
+.tabla-status-detalle{
+    height:20px;
+    padding:var(--padding);
+    border-radius: 16px;
+    color:var(--white);
+    background-color: #2e5f55
+}
 .tabla-status-aprobada{
     height:20px;
     padding:var(--padding);
     border-radius: 16px;
     color:var(--white);
     background-color: #31572c;
+}
+
+th, td {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  font-size: 13px!important;
 }

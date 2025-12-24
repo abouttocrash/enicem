@@ -38,3 +38,10 @@ table{
   background-color: #f5f5f5;
   z-index: 100;
 }
+
+:host ::ng-deep .mdc-data-table__header-cell{
+    padding:0 4px;
+}
+td[class*="mat-column"]{
+  padding:0 4px;
+}

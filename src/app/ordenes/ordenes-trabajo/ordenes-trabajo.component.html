@@ -1,69 +1,19 @@
  
  <div class="tab">
     <div class="bar">
-      <auto-icem appareance="fill" (keyup)="applyFilter($event)" [filters]="p.o.filters" [filteredFilters]="p.o.filteredFilters"></auto-icem>
-      
+      <auto-icem appareance="fill" 
+      (keyup)="applyFilter($event)" 
+      [filters]="p.o.filters" 
+      [filteredFilters]="p.o.filteredFilters"
+    ></auto-icem>
     </div>
 
     <div style="height: 100%;overflow-y: scroll;">
-      <table mat-table 
+      <tabla-ordenes
+        [showProyecto]="false"
         [dataSource]="p.o.dataSource"
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        (cdkDropListDropped)="drop($event)"
-        matSort>
-        <ng-container matColumnDef="folio">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
-          <td mat-cell *matCellDef="let row" style="font-weight: 600;"> {{pad(row.folio,row.tipo)}} </td>
-        </ng-container>
-        <ng-container matColumnDef="tipo">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
-          <td mat-cell *matCellDef="let row"> {{fixAcabado(row.tipo)}} </td>
-        </ng-container>
-        <ng-container matColumnDef="totalPiezas">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> No. Piezas </th>
-          <td mat-cell *matCellDef="let row"> {{row.totalPiezas}} </td>
-        </ng-container>
-        <ng-container matColumnDef="proveedor">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Proveedor </th>
-          <td mat-cell *matCellDef="let row"> {{row.proveedor}} </td>
-        </ng-container>
-        <ng-container matColumnDef="creada">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Creada </th>
-          <td mat-cell *matCellDef="let row"> {{row.createdAt}} </td>
-        </ng-container>
-        <ng-container matColumnDef="dateEntrega">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Entrega esperada </th>
-          <td mat-cell *matCellDef="let row"> {{row.dateEntrega}} </td>
-        </ng-container>
-        <ng-container matColumnDef="status">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
-          <td mat-cell *matCellDef="let row"> 
-            <span [ngClass]="getStatusClass(row.status)">{{row.status}}</span>
-           </td>
-        </ng-container>
-        <ng-container matColumnDef="dateReal">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Entrega Real </th>
-          <td mat-cell *matCellDef="let row"> {{row.dateReal || "-"}} </td>
-        </ng-container>
-        <ng-container matColumnDef="cantidadRecibida">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Recibidas </th>
-          <td mat-cell style="color:var(--green)" *matCellDef="let row"> {{row.cantidadRecibida}} </td>
-        </ng-container>
-        <ng-container matColumnDef="cantidadRechazada">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Rechazadas </th>
-          <td mat-cell style="color:var(--red)" *matCellDef="let row"> {{row.cantidadRechazada}}</td>
-        </ng-container>
-        <ng-container matColumnDef="cantidadPendiente">
-          <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header> Pendientes </th>
-          <td mat-cell *matCellDef="let row"> {{calcularPendientes(row)}} </td>
-        </ng-container>
-      
-        <tr mat-header-row *matHeaderRowDef="p.o.displayedColumns;sticky:true"></tr>
-        <tr style="cursor: pointer!important;" mat-row *matRowDef="let row; columns: p.o.displayedColumns;" (click)="recibirPiezas(row)"></tr>
-        
-        <tr class="mat-row" *matNoDataRow><td class="mat-cell" colspan="4"></td></tr>
-      </table>
+        [displayedColumns]="displayedColumns">
+      </tabla-ordenes>
     </div>
  </div>
 

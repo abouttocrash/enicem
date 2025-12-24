@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Rechazo } from '@shared-types/Rechazo';
-import { APIService } from '../api.service';
+import { APIService } from '../../api.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';

@@ -61,7 +61,7 @@ export class ProjectDetailComponent {
     if(dialogResponse.bool){
 
       const r = await this.p.editProyecto(dialogResponse.p)
-      if(r){
+      if(r == true){
         this.api.currentProject.name = dialogResponse.p.name
         this.api.currentProject.noSerie = dialogResponse.p.noSerie
         this.api.currentProject.designer = dialogResponse.p.designer
@@ -69,7 +69,7 @@ export class ProjectDetailComponent {
         this.snackBar.open("Proyecto editado","OK",{duration:2000})
       }
       else{
-        this.snackBar.open("Ocurrió un error","OK",{duration:2000})
+        this.snackBar.open(`Ocurrió un error ${r.data.error}`,"OK")
       }
     }
       

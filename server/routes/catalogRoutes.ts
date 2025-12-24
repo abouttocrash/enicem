@@ -67,6 +67,7 @@ catalogRouter.post("/verify",upload.array('files'), async(req, res) => {
         return res.status(200).send({data:pdfs})
     }catch(e){
         console.log(e)
+        pdf.emptyUploads(req.body.projectId,false)
         res.status(400).send({error:e})
     }
 });

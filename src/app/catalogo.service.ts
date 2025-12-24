@@ -40,8 +40,9 @@ export class CatalogoService {
         milestone:milestone
       }
       const r = await this.api.POST<ICEMR<CatalogoResponse>>("catalog",body)
-      this.api.currentProject.catalogId = r.data.catalogId
-      return {response:r.data}
+      if(r)
+        this.api.currentProject.catalogId = r.data.catalogId
+      return {response:r!.data}
     }catch(e){
       return {e,response:undefined}
     }
@@ -54,10 +55,14 @@ export class CatalogoService {
         catalogId:this.api.currentProject.catalogId!,
         milestone:milestone
       }
+      //TODO error correcto
       const r = await this.api.POST<ICEMR<CatalogoResponse>>("catalog/add",body)
+      if(r)
       return {response:r.data}
+      else
+          return this.api.FAILURE
     }catch(e){
-      return {e,response:undefined}
+      return this.api.FAILURE
     }
   }
 
@@ -72,7 +77,10 @@ export class CatalogoService {
     try{
       
       const r = await this.api.POST<ICEMDR<Pieza>>("catalog/verify",form)
+      if(r)
       return r.data
+      else
+          return {response:undefined}
     }catch(e){
       return {e,response:undefined}
     }

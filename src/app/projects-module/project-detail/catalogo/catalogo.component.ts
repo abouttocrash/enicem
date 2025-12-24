@@ -79,8 +79,13 @@ async agregarPlanos() {
       const ref = this._snackBar.open("actualizando bitácora")
       const milestone = createMilestone("Planos agregados al catálogo",this.api.currentProject.catalogId!,this.api.currentUser._id!,[],"")
       const res = await this.p.c.updateCatalog(milestone)
-      this._snackBar.open("Bitácora actualizada","OK",{duration:2000})
-      await this.p.getAll()
+      if(res.response != undefined){
+        this._snackBar.open("Bitácora actualizada","OK",{duration:2000})
+        await this.p.getAll()
+      }
+      else
+        this._snackBar.open("Ha ocurrido un error","OK",{duration:2000})
+      
     }
 
   
@@ -165,7 +170,7 @@ async agregarPlanos() {
           this.tableChecked = false
         }
         else{
-          this._snackBar.open("Información de bitacora desactualizada, actualiza la información","OK",{duration:1000})
+          this._snackBar.open("Información de bitácora desactualizada, actualiza la información para proceder","OK",{duration:5000})
         }
         
       }

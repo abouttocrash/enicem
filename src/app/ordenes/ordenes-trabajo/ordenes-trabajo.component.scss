@@ -9,16 +9,3 @@
     padding:0 24px 0 24px;
 }
 
-table {
-  width: 100%;
-  min-width: 0;
-  table-layout: auto; // O 'fixed' si quieres que las columnas se ajusten aún más
-}
-
-th, td {
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px; // Ajusta este valor según tu preferencia
-}
-

@@ -6,35 +6,36 @@ const projectRouter = Router();
 const mongo = Mongo.instance
 
 projectRouter.get("/all",async(req,res)=>{
-    const status = req.query.status as Status
-    const p = await mongo.projects.getAll(status)
-    res.status(200).send({data:p})
+    try{
+        const status = req.query.status as Status
+        const p = await mongo.projects.getAll(status)
+        res.status(200).send({data:p})
+    }
+    catch(e){
+        res.status(500).send({data:{error:e}});
+    }
 })
 
 projectRouter.post("/",async(req,res)=>{
-    const r = await mongo.projects.createProject(req.body.proyecto,req.body.creador)
-    await mongo.logs.createBitacora(r.insertedId,req.body.creador._id)
-    res.status(200).send({data:r});
+    try{
+        const r = await mongo.projects.createProject(req.body.proyecto,req.body.creador)
+        await mongo.logs.createBitacora(r.insertedId,req.body.creador._id)
+        res.status(200).send({data:r});
+    }catch(e:any){
+        res.status(500).send({data:{error:e}});
+    }
 })
 
-projectRouter.put("/",async(req,res)=>{
-     const updateObject = { 
-        catalogId: req.body.catalogId,
-        createdLogId: req.body.userId,
-        piezasCount:req.body.count
-    }
-    const p = await mongo.projects.updateProject(updateObject, "_id",new ObjectId(req.body.projectId))
-    res.status(200).send({data:p})
-})
 projectRouter.put("/edit",async(req,res)=>{
     try{
         const p = await mongo.projects.updateProject(req.body.pData, "_id",new ObjectId(req.body.projectId))
         res.status(200).send({data:true})
     }
     catch(e){
-        res.status(500).send({data:false})
+         res.status(500).send({data:{error:e}});
     }
 })
+
 projectRouter.put("/cancel",async(req,res)=>{
     try{
         const p = await mongo.projects.updateProject(req.body.pData, "_id",new ObjectId(req.body.projectId))

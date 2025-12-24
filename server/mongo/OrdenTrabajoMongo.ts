@@ -5,6 +5,7 @@ import { Pieza } from "@shared-types/Pieza.js";
 import moment from "moment";
 import { Proyecto } from "@shared-types/Proyecto.js";
 import { Usuario } from "@shared-types/Usuario.js";
+import { pBlue, printToLog, pYellow } from "../Printer.js";
 export class OrdenTrabajoMongo extends Mongoloid{
     constructor(client:MongoClient){
         super("orders",client)
@@ -49,6 +50,11 @@ export class OrdenTrabajoMongo extends Mongoloid{
     async getOrders(projectId:string){
         let r = await this.getMany<OrdenTrabajo>("idProject",projectId)
         r = await this.asignarProveedor(r)
+        return r
+    }
+    async getOrdersV2(projectId:string,client:MongoClient){
+        let r = await this.getManyWithClient<OrdenTrabajo>("idProject",projectId,client)
+        r = await this.asignarProveedorWithClient(client,r)
         return r
     }
     async getOrdersbyProveedor(proveedorId:string,fechaInicial:string,fechaFinal:string){
@@ -106,33 +112,42 @@ export class OrdenTrabajoMongo extends Mongoloid{
     }
 
 
-    async createOrden(body:any){
-        body.piezas.forEach((pieza:Pieza)=>{
-            delete pieza.checked
-            pieza.cantidadAlmacen = []
-            pieza.cantidadRechazada = []
-            pieza.cantidadRecibida= []
-            pieza.fechaRecibida = []
-            pieza.cantidadManufactura = []
-            pieza.cantidadDetalle = []
-            pieza.cantidadInDialog = undefined
-        })
-        const obj = {
-            piezas:body.piezas,
-            status:"ABIERTA",
-            folio:body.folio,
-            idProveedor:body.idProveedor,
-            dateEntrega:body.dateEntrega,
-            tipo:body.tipo,
-            idProject:body.idProject,
-            createdAt: new Date().toISOString(),
-            createdBy:body.user
-        }
+    async createOrden(body:OrdenTrabajo,user:Usuario){
+        const obj = this.cleanupOrden(body,user)
         const insertResult = await this.create(obj)
         await this.incrementFolio(obj.tipo)
         return insertResult
     }
 
+    async createOrdenV2(body:OrdenTrabajo,user:Usuario){
+        const obj = this.cleanupOrden(body,user)
+        printToLog(`Creando orden #${pBlue(body.folio)} Tipo ${pYellow(body.tipo)}`)
+        const insertResult = await this.createDataWithClient(this.client,obj)
+        printToLog(` • Incrementando folio ${pBlue(body.folio)} → ${pBlue((Number(body.folio)+1))}`)
+        await this.incrementFolioWithClient(obj.tipo,this.client)
+        return insertResult
+    }
+
+    private async asignarProveedorWithClient(client:MongoClient,ordenes:OrdenTrabajo[],fechaBonita = true){
+        let proveedores:Usuario[] = []
+        if(fechaBonita)
+            proveedores = await this.mongo.provider.getProvedoresWithClient(client)
+        const proyectos = await this.getAllItemsWithClient<Proyecto>("projects",client)
+        ordenes.forEach(o=>{
+            if(fechaBonita)
+             o.proveedor = proveedores.find(p=>{return p._id == o.idProveedor})?.name!
+            o.project = proyectos.find(p=>{return p._id == o.idProject})!.name
+            o.createdAt = moment(o.createdAt).locale("es").format("DD MMMM YYYY")
+            if(fechaBonita)
+            o.dateEntrega = moment(o.dateEntrega).locale("es").format("DD MMMM YYYY")
+            if(o.dateReal != undefined && o.dateReal != "-"){
+                o.dateReal = moment(o.dateReal).locale("es").format("DD MMMM YYYY")
+            }
+            const x = o.piezas.reduce((sum: number, p: any) => sum + Number(p.piezas), 0);
+            o["totalPiezas"] = x
+        })
+        return ordenes
+    }
     private async asignarProveedor(ordenes:OrdenTrabajo[],fechaBonita = true){
         let proveedores:Usuario[] = []
         if(fechaBonita)
@@ -152,6 +167,55 @@ export class OrdenTrabajoMongo extends Mongoloid{
             o["totalPiezas"] = x
         })
         return ordenes
+    }
+
+    private cleanupOrden(body:OrdenTrabajo,user:Usuario){
+        body.piezas.forEach((pieza:Pieza)=>{
+            delete pieza.checked
+            pieza.cantidadAlmacen = []
+            pieza.cantidadRechazada = []
+            pieza.cantidadRecibida= []
+            pieza.fechaRecibida = []
+            pieza.cantidadManufactura = []
+            pieza.cantidadDetalle = []
+            pieza.cantidadInDialog = undefined
+        })
+        return {
+            piezas:body.piezas,
+            status:"ABIERTA",
+            folio:body.folio,
+            idProveedor:body.idProveedor,
+            dateEntrega:body.dateEntrega,
+            tipo:body.tipo,
+            idProject:body.idProject,
+            createdAt: new Date().toISOString(),
+            createdBy:user
+        }
+    }
+
+    async verificarNoEstaEnUso(catalogId:string,list:Pieza[],client:MongoClient){
+        const p = await this.mongo.catalog.getCatalogoWithClient(catalogId,client)
+        const inCatalog:Pieza[] = []
+        list.forEach((pi:Pieza)=>{
+            inCatalog.push(p!.logs.find((db:Pieza)=>{return db.title == pi.title}))
+        })
+        const body = list as Pieza[]
+        let todoBien = true;
+        inCatalog.forEach((pieza:Pieza)=>{
+            const sentPieza = body.find(p=>{return p.title == pieza.title })!
+            if( JSON.stringify(sentPieza.cantidadManufactura) == JSON.stringify(pieza.cantidadManufactura)&&
+                    JSON.stringify(sentPieza.cantidadDetalle) == JSON.stringify(pieza.cantidadDetalle) &&
+                    JSON.stringify(sentPieza.cantidadRecibida) == JSON.stringify(pieza.cantidadRecibida) &&
+                    JSON.stringify(sentPieza.cantidadAlmacen) == JSON.stringify(pieza.cantidadAlmacen) &&
+                JSON.stringify(sentPieza.stock) == JSON.stringify(pieza.stock)
+            )
+                todoBien = true
+            else{
+                todoBien = false
+                return
+            }
+        })
+        return {todoBien,inCatalog}
     }
 
 

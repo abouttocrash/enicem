@@ -106,7 +106,7 @@ export class VistaSalidasComponent {
         await this.s.updateSalida(r.data)
         const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name} Razón: ${r.data.razon}`
         const what = createWhat(r.data.salidas,"piezas")
-        await this.api.getProjects("ABIERTO")
+        await this.p.getProjects("ABIERTO")
         this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})!
         await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
         
@@ -198,7 +198,7 @@ export class VistaSalidasComponent {
         await this.s.updateCantidadSalida(r.data)
         const desc = `(Nuevas cantidades) Salida con Folio ${r.data.folio} Modificada por ${this.api.currentUser.name}`
         const what = createWhat(r.data.salidas,"piezas")
-        await this.api.getProjects("ABIERTO")
+        await this.p.getProjects("ABIERTO")
         this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})! 
         await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
         await this.buscar()

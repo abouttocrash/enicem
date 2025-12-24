@@ -5,19 +5,38 @@ export class Mongoloid{
     private collection:Collection
     private dbName = 'icem';
     mongo = Mongo.instance
+    private folioObject = new ObjectId("000000000000000000000000")
     constructor(collection:Collection,client:MongoClient){
         this.client = client
         this.collection = collection
     }
 
+    getClient(){
+        return this.client
+    }
+    async connectClient(){
+        await this.client.connect()
+        return this.client
+    }
+
     async incrementFolio(attribute:string){
         const folio = await this.getFolio()
         folio[attribute] = folio[attribute] +1
-        await this.updateOne(folio,"Folio",new ObjectId("000000000000000000000000"),"folio")
+        await this.updateOne(folio,"Folio",this.folioObject,"folio")
+    }
+    async incrementFolioWithClient(attribute:string,client:MongoClient){
+        const folio = await this.getOneWithClient(client,"Folio",this.folioObject,"folio")!
+        folio![attribute] = folio![attribute] +1
+        await this.updateOneWithClient(client,folio,"Folio",this.folioObject,"folio")
     }
 
     async getFolio(){
-        const folio = await this.getOne("Folio",new ObjectId("000000000000000000000000"),"folio")
+        const folio = await this.getOne("Folio",this.folioObject,"folio")
+        return folio!
+    }
+
+    async getFolioWithClient(client:MongoClient){
+        const folio = await this.getOneWithClient(client,"Folio",this.folioObject,"folio")!
         return folio!
     }
 
@@ -28,6 +47,13 @@ export class Mongoloid{
         const cursor = await c.find(obj)
         const r = await cursor.toArray()
         await this.client.close()
+        return r as T[]
+    }
+    protected async getManyWithClient<T>(by:string,id:string,client:MongoClient){
+        const obj = {[by]:id}
+        const c = await this.getCollectionWithClient(this.collection,client)
+        const cursor = await c.find(obj)
+        const r = await cursor.toArray()
         return r as T[]
     }
     protected async getManyObj<T>(obj:any){
@@ -45,10 +71,22 @@ export class Mongoloid{
         await this.client.close()
         return r 
     }
+    protected async getOneWithClient(client:MongoClient,by:string,id:string | ObjectId,collection = this.collection){
+        const obj = {[by]:id}
+        const c = await this.getCollectionWithClient(collection,client)
+        const r = await c.findOne(obj)
+        return r 
+    }
     
     protected async create(obj:any){
         const c = await this.getCollection(this.collection)
         const insertResult = await c.insertOne(obj);
+        return insertResult
+    }
+
+    protected async createDataWithClient(client:MongoClient,obj:any){
+        const c = await this.getCollectionWithClient(this.collection,client)
+        const insertResult = await c.insertOne(obj)
         return insertResult
     }
     
@@ -67,6 +105,12 @@ export class Mongoloid{
 
     protected async getAllItems<T>(col:Collection):Promise<T[]>{
         const c = await this.getCollection(col)
+        const cursor = await c.find()
+        const r = await cursor.toArray()
+        return r as T[]
+    }
+    protected async getAllItemsWithClient<T>(col:Collection,client:MongoClient):Promise<T[]>{
+        const c = await this.getCollectionWithClient(col,client)
         const cursor = await c.find()
         const r = await cursor.toArray()
         return r as T[]
@@ -91,9 +135,8 @@ export class Mongoloid{
     }
     protected async updateOneWithClient(client:MongoClient,obj:any,by:string,id:string|ObjectId,collection = this.collection){
         const byObj = {[by]:id}
-        const pc = await this.getCollection(collection)
+        const pc = await this.getCollectionWithClient(collection,client)
         const r = await pc.updateOne(byObj,{ $set:obj})
-        await this.client.close()
         return r
     
     }

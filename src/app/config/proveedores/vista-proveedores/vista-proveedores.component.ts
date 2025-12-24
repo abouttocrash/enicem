@@ -6,10 +6,10 @@ import { MatSort } from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
-import { APIService } from '../../api.service';
-import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
-import { ProveedoresComponent } from '../../users-module/proveedores/proveedores.component';
-import { ViewsImports, baseDialog } from '../../utils/Utils';
+import { APIService } from '../../../api.service';
+import { AutoIcemComponent, AutoFilter } from '../../../components/auto-icem/auto-icem.component';
+import { ProveedoresComponent } from '../dialog-proveedores/proveedores.component';
+import { ViewsImports, baseDialog } from '../../../utils/Utils';
 
 @Component({
   selector: 'app-vista-proveedores',

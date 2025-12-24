@@ -1,10 +1,8 @@
 import { Component, inject, signal, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CdkDropList, CdkDrag, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { OrdenTrabajo } from '@shared-types/OrdenTrabajo';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -18,32 +16,27 @@ import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-i
 import { OrdenesService } from '../../ordenes/ordenes.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { PanelOrdenComponent } from '../../ordenes/panel-orden/panel-orden.component';
-import { APIService } from '../../api.service';
-import { fixAcabado, getStatusClass, pad } from '../../utils/Utils';
 import { CommonModule } from '@angular/common';
 import { ProyectoService } from '../../proyecto.service';
+import { OrdenesComponent } from '../../tablas/ordenes/ordenes.component';
 @Component({
   selector: 'app-vista-ordenes',
   providers:[
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ],
-  imports: [MatTableModule, MatIconModule, MatSortModule, MatTooltipModule,
+  imports: [MatIconModule, MatTooltipModule,OrdenesComponent,
     MatSelectModule, FormsModule, AutoIcemComponent, MatSidenavModule, PanelOrdenComponent,
-    MatFormFieldModule, MatInputModule, CdkDropList, CdkDrag, MatDatepickerModule,CommonModule],
+    MatFormFieldModule, MatInputModule, MatDatepickerModule,CommonModule],
   templateUrl: './vista-ordenes.component.html',
   styleUrl: './vista-ordenes.component.scss'
 })
 export class VistaOrdenesComponent {
-  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatDrawer) drawer!:MatDrawer
+  @ViewChild(OrdenesComponent) ordenes!:OrdenesComponent
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
   dataSource!:MatTableDataSource<OrdenTrabajo>;
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
-  displayedColumns = ["folio","tipo","createdAt","dateEntrega","status", "dateReal","totalPiezas","proveedor","project"]
-  pad = pad
-  fixAcabado = fixAcabado
-  getStatusClass = getStatusClass
   tipo = "Ambas"
   status = "Todos"
   fecha1:Date
@@ -67,7 +60,7 @@ export class VistaOrdenesComponent {
     },
   ]
   filteredFilters:Array<AutoFilter> = []
-  constructor(public o:OrdenesService,private api:APIService,private p:ProyectoService){
+  constructor(public o:OrdenesService,public p:ProyectoService){
     this.fecha1 = moment().startOf("month").toDate()
     this.fecha2 = moment().endOf("month").toDate()
   }
@@ -82,20 +75,18 @@ export class VistaOrdenesComponent {
   async ngAfterViewInit(){
     this._locale.set('es');
     this._adapter.setLocale(this._locale());
+    this.ordenes.drawer = this.drawer
     const httpParams = new HttpParams()
     .set("tipo", this.tipo)
     .set("status", this.status)
     .set("fecha1", moment( this.fecha1.toISOString()).startOf("D").toISOString())
     .set("fecha2", moment( this.fecha2.toISOString()).endOf("D").toISOString());
     const ordenes = await this.o.getAllOrders(httpParams)
-    this.dataSource = new MatTableDataSource(ordenes.data)
-    this.dataSource.sort = this.sort
+    this.p.o.init(ordenes.data,this.drawer,this.ordenes.sort)
     this.initFilters(ordenes.data)
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
-  }
+  
 
   applyFilter(event: Event | string) {
     let filterValue = ""
@@ -131,23 +122,9 @@ export class VistaOrdenesComponent {
     this.initFilters(r.data)
     this.createDataSource(r)
   }
-  createDataSource(r:ICEMDR<OrdenTrabajo>){
-    this.dataSource = new MatTableDataSource(r.data)
-    this.dataSource.sort = this.sort
-  }
 
-  async recibirPiezas(element:OrdenTrabajo){
-    this.p.b.currentPieza = undefined
-    this.o.currentOrden = await this.o.getOrder(element._id)
-    if(this.api.projects.length == 0){
-      await this.api.getProjects("ABIERTO")
-      this.api.currentProject = this.api.projects.find(p=>{return p._id! == this.o.currentOrden?.idProject})!
-    }
-    await this.o.getImages()
-    this.o.piezasEnPanel = JSON.parse(JSON.stringify(this.o.currentOrden.piezas.slice())) || []
-    this.o.drawer  = this.drawer;
-    this.drawer.open()
+  createDataSource(r:ICEMDR<OrdenTrabajo>){
+     this.p.o.init(r.data)
   }
-  
 }
 

@@ -43,6 +43,17 @@ export class CatalogoMongo extends Mongoloid{
         const p = await this.getOne( "_id",new ObjectId(id))
         return p
     }
+    async getCatalogoWithClient(id:string,client:MongoClient){
+        if(id == undefined || id == "undefined"){
+            const empty:Catalogo = {
+                logs:[],
+                createdAt:""
+            }
+            return empty
+        }
+        const p = await this.getOneWithClient(client, "_id",new ObjectId(id))
+        return p
+    }
 
     async deletePieza(catalogId:string,logs:Array<any>){
         const pc = await this.getCollection("catalog")

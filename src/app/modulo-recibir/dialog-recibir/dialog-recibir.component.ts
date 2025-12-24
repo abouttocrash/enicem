@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Pieza } from '@shared-types/Pieza';
 import { allPiezasAreFilled, isArrow, isF } from '../../utils/Utils';
 import { CatalogoService } from '../../catalogo.service';
-import { OrdenesService } from '../ordenes.service';
+import { OrdenesService } from '../../ordenes/ordenes.service';
 
 @Component({
   selector: 'app-dialog-recibir',
@@ -57,6 +57,7 @@ export class DialogRecibirComponent {
       if(e.key == "Enter"){
         this.enterFound = true;
         this.ultimoScan = this.currentScan.replace("&","").replace(/\/H/g, "(").replace(/\/I/g, ")").trim().toUpperCase();
+        this.ultimoScan = this.ultimoScan.replace(/'/g,'-')
         const pieza = this.o.currentOrden?.piezas.find(p=>{
         return p.title.toUpperCase() == this.ultimoScan
       })

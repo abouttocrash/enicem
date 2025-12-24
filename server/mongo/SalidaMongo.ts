@@ -2,6 +2,7 @@ import { MongoClient, ObjectId } from "mongodb";
 import { Mongoloid } from "./Mongoloid.js";
 import { Salida } from "@shared-types/Salida.js";
 import moment from "moment";
+import { printToLog } from "../Printer.js";
 
 export class SalidaMongo extends Mongoloid{
    
@@ -11,6 +12,11 @@ export class SalidaMongo extends Mongoloid{
 
     async createSalida(salida:any){
         const p = await this.create(salida)
+        return p
+    }
+    async createSalidaWithClient(client:MongoClient,salida:any){
+        printToLog(` • Creando salida de Almacen`)
+        const p = await this.createDataWithClient(client,salida)
         return p
     }
 

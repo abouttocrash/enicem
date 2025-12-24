@@ -3,6 +3,7 @@ import { Mongoloid } from "./Mongoloid.js";
 import { Proyecto } from "@shared-types/Proyecto.js";
 import { Usuario } from "@shared-types/Usuario.js";
 import moment from "moment";
+import { pBlue, printToLog, pYellow } from "../Printer.js";
 export type Status = "ABIERTO" | "CERRADO" | "CANCELADO"
 export class ProyectosMongo extends Mongoloid{
 
@@ -34,6 +35,11 @@ export class ProyectosMongo extends Mongoloid{
 
     async updateProject(updateObject:any,by:string,id:ObjectId){
         const r = await this.updateOne(updateObject,by,id)
+        return r
+    }
+    async updateProjectWithClient(updateObject:any,by:string,id:ObjectId,client:MongoClient){
+        printToLog(` • Actualizando # de ordenes - proyecto ${pYellow(id)}`)
+        const r = await this.updateOneWithClient(client,updateObject,by,id)
         return r
     }
     async deleteProject(projectId:string){

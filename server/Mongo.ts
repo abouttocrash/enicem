@@ -11,6 +11,7 @@ import { ProveedorMongo } from './mongo/ProveedorMongo.js';
 import { SalidaMongo } from './mongo/SalidaMongo.js';
 import moment from 'moment';
 import { RechazoMongo } from './mongo/RechazoMongo.js';
+import { printToLog } from './Printer.js';
 export type Collection = "logs"|"projects"|"catalog"|"orders"|"users" | "provider" | "folio" | "almacen" |"out" | "roles" | "rechazo"
 export class Mongo{
     private url = 'mongodb://localhost:27017';
@@ -60,7 +61,7 @@ export class Mongo{
         milestone.createdAt = date.toISOString()
         milestone.updatedAt =  date.toISOString()
         milestone.generalId = milestone.generalId!
-        const pc = await this.getCollectionWitchClient("logs",client)
+        const pc = await this.getCollectionWithClient("logs",client)
         const r = await pc.updateOne(
         { projectId:projectId},
         { $push: { milestones: milestone as any } })
@@ -93,6 +94,34 @@ export class Mongo{
             responses.push(r)
         }
          await this.client.close()
+         return responses
+
+    }
+    async updateStockWithClient(body:any,client:MongoClient){
+        printToLog(" • Actualizando stock")
+        const responses:any[] = []
+        const piezas = body.piezas as What[]
+        const catalogId = body.catalogId as string
+        const razon = body.razon as string
+        const pc = await this.getCollectionWithClient("catalog",client)
+        const catalog = await pc.findOne({ _id:new ObjectId(catalogId)}) as unknown as Catalogo
+        for(let i = 0;i < piezas.length;i++){
+            const pieza = piezas[i]!
+            const piezaEnCatalogo = catalog.logs.find((c:any)=>{return c.title == pieza.plano}) as Pieza
+            const cantidad = razon.includes("ENTRADA")? Number(pieza.cantidad) : pieza.cantidad * -1
+            piezaEnCatalogo.stock.push({c:cantidad ,t:razon})
+            const r = await pc.updateOne(
+            { _id:new ObjectId(catalogId)},
+            {$set: 
+                {
+                    [`logs.$[x].stock`]:piezaEnCatalogo.stock
+                }
+            },
+            {
+                arrayFilters: [{"x.title": pieza.plano}]
+            })
+            responses.push(r)
+        }
          return responses
 
     }
@@ -139,7 +168,7 @@ export class Mongo{
         return insertResult
     }
     async createLogwithClient(log:any,client:MongoClient){
-        const c = await this.getCollectionWitchClient("logs",client)
+        const c = await this.getCollectionWithClient("logs",client)
         const insertResult = await c.insertOne(log);
         await this.client.close()
         return insertResult
@@ -231,7 +260,7 @@ export class Mongo{
         const collection = db.collection(c);
         return collection
     }
-    private async getCollectionWitchClient(c:Collection,client:MongoClient){
+    private async getCollectionWithClient(c:Collection,client:MongoClient){
         const db = this.client.db(this.dbName);
         const collection = db.collection(c);
         return collection

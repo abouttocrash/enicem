@@ -13,6 +13,10 @@ export class ProveedorMongo extends Mongoloid{
         const p = await this.getAllItems<Usuario>("provider")
         return p
     }
+    async getProvedoresWithClient(client:MongoClient){
+        const p = await this.getAllItemsWithClient<Usuario>("provider",client)
+        return p
+    }
 
     async editProveedor(user:Proveedor){
         let id = user._id

@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { Proyecto } from '@shared-types/Proyecto';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
+import { ProyectoService } from '../../proyecto.service';
 @Component({
   selector: 'app-projects',
   imports: [MatIconModule,MatDialogModule,MatMenuModule,ProjectCardComponent,
@@ -27,11 +28,15 @@ export class ProjectsComponent {
   filtro = ""
   @ViewChild('input', { read: ElementRef }) searchInput!: ElementRef<HTMLInputElement>;
   filteredProjects:Array<Proyecto> = []
-  constructor(private router:Router,public API:APIService,private storage:StorageService){}
+  constructor(private router:Router,public API:APIService,private storage:StorageService, private p:ProyectoService){}
   
   async ngAfterViewInit(){
-    const p = await this.API.getProjects("ABIERTO")
-    this.filteredProjects = p;
+    const res = await this.p.getProjects("ABIERTO")
+    if("success" in res)
+      this.filteredProjects = res.p;
+    else
+      this._snackBar.open(res.error.data.error,"OK",{duration:5000})
+    
   }
 
   async newProject(){
@@ -39,12 +44,16 @@ export class ProjectsComponent {
       {width:"860px",height:"620px",disableClose:true,data:"NEW"}
     );
     dialogRef.componentInstance.actionPerformed.subscribe(async(data:Proyecto)=>{
-      await this.API.createProject(data)
-      this._snackBar.open("✔️ Proyecto creado con éxito","OK",{duration:1500})
-      const p = await this.API.getProjects("ABIERTO")
-      this.filteredProjects = p;
-      dialogRef.close()
-      //TODO error state?
+      const r = await this.p.createProject(data)
+      if('name' in r){
+        this._snackBar.open("✔️ Proyecto creado con éxito","OK",{duration:1500})
+        const res = await this.p.getProjects("ABIERTO")
+        if("success" in res)
+          this.filteredProjects = res.p;
+        dialogRef.close()
+      }
+      else
+        this._snackBar.open(r.data.error,"OK",{duration:5000})
     })
   }
 
@@ -57,15 +66,13 @@ export class ProjectsComponent {
   }
 
   async buscarProyecto(filtro:string){
-    const p = await this.API.getProjects(this.filtro)
-    this.filteredProjects = p;
-    this.searchInput.nativeElement.value = ""
+    const res = await this.p.getProjects(this.filtro)
+    if("success" in res){
+      this.filteredProjects = res.p;
+      this.searchInput.nativeElement.value = ""
+    }
+    
   }
-
-  
-
- 
-
   seeDetails(p:Proyecto){
     this.API.currentProject = p;
     this.storage.setProject(this.API.currentProject)

@@ -102,6 +102,8 @@ export function getStatusClass(status:string){
       case "CANCELADA":c = "tabla-status-cancelada";break;
       case "RECHAZADA":c = "tabla-status-cancelada";break;
       case "APROBADA":c = "tabla-status-aprobada";break;
+      case "Maquinado": c = "tabla-status-maquinado";break
+      case "Detalle": c = "tabla-status-detalle";break
       default:c = "";break
     }
     return c

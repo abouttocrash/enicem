@@ -3,11 +3,11 @@ import { Mongo } from '../Mongo.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs'
-import { ObjectId } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import { Salida } from '@shared-types/Salida.js';
 import moment from 'moment';
-import { Pieza } from '@shared-types/Pieza.js';
 import { ip } from '../App.js';
+import { createWhat } from '../mongo/ICEMTransactions.js';
 const orderRouter = Router();
 const mongo = Mongo.instance
 const upload = multer({ dest: 'uploads/' });
@@ -31,38 +31,6 @@ orderRouter.put("/status",async(req,res)=>{
 orderRouter.get("/folio",async(req,res)=>{
     const p = await mongo.orders.getFolio()
     res.status(200).send({data:p})
-})
-orderRouter.post("/verify",async(req,res)=>{
-    const p = await mongo.catalog.getCatalogo(req.body.id)
-    const inCatalog:Pieza[] = []
-    req.body.list.forEach((pi:Pieza)=>{
-        inCatalog.push(p!.logs.find((db:Pieza)=>{return db.title == pi.title}))
-    })
-    const body = req.body.list as Pieza[]
-    let todoBien = true;
-    inCatalog.forEach((pieza:Pieza)=>{
-        const sentPieza = body.find(p=>{return p.title == pieza.title })!
-        console.log(
-    //     JSON.stringify(sentPieza.cantidadManufactura) , JSON.stringify(pieza.cantidadManufactura),"&&",
-            //  JSON.stringify(sentPieza.cantidadDetalle) , JSON.stringify(pieza.cantidadDetalle),"&&",
-            //  JSON.stringify(sentPieza.cantidadRecibida) ,JSON.stringify(pieza.cantidadRecibida) ,"&&",
-            //  JSON.stringify(sentPieza.cantidadAlmacen) , JSON.stringify(pieza.cantidadAlmacen) ,"&&",
-            // JSON.stringify(sentPieza.stock) ,"==", JSON.stringify(pieza.stock) 
-        )
-        if( JSON.stringify(sentPieza.cantidadManufactura) == JSON.stringify(pieza.cantidadManufactura)&&
-             JSON.stringify(sentPieza.cantidadDetalle) == JSON.stringify(pieza.cantidadDetalle) &&
-             JSON.stringify(sentPieza.cantidadRecibida) == JSON.stringify(pieza.cantidadRecibida) &&
-             JSON.stringify(sentPieza.cantidadAlmacen) == JSON.stringify(pieza.cantidadAlmacen) &&
-            JSON.stringify(sentPieza.stock) == JSON.stringify(pieza.stock)
-        )
-            todoBien = true
-        else{
-            todoBien = false
-            return
-        }
-    })
-    
-    res.status(200).send({data:{db:inCatalog,sent:req.body.list,todoBien:todoBien}})
 })
 
 orderRouter.get("/all",async(req,res)=>{
@@ -125,12 +93,17 @@ orderRouter.post("/images", upload.array('imagenes'), async (req, res) => {
 });
 
 orderRouter.post('/', async (req, res) => {
+    const client:MongoClient = await mongo.orders.connectClient()
     try {
-        const obj = await mongo.orders.createOrden(req.body)
-        const o = await mongo.orders.getOrders(req.body.idProject!)
-        await mongo.projects.updateProject({ordenesCount:o.length},"_id",new ObjectId(req.body.idProject))
+        const {todoBien,inCatalog} = await mongo.orders.verificarNoEstaEnUso(req.body.catalogId,req.body.orden.piezas,client)
+        if(!todoBien)
+            return res.status(200).send({data:{db:inCatalog,sent:req.body.list,todoBien:todoBien}})
+
+        const r = await mongo.orders.createOrdenV2(req.body.orden,req.body.orden.user)
+        const o = await mongo.orders.getOrdersV2(req.body.orden.idProject!,client)
+        await mongo.projects.updateProjectWithClient({ordenesCount:o.length},"_id",new ObjectId(req.body.orden.idProject),client)
         
-        if(req.body.tipo == "Detalle"){
+        if(req.body.orden.tipo == "Detalle"){
             let salidas:{
                 salidas:Array<Salida>,
                 idUsuario:string,
@@ -146,22 +119,22 @@ orderRouter.post('/', async (req, res) => {
                 actualSalidas:Array<number>
             } = {
                 salidas:[],
-                usuario:req.body.user.name,
-                catalogId:req.body.catalogId,
-                idUsuario:req.body.user._id,
+                usuario:req.body.orden.user.name,
+                catalogId:req.body.orden.catalogId,
+                idUsuario:req.body.orden.user._id,
                 fechaSalida:moment().endOf("D").toISOString(),
-                projectId:req.body.idProject!,
-                project:req.body.project!,
+                projectId:req.body.orden.idProject!,
+                project:req.body.orden.project!,
                 folio:"",
-                folioOrden:req.body.folio,
+                folioOrden:req.body.orden.folio,
                 tipo:"Detalle",
                 status:"ABIERTA",
                 actualSalidas : []
             }
-            const folio = await mongo.orders.getFolio()
+            const folio = await mongo.orders.getFolioWithClient(client)
             salidas.folio = folio.Almacen
-            for(let i = 0 ;i < req.body.piezas.length;i++){
-                const pieza = req.body.piezas[i]
+            for(let i = 0 ;i < req.body.orden.piezas.length;i++){
+                const pieza = req.body.orden.piezas[i]
                 const salida:Salida ={
                     tipo:"Detalle",
                     fechaSalida:moment().endOf("D").toISOString(),
@@ -169,29 +142,36 @@ orderRouter.post('/', async (req, res) => {
                     material:pieza.material,
                     acabado:pieza.acabado,
                     folio:folio.Almacen,
-                    folioOrden:req.body.folio,
+                    folioOrden:req.body.orden.folio,
                     piezas:Number(pieza.piezas),
-                    idUsuario:req.body.user.name,
-                    usuario:req.body.user._id,
-                    projectId:req.body.idProject!
+                    idUsuario:req.body.orden.user.name,
+                    usuario:req.body.orden.user._id,
+                    projectId:req.body.orden.idProject!
                 }
                 salidas.salidas.push(salida)
             }
-            await mongo.salida.createSalida(salidas)
-            await mongo.salida.incrementFolio("Almacen")
-            
+            await mongo.salida.createSalidaWithClient(client,salidas)
+            await mongo.salida.incrementFolioWithClient("Almacen",client)
+            const what = createWhat(req.body.orden.piezas,"piezas")
+            const body = {
+                piezas:what,
+                catalogId:req.body.catalogId,
+                razon:"SALIDA Detalle"
+            }
+            const p = await mongo.updateStockWithClient(body,client)
             
         }   
-        res.status(200).send({ success: true, insert:obj });
+        await client.close()
+        res.status(200).send({ success: true, insert:r,todoBien:todoBien });
     } catch (err) {
+        
         console.log(err)
-        res.status(500).send({ error: 'Error al guardar imágenes', details: err });
+        res.status(500).send({ error: 'Error al crear orden de trabajo', details: err });
+    }finally{
+        try{ await mongo.orders.getClient().close() }
+        catch(e){}
+        
     }
 });
-
-
-
-
-
 
 export default orderRouter;

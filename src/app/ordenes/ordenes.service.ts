@@ -14,14 +14,6 @@ import { AutoFilter } from '../components/auto-icem/auto-icem.component';
 import { Proveedor } from '@shared-types/Proveedor';
 import moment from 'moment';
 
-// Add a minimal declaration for the Web Serial API to satisfy TypeScript
-declare global {
-  interface Navigator {
-    serial?: any;
-    hid?:any
-  }
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -52,7 +44,7 @@ export class OrdenesService {
   drawer!:MatDrawer
   currentOrden!:OrdenTrabajo | undefined
   piezasEnPanel:Array<Pieza> = []
-  displayedColumns: string[] = ['folio','tipo','totalPiezas','proveedor','creada', 'dateEntrega','status','dateReal','cantidadRecibida','cantidadRechazada','cantidadPendiente'];
+  displayedColumns: string[] = ['folio','tipo','proveedor','status','creada', 'dateEntrega','dateReal','totalPiezas','cantidadRecibida','cantidadRechazada','cantidadPendiente','project'];
   dataSource!: MatTableDataSource<OrdenTrabajo>;
   private route = "order"
   constructor(private api:APIService) {}
@@ -97,75 +89,53 @@ export class OrdenesService {
   async uploadImagenes(formData: FormData) {
     await firstValueFrom(this.http.post(`${this.api.BASE}/${this.route}/images`,formData));
   }
-  async getOrders(){
-    const r = await this.api.GET<ICEMDR<OrdenTrabajo>>("order/all",{attr:"projectId",value:this.api.currentProject._id!})
-    r.data.forEach(o=>{
-      o.proveedor = this.api.proveedores.find(p=>{return p._id == o.idProveedor})!.name
-    })
-    this.dataSource = new MatTableDataSource(r.data);
-    this.dataSource.sort = this.sort;
-    return r
-  }
+  
 
   async getOrder(_id:string){
     if(this.api.proveedores.length == 0){
       await this.api.getProveedores()
     }
     const r = await this.api.GET<ICEMR<OrdenTrabajo>>("order/",{attr:"orderId",value:_id!})
-    // if(r.data.tipo == "Detalle")
-    //   r.data.tipo = "Acabado"
     r.data.proveedor = this.api.proveedores.find(p=>{return p._id == r.data.idProveedor})!.name
     
     return r.data
   }
 
-  async uploadOrden(piezas: any[],date:Date,p:string,tipo:string,folio:string) {
+  async uploadOrden(piezas: any[],date:Date,p:string,tipo:string,folio:string,catalogId:string) {
     const body = {
-      idProject:this.api.currentProject._id!,
-      project:this.api.currentProject.name,
-      catalogId:this.api.currentProject.catalogId,
-      idProveedor:p,
-      dateEntrega:date.toISOString(),
-      tipo:tipo,
-      folio:folio,
-      piezas:piezas,
-      user:this.api.currentUser
+      orden:{
+        idProject:this.api.currentProject._id!,
+        project:this.api.currentProject.name,
+        catalogId:this.api.currentProject.catalogId,
+        idProveedor:p,
+        dateEntrega:date.toISOString(),
+        tipo:tipo,
+        folio:folio,
+        piezas:piezas,
+        user:this.api.currentUser
+      },
+      catalogId:catalogId
+      
     }
     
     const r = await firstValueFrom(this.http.post(`${this.api.BASE}/${this.route}`, body));
     return r as any
   }
-  async verifyOrder(list:Array<Pieza>){
-    const body = {
-      list:list,
-      id:this.api.currentProject.catalogId
-    }
-    const r = await this.api.POST(`${this.route}/verify`,body) as unknown as any
-    return r.data.todoBien
-
-  }
+  
   async createOrder(tipo:string,folio:string,list:Array<Pieza>,date:Date,proveedor:Proveedor){
     let desc = tipo == "Maquinado"?MILESTONE_DESC.ORDER_MAQUI_CREATED:MILESTONE_DESC.ORDER_DETAIL_CREATED as string
     desc = desc+" Folio #"+folio
     list.forEach(p=>{
       p.piezas = p.cantidadInDialog!.toString()
     })
-    const todoBien = await this.verifyOrder(list)
-    if(todoBien){
-      const r = await this.uploadOrden(list, date,proveedor._id!,tipo,folio)
+    
+    const r = await this.uploadOrden(list, date,proveedor._id!,tipo,folio,this.api.currentProject.catalogId!)
+    if(!r.todoBien) return r.todoBien
+
     const what = createWhat(list,"piezas")
-    if(tipo == "Detalle"){
-      const body = {
-        piezas:what,
-        catalogId:this.api.currentProject.catalogId!,
-        razon:"SALIDA Detalle"
-      }
-     
-      await this.api.updateStock(body)
-    }
     await this.api.updateLog(createMilestone(desc,r.insert.insertedId,this.api.currentUser._id!,what,proveedor._id))
-    }
-    return todoBien
+    
+    return r.todoBien
     
   }
 

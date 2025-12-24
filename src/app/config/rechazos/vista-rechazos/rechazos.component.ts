@@ -3,11 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { firstValueFrom } from 'rxjs';
-import { APIService } from '../api.service';
-import { ProveedoresComponent } from '../users-module/proveedores/proveedores.component';
-import { ViewsImports, baseDialog } from '../utils/Utils';
+import { APIService } from '../../../api.service';
+import { ViewsImports, baseDialog } from '../../../utils/Utils';
 import { Rechazo } from '@shared-types/Rechazo';
-import { DialogRechazosComponent } from '../dialog-rechazos/dialog-rechazos.component';
+import { DialogRechazosComponent } from '../../dialog-rechazos/dialog-rechazos.component';
 
 @Component({
   selector: 'app-rechazos',

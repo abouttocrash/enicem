@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="projects-list">
-        @for(p of filteredProjects;track p.name;let i = $index){
+        @for(p of filteredProjects;track p._id;let i = $index){
             <project-card
                 (click)="seeDetails(p)"
                 [project]="p">

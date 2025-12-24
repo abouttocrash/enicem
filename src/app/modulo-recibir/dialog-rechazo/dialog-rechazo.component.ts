@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DialogOrdenComponent } from '../dialog-orden/dialog-orden.component';
+import { DialogOrdenComponent } from '../../ordenes/dialog-orden/dialog-orden.component';
 import { Pieza } from '@shared-types/Pieza';
 import { allPiezasAreFilled, isArrow, isF } from '../../utils/Utils';
 import { ProyectoService } from '../../proyecto.service';

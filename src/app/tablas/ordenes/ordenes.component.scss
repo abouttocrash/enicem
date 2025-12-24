@@ -1,0 +1,19 @@
+td[class*="mat-column-date"],td.mat-column-creada{
+    color:var(--gray);
+}
+
+.mat-column-totalPiezas, .mat-column-cantidadRecibida, .mat-column-cantidadRechazada, .mat-column-cantidadPendiente{
+  // text-align: right;
+  
+}
+td[class*="mat-column"]{
+  padding:0 4px;
+}
+:host ::ng-deep .mdc-data-table__header-cell{
+    padding:0 4px;
+}
+table {
+  width: 100%;
+  min-width: 0;
+  table-layout: auto;  
+}

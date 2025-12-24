@@ -13,6 +13,18 @@ import { FormGroup } from '@angular/forms';
 import { Proveedor } from '@shared-types/Proveedor';
 import { Rechazo } from '@shared-types/Rechazo';
 import GET_IP from '@shared-types/APP_CONTS';
+export type PostType = {
+  data:{
+    insertedId:string
+  }
+  status:number
+}
+export type ErrorType = {
+  data:{
+    error:any
+  }
+  status:number
+}
 export type AllR ={
   proyectos:Proyecto[]
   ordenes:OrdenTrabajo[]
@@ -30,7 +42,13 @@ export type AllR ={
   providedIn: 'root'
 })
 export class APIService {
-  
+  FAILURE = {response:undefined}
+  ERROR = {
+    data:{
+      error:{}
+    },
+    status:0,
+  } as ErrorType
   BASE = `${GET_IP}/api`
   BASE_NO_API = GET_IP
   currentProject!:Proyecto
@@ -69,17 +87,6 @@ export class APIService {
     return r
   }
 
-  async getOrders(){
-    const r = await this.GET<ICEMDR<OrdenTrabajo>>("order/all",{attr:"projectId",value:this.currentProject._id!})
-    r.data.forEach(o=>{
-      o.proveedor = this.proveedores.find(p=>{return p._id == o.idProveedor})!.name
-    })
-    return r
-  }
- 
-
-  
-
   async updateStock(body:any){
      const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/catalog/stock`,body))
   }
@@ -105,26 +112,6 @@ export class APIService {
   async updateProjectStatus(status:string){
     await this.PUT("projects/status",{status:status,projectId:this.currentProject._id})
   }
-  async updateProject(count:number){
-    const ids = {
-      catalogId:this.currentProject.catalogId,
-      userId:this.currentUser._id,
-      projectId:this.currentProject._id!,
-      count:count
-    }
-    const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/projects`,ids,{headers:this.headers}))
-    return r
-  }
-
-  async createProject(project:Proyecto){
-    const body = {
-      proyecto:project,
-      creador:this.currentUser
-    }
-    const r = await firstValueFrom<any>(this.http.post(`${this.BASE}/projects`,body,{headers:this.headers}))
-    return project
-  }
-  
   async createRechazo(form:FormGroup){
     let body = {
       name:form.get("name")?.value,
@@ -195,26 +182,9 @@ export class APIService {
     return this.proveedores
   }
 
-  async getProjects(status:string){
-    this.projects = []
-    const r = await this.GET<ICEMDR<Proyecto>>("projects/all",{attr:"status",value:status})
-    this.projects = r.data
-    // r.data.forEach((p:Project)=>{
-    //   // const project = new Project(p)
-    //   // project.setUser(this.findUserbyId(p.idUser!))
-    //   this.projects.push(project)
-    // })
-    return this.projects
-  }
-
-  
-
-  private findUserbyId(id:string){
-    return this.users.find(u=>{return u._id = id})!
-  }
-
-  async POST<T>(route:string,body:Object){
-    return await firstValueFrom<T>(this.http.post<T>(`${this.BASE}/${route}`, body));
+  async POST<T>(route:string,body:Object):Promise<T>{
+    const response = await firstValueFrom<T>(this.http.post<T>(`${this.BASE}/${route}`, body));
+    return response
   }
   async DELETE<T>(route:string,params:HttpParams){
     return await firstValueFrom<T>(this.http.delete<T>(`${this.BASE}/${route}`,{params:params}));
