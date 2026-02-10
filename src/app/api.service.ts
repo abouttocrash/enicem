@@ -90,6 +90,9 @@ export class APIService {
   async updateStock(body:any){
      const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/catalog/stock`,body))
   }
+  async backup(){
+     const r = await firstValueFrom<any>(this.http.get(`${this.BASE}/backup`))
+  }
   
   async updateLog(milestone:Milestone){
     const body = {

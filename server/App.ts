@@ -9,6 +9,8 @@ import { Catalogo } from '@shared-types/Pieza.js';
 import { Reporter } from './Reporter.js';
 import { writePDF } from './PDF_reader/PDF_Writer.js';
 import moment from 'moment';
+import {exec} from 'child_process';
+import { promisify } from 'util';
 import { Proveedor } from '@shared-types/Proveedor.js';
 const app = express();
 export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
@@ -21,6 +23,7 @@ app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
 app.use('/static',express.static(UPLOADS_PATH));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
 export const ip = GET_IP.GET_IP
+const execPromise = promisify(exec);
 app.use(express.static(browserDist));
 
 // tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)
@@ -42,9 +45,13 @@ app.listen(port, async() => {
     console.log(`Server listening on port ${port}`);
     const dataDir = path.join(process.cwd(), 'data')
     const pdfDir = path.join(process.cwd(), 'pdf-ordenes')
+    const backupDir = path.join(process.cwd(), 'backups')
     if(!fs.existsSync(dataDir)){
         mkdirSync(dataDir)
         mkdirSync(pdfDir)
+    }
+    if(!fs.existsSync(backupDir)){
+        mkdirSync(backupDir)
     }
 });
 
@@ -137,6 +144,17 @@ app.get("/api/report/proveedor",async(req,res)=>{
             path:`${ip}/static/proveedor_${id}.xlsx`
         }
     })
+})
+app.get("/api/backup",async(req,res)=>{
+    try {
+        const backupDir = path.join(process.cwd(), 'mongodump')
+        const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
+        
+        res.status(200).send({data:"EXITO CON EL BACKUP"})
+    } catch (error) {
+        console.error(`exec error: ${error}`);
+        res.status(200).send({data:error})
+    }
 })
 
 app.post("/api/pdf/orden",async(req,res)=>{

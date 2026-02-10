@@ -88,6 +88,7 @@ export class PanelOrdenComponent {
       if(result.bool){
         const p = this.api.projects.find(pr=>{return pr._id == this.o.currentOrden?.idProject!})!
         await this.o.aprobar(result,p.catalogId!)
+        this.snack.open("Piezas recibidas","OK",{duration:2000})
         await this.p.getAll()
         let suma = 0
         this.o.currentOrden!.piezas.forEach(pieza=>{

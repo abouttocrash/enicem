@@ -137,7 +137,7 @@ export class SalidasComponent {
   }
 
 
-   async abrirDialogoSalida(salida:any){
+   async revisarSalida(salida:any){
       if(salida.tipo == "Integración" && salida.status == "ABIERTA"){
         const dialog = this.dialog.open(DialogSalidaComponent,{
           ...longDialog,

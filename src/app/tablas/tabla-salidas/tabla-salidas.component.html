@@ -1,16 +1,4 @@
- <div class="tab">
-   <div class="bar">
-        <div>
-        <auto-icem appareance="fill" (keyup)="applyFilter($event)" [filters]="filters" [filteredFilters]="filteredFilters"></auto-icem>
-        </div>
-    
-    </div>
-    
-
-    
-
-    <div style="height: 100%;overflow-y: auto;overflow-x: auto;width:100%">
-        <table mat-table 
+<table mat-table 
             [dataSource]="s.dataSource" 
             cdkDropList
             cdkDropListOrientation="horizontal"
@@ -75,9 +63,7 @@
 
             <tr mat-header-row *matHeaderRowDef="s.displayedColumns;sticky:true"></tr>
             <tr mat-row *matRowDef="let row; columns: s.displayedColumns;"></tr>
-            <!-- Row shown when there is no matching data. -->
             <tr class="mat-row" *matNoDataRow>
                 <td class="mat-cell" colspan="4"></td>
             </tr>
         </table>
-    </div>

@@ -48,3 +48,6 @@ package-lock.json
 package-lock.json
 server/mongo/ICEMTransactions.ts
 server/uploads/*
+server/mongodump/mongodump.exe
+server/mongodump.exe
+server/backups/*

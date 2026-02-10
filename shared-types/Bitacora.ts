@@ -43,7 +43,6 @@ export interface What{
 }
 
 export function createMilestone(description:string,generalId:string,createdBy:string,what:Array<What>,p:any,expand = true){
-    console.log(expand)
     const milestone = {
         description:description,
         generalId:generalId,

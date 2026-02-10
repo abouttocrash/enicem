@@ -10,6 +10,7 @@ import { Reporter } from '../Reporter.js';
 import { Catalogo } from '@shared-types/Pieza.js';
 import { ip, UPLOADS_PATH } from '../App.js';
 import { actualizarBitacora, crearBitacora } from '../mongo/ICEMTransactions.js';
+import { printToException, printToLog } from '../Printer.js';
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const p = `${UPLOADS_PATH}/${req.body.projectId}`
@@ -36,7 +37,7 @@ catalogRouter.delete('/clear/one', async(req, res) => {
         }
         res.status(200).send({data:true})
     }catch(e){
-        console.log(e)
+        printToException(e)
         res.status(500).send({error:e})
     }
 });

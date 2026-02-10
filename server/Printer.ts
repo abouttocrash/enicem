@@ -3,6 +3,10 @@ import moment from "moment"
 export function printToLog(toPrint:string){
     console.log(`${toPrint} ${moment()}`)
 }
+export function printToException(toPrint:any){
+    pMagenta("EXCEPTION TIME "+ moment())
+    console.log(toPrint)
+}
 
 export function pRed(text:string){
     return `\x1b[31m${text}\x1b[0m`

@@ -14,7 +14,7 @@ import { ProyectoService } from '../../../proyecto.service';
 import { SalidaAlmacenComponent } from './salida-almacen/salida-almacen.component';
 import { Catalogo, Pieza } from '@shared-types/Pieza';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { baseDialog, createWhat, longDialog, longerDialog, projectDisabled } from '../../../utils/Utils';
+import { baseDialog, longDialog, longerDialog, projectDisabled } from '../../../utils/Utils';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -42,7 +42,9 @@ export class CatalogoComponent {
   textoPlanos = "Crear Bitácora"
   displayedColumns: string[] = ['box','title','material','acabado','piezas','cantidadManufactura','cantidadDetalle','cantidadAlmacen','cantidadRechazada', 'asociadas','stockNumber', 'expand','remove'];
   
-  constructor(public api:APIService,private storage:StorageService,public p:ProyectoService){
+  constructor(public api:APIService,private storage:StorageService,public p:ProyectoService,
+    private snack:MatSnackBar
+  ){
     
   }
   
@@ -132,6 +134,7 @@ async agregarPlanos() {
     dialog.afterClosed().subscribe(async(r:{bool:boolean,piezas:Pieza[]})=>{
       if(r.bool){
         await this.p.c.createAlmacen(r.piezas)
+        this.snack.open("Salida creada","OK",{duration:2000})
         await this.p.getAll()
       }
     })
