@@ -67,7 +67,7 @@ export class SalidaMongo extends Mongoloid{
         let r = await this.getManyObj<any>(obj)
         r = r.filter(d=>{
             d.fechaSalida = moment(d.fechaSalida).locale("es").format("DD MMMM YYYY")
-            return d.tipo != "Scrap"
+            return d.tipo != "Scrap" && d.tipo != "Detalle"
         })
         return r
     }

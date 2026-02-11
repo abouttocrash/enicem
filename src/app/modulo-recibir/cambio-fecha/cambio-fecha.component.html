@@ -13,6 +13,19 @@
                     <mat-error>Fecha estimada requerida DD/MM/AAAA</mat-error>
                 }
             </mat-form-field>
+            <mat-form-field appearance="outline" >
+                    <mat-label>Proveedor</mat-label>
+                    <mat-select  formControlName="proveedor">
+                        @for(p of filteredProveedores;track p._id){
+                            @if(p.active){
+                                <mat-option (click)="selectProveedor(p)" [value]="p.name">{{p.name}}</mat-option>
+                            }
+                        }
+                    </mat-select>
+                    @if (!form.get("proveedor")!.valid) {
+                        <mat-error>Proveedor requerido</mat-error>
+                    }
+                </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Razón de cambio</mat-label>
                 <textarea formControlName="razon" matInput lines="3"></textarea>

@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { createWhat } from '../utils/Utils';
+import { createWhat, sum } from '../utils/Utils';
 import { MatDrawer } from '@angular/material/sidenav';
 import { AutoFilter } from '../components/auto-icem/auto-icem.component';
 import { Proveedor } from '@shared-types/Proveedor';
@@ -147,9 +147,10 @@ export class OrdenesService {
     }
     await this.api.PUT<ICEMR<OrdenTrabajo>>(this.route,body)
   }
-  async editarFechaOrder(date:Date,razon:string){
+  async editarFechaOrder(date:Date,razon:string,proveedor:string){
     const body = {
       dateEntrega:moment(date).endOf("day").toDate(),
+      proveedor:proveedor,
       razonCambio:razon,
       id:this.currentOrden?._id!
     }
@@ -180,12 +181,12 @@ export class OrdenesService {
     const cual = this.currentOrden!.tipo == "Detalle" ? "cantidadDetalle":"cantidadManufactura"
     await this.api.updateCatalogo(cual,toUpload,idCatalogo)
     
-       const body = {
-        piezas:what,
-        catalogId:idCatalogo,
-        razon:`ENTRADA ${this.currentOrden!!.tipo}`
-      }
-      await this.api.updateStock(body)
+    const body = {
+      piezas:what,
+      catalogId:idCatalogo,
+      razon:`ENTRADA ${this.currentOrden!!.tipo}`
+    }
+    await this.api.updateStock(body)
     
     const desc =  `(${recibidas}) Piezas recibidas para orden de ${this.currentOrden!.tipo} #${this.currentOrden!.folio}`
     await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor))
@@ -229,6 +230,26 @@ export class OrdenesService {
     const desc = this.currentOrden!.tipo == "Detalle" ? "ORDEN DETALLE "+status : "ORDEN MAQUINADO "+status
     await this.api.updateLog({description:desc,generalId:this.currentOrden!._id,createdBy:this.api.currentUser._id,expand:true})
     this.currentOrden!.status = status
+    if(status == "CANCELADA" && this.currentOrden!.tipo == "Detalle"){
+      let what:What[] = []
+      let piezasToWhat:Pieza[] = []
+      this.currentOrden!.piezas.forEach(p=>{
+      const pieza =  this.currentOrden!.piezas.find(pi=>{return p.title == pi.title}) 
+      pieza!.cantidadInDialog = Number(pieza?.piezas) - sum(pieza!.cantidadRecibida)
+      if(pieza != undefined){
+        piezasToWhat.push(pieza)
+        p.cantidadRecibida.push(pieza.cantidadInDialog!)
+        p.fechaRecibida.push({c:pieza.cantidadInDialog!,fecha:new Date().toISOString()})
+      }
+    })
+    what = createWhat(piezasToWhat,"cantidadInDialog")
+      const body = {
+        piezas:what,
+        catalogId:this.api.currentProject.catalogId!,
+        razon:`ENTRADA CANCELADA`
+      }
+    await this.api.updateStock(body)
+    }
   }
 
   async getAllOrders(params:any){

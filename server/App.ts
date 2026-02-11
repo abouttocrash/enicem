@@ -13,6 +13,8 @@ import {exec} from 'child_process';
 import { promisify } from 'util';
 import { Proveedor } from '@shared-types/Proveedor.js';
 const app = express();
+import cron from 'node-cron';
+import { printToException, printToLog } from './Printer.js';
 export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
 app.use(express.json({ limit: '100mb' }))
 app.use(cors())
@@ -53,6 +55,16 @@ app.listen(port, async() => {
     if(!fs.existsSync(backupDir)){
         mkdirSync(backupDir)
     }
+    cron.schedule('0 19 * * *', async () => {
+        try {
+            const backupDir = path.join(process.cwd(), 'mongodump')
+            const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
+            printToLog("BACKUP Realizado")
+        
+        } catch (error) {
+            console.error(`exec error: ${error}`);
+        }
+        });
 });
 
 app.get("/api/projectData",async(req,res)=>{

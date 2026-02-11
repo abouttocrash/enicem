@@ -65,15 +65,17 @@ export class PanelOrdenComponent {
 
   async cambioFecha(){
     const d = this.dialog.open(CambioFechaComponent,{
-      ...baseDialog
+      ...baseDialog,
+      data:this.o.currentOrden?.tipo
     })
     const r = await firstValueFrom(d.afterClosed())
     if(r.bool){
-      await this.o.editarFechaOrder(r.body.date,r.body.razon)
+      await this.o.editarFechaOrder(r.body.date,r.body.razon,r.body.proveedor._id)
       const desc = `Orden con Folio #${pad(this.o.currentOrden?.folio!,this.o.currentOrden?.tipo!)} - Cambio de fecha de ${moment(this.o.currentOrden?.dateEntrega!).locale("es").format("DD MMM YYYY")} a ${moment(r.body.date).locale("es").format("DD MMM YYYY")} Razón: ${r.body.razon}`
       this.o.currentOrden!.dateEntrega = r.body.date!
+      this.o.currentOrden!.proveedor = r.body.proveedor.name
       await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,[],"",false))
-      
+      this.snack.open("Orden editada","OK",{duration:2000})
       await this.p.getAll()
     }
   }
