@@ -59,10 +59,14 @@
                     
                 </td>
             </ng-container>
+                <ng-container matColumnDef="project">
+                <th cdkDrag mat-header-cell *matHeaderCellDef mat-sort-header>Proyecto</th>
+                <td mat-cell *matCellDef="let row"> {{row.project}} </td>
+            </ng-container>
     
 
-            <tr mat-header-row *matHeaderRowDef="s.displayedColumns;sticky:true"></tr>
-            <tr mat-row *matRowDef="let row; columns: s.displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns();sticky:true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns();"></tr>
             <tr class="mat-row" *matNoDataRow>
                 <td class="mat-cell" colspan="4"></td>
             </tr>

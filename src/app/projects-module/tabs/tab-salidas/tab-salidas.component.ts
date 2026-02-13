@@ -23,6 +23,7 @@ import { TablaSalidasComponent } from '../../../tablas/tabla-salidas/tabla-salid
 export class SalidasComponent {
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
   @ViewChild(TablaSalidasComponent) tablaSalidas!:TablaSalidasComponent
+  displayedColumns:string[]=[]
   filters:Array<AutoFilter>=[
       {
         filter:"Tipo",
@@ -51,6 +52,7 @@ export class SalidasComponent {
     })
     const r = this.s.init(data,this.tablaSalidas.sort)
     this.initFilters(data)
+    this.displayedColumns = this.s.displayedColumns.filter(item=>{return item != "project"})
     
   }
 

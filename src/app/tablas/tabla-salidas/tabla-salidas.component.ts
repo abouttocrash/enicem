@@ -65,7 +65,7 @@ export class TablaSalidasComponent {
       }
     }
   }
-
+  //TODO: que no deje editar si son mas de las que hay en stock
   async editarSalida(salida:any){
     const dialog = this.dialog.open(DialogEditarSalidaComponent,{
       ...baseDialog,
