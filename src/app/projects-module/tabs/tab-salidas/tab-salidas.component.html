@@ -1,0 +1,18 @@
+ <div class="tab">
+   <div class="bar">
+        <div>
+        <auto-icem appareance="fill" (keyup)="applyFilter($event)" [filters]="filters" [filteredFilters]="filteredFilters"></auto-icem>
+        </div>
+    
+    </div>
+    
+
+    
+
+    <div style="height: 100%;overflow-y: auto;overflow-x: auto;width:100%">
+       <tabla-salidas
+        [showProyecto]="false"
+        [dataSource]="s.dataSource"
+        [displayedColumns]="s.displayedColumns">
+      </tabla-salidas>
+    </div>

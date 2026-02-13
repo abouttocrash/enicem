@@ -38,7 +38,7 @@ export class SalidaMongo extends Mongoloid{
         let r = await this.getMany<Salida>("projectId",id)
          r = r.filter(d=>{
             d.fechaSalida = moment(d.fechaSalida).locale("es").format("DD MMMM YYYY")
-            return d
+            return  d.tipo != "Detalle"
         })
         return r
     }

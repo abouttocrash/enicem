@@ -1,4 +1,3 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, inject, signal, ViewChild } from '@angular/core';
 import { MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
 import { MatSort } from '@angular/material/sort';
@@ -8,36 +7,29 @@ import { Salida } from '@shared-types/Salida';
 import { HttpParams } from '@angular/common/http';
 import { ICEMDR } from '@shared-types/ICEMR';
 import { MatDialog } from '@angular/material/dialog';
-import { firstValueFrom } from 'rxjs';
-import { createMilestone } from '@shared-types/Bitacora';
 import { APIService } from '../../api.service';
 import { AutoIcemComponent, AutoFilter } from '../../components/auto-icem/auto-icem.component';
-import { DialogEditarSalidaComponent } from '../../dialog-editar-salida/dialog-editar-salida.component';
-import { DialogSalidaComponent } from '../../dialog-salida/dialog-salida.component';
 import { ProyectoService } from '../../proyecto.service';
 import { SalidaService } from '../../salida.service';
-import { ViewsImports, longDialog, createWhat, baseDialog, pad, getStatusClass } from '../../utils/Utils';
+import { ViewsImports } from '../../utils/Utils';
 import { CommonModule } from '@angular/common';
+import { TablaSalidasComponent } from '../../tablas/tabla-salidas/tabla-salidas.component';
 
 @Component({
   selector: 'app-vista-salidas',
   providers:[
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ],
-  imports: [...ViewsImports,AutoIcemComponent,CommonModule],
+  imports: [...ViewsImports,AutoIcemComponent,CommonModule,TablaSalidasComponent],
   templateUrl: './vista-salidas.component.html',
   styleUrl: './vista-salidas.component.scss'
 })
 export class VistaSalidasComponent {
   dialog = inject(MatDialog)
-  pad = pad
-  getStatusClass = getStatusClass
   @ViewChild(MatSort) sort!: MatSort;
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
   @ViewChild(AutoIcemComponent) auto!:AutoIcemComponent
-  dataSource!:MatTableDataSource<Salida>;
-  displayedColumns = ["folio","tipo","fechaSalida","folioOrden","salidas","usuario","project","status","editar",'action', 'pdf']
   
 
   tipo = "Ambas"
@@ -92,47 +84,11 @@ export class VistaSalidasComponent {
     this.initFilters(salidas.data)
   }
 
-  async abrirDialogoSalida(salida:any){
-    if(salida.tipo == "Integración" && salida.status == "ABIERTA"){
-      const dialog = this.dialog.open(DialogSalidaComponent,{
-        ...longDialog,
-        data: JSON.parse(JSON.stringify(salida))
-      });
-      const r = await firstValueFrom(dialog.afterClosed())
-      if(r.bool ){
-        r.data.modifiedBy = this.api.currentUser.name
-        r.data.modifiedById = this.api.currentUser._id
-        r.data.modifiedDate = moment().endOf("D").toISOString()
-        await this.s.updateSalida(r.data)
-        const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name} Razón: ${r.data.razon}`
-        const what = createWhat(r.data.salidas,"piezas")
-        await this.p.getProjects("ABIERTO")
-        this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})!
-        await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
-        
-        if(r.data.status == "APROBADA"){
-        const bodyStock = {
-          piezas:what,
-          catalogId:this.api.currentProject.catalogId!,
-          razon:"SALIDA Integracion"
-        }
-     
-        await this.api.updateStock(bodyStock)
-        } 
-        
-        await this.init()
-      }
-    }
-    
-  }
+  
 
   createDataSource(r:ICEMDR<Salida>){
-    this.dataSource = new MatTableDataSource(r.data)
-    this.dataSource.sort = this.sort
-  }
-
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
+    this.s.dataSource = new MatTableDataSource(r.data)
+    this.s.dataSource.sort = this.sort
   }
 
   applyFilter(event: Event | string) {
@@ -147,7 +103,7 @@ export class VistaSalidasComponent {
       filterValue = event.trim().toLowerCase();
     else
       filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
+    this.s.dataSource.filterPredicate = (data: any, filter: string) => {
       const matchUsuario = data.usuario.toLowerCase().includes(filter);
       const matchTipo = data.tipo.toLowerCase().includes(filter)
       const matchProyecto = data.project!.toLowerCase().includes(filter)
@@ -155,7 +111,7 @@ export class VistaSalidasComponent {
       
       return matchUsuario || matchTipo || matchStatus || matchProyecto
     };
-    this.dataSource.filter = filterValue;
+    this.s.dataSource.filter = filterValue;
     this.filteredFilters = this.auto.filterGroup(filterValue)
   }
 
@@ -167,42 +123,6 @@ export class VistaSalidasComponent {
     const r = await this.s.getAllSalidas(httpParams)
     this.createDataSource(r)
     this.initFilters(r.data)
-  }
-
-  //TODO
-  canApprove(){
-    if(this.api.currentUser == undefined) return false
-    return this.api.currentUser.actions.includes("APROBAR_ALMACEN")
-  }
-  //TODO
-  async getPDF(salida:Salida){
-    let x = salida as any
-    x.idProject = salida.projectId
-    const body = {
-      salida:x
-    }
-    const r = await this.api.POST<any>("pdf/salida",body)
-    window.open(r.data.path, '_blank');
-  }
-
-  async editarSalida(salida:any){
-      const dialog = this.dialog.open(DialogEditarSalidaComponent,{
-        ...baseDialog,
-        data: JSON.parse(JSON.stringify(salida))
-      });
-      const r = await firstValueFrom(dialog.afterClosed())
-      if(r.bool ){
-        r.data.modifiedBy = this.api.currentUser.name
-        r.data.modifiedById = this.api.currentUser._id
-        r.data.modifiedDate = moment().endOf("D").toISOString()
-        await this.s.updateCantidadSalida(r.data)
-        const desc = `(Nuevas cantidades) Salida con Folio ${r.data.folio} Modificada por ${this.api.currentUser.name}`
-        const what = createWhat(r.data.salidas,"piezas")
-        await this.p.getProjects("ABIERTO")
-        this.api.currentProject = this.api.projects.find(p=>{return p._id! == salida.projectId})! 
-        await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
-        await this.buscar()
-      }
   }
   
 }

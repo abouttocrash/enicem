@@ -6,8 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule} from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import {MatTabsModule} from '@angular/material/tabs';
-import { CatalogoComponent } from './catalogo/catalogo.component';
-import { BitacoraComponent } from './bitacora/bitacora.component';
 import { OrdenesTrabajoComponent } from '../../ordenes/ordenes-trabajo/ordenes-trabajo.component';
 import { StorageService } from '../../storage.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
@@ -15,12 +13,14 @@ import { PanelOrdenComponent } from '../../ordenes/panel-orden/panel-orden.compo
 import { MatDialog } from '@angular/material/dialog';
 import { DialogConfirmComponent } from '../../components/dialog-confirm/dialog-confirm.component';
 import { ProyectoService } from '../../proyecto.service';
-import { SalidasComponent } from '../../salidas/salidas.component';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NewProjectDialog } from '../projects/dialog-project/dialog-project';
 import { firstValueFrom } from 'rxjs';
 import { DialogCancelComponent } from '../../dialog-cancel/dialog-cancel.component';
+import { BitacoraComponent } from '../tabs/tab-bitacora/bitacora.component';
+import { CatalogoComponent } from '../tabs/tab-catalogo/catalogo.component';
+import { SalidasComponent } from '../tabs/tab-salidas/tab-salidas.component';
 @Component({
   selector: 'app-project-detail',
   imports: [FormsModule,
