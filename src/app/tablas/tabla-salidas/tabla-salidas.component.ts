@@ -91,7 +91,7 @@ export class TablaSalidasComponent {
 
   async getPDF(salida:Salida){
       let x = salida as any
-      x.idProject = this.api.currentProject._id
+      x.idProject = salida.projectId
       const body = {
         salida:x
       }
