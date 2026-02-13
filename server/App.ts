@@ -198,7 +198,7 @@ app.post("/api/pdf/salida",async(req,res)=>{
             const piezas:any[] = []
             let total = 0 
             salida.salidas.forEach((s:any)=>{
-                total += s.piezas
+                total += Number(s.piezas)
             piezas.push({
                     title:s.pieza,
                     acabado:s.acabado || "-",
