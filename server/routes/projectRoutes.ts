@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { Mongo } from '../Mongo.js';
-import { ObjectId } from 'mongodb';
+import { MongoError, ObjectId } from 'mongodb';
 import { Status } from '../mongo/ProyectosMongo.js';
+import { getLogger } from '../App.js';
 const projectRouter = Router();
 const mongo = Mongo.instance
 
@@ -11,8 +12,17 @@ projectRouter.get("/all",async(req,res)=>{
         const p = await mongo.projects.getAll(status)
         res.status(200).send({data:p})
     }
-    catch(e){
-        res.status(500).send({data:{error:e}});
+    catch(e:any){
+        const ERROR = e as MongoError
+        res.status(500).send({data:{error:ERROR.stack}});
+        const logger = getLogger()
+        console.log(e.to)
+        if(logger){
+            logger.log({
+                level: 'error',
+                message: `[MONGO] ${e}`,
+            });
+        }
     }
 })
 

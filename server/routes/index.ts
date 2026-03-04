@@ -7,6 +7,7 @@ import providerRouter from './ProviderRoutes.js';
 import orderRouter from './orderRoutes.js';
 import salidaRouter from './salidasRoutes.js';
 import rechazoRouter from './RechazoRoutes.js';
+import backupRouter from './backupRoutes.js';
 
 const apiRouter = Router();
 
@@ -18,6 +19,7 @@ apiRouter.use('/api/proveedor', providerRouter);
 apiRouter.use('/api/order', orderRouter);
 apiRouter.use('/api/out', salidaRouter);
 apiRouter.use('/api/rechazo', rechazoRouter);
+apiRouter.use('/api/backup', backupRouter);
 
 export default apiRouter;
 

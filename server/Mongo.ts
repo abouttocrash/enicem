@@ -29,7 +29,7 @@ export class Mongo{
     public static get instance(): Mongo {
         if (!Mongo.#instance) {
             Mongo.#instance = new Mongo();
-            this.#instance.client =  new MongoClient(this.#instance.url);
+            this.#instance.client =  new MongoClient(this.#instance.url,{serverSelectionTimeoutMS:5000});
             Mongo.#instance.orders = new OrdenTrabajoMongo(this.#instance.client)
             Mongo.#instance.projects = new ProyectosMongo(this.#instance.client)
             Mongo.#instance.logs = new BitacoraMongo(this.#instance.client)

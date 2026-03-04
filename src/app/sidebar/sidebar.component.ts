@@ -70,6 +70,18 @@ export class SidebarComponent {
     return this.API.currentUser.actions.includes("NUEVO_USUARIO") &&
     this.API.currentUser.actions.includes("NUEVO_PROVEEDOR")
   }
+  async secret($event:MouseEvent){
+    if($event.ctrlKey){
+      const r = await this.API.backup()
+      console.log(r.data)
+    }
+    
+  }
+  async backup($event:MouseEvent){
+    if($event.ctrlKey){
+      await this.API.postbackup()
+    }
+  }
 
   
 

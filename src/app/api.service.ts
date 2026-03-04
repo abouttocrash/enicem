@@ -92,6 +92,11 @@ export class APIService {
   }
   async backup(){
      const r = await firstValueFrom<any>(this.http.get(`${this.BASE}/backup`))
+     return r
+  }
+  async postbackup(){
+     const r = await firstValueFrom<any>(this.http.post(`${this.BASE}/backup`,{}))
+     return r
   }
   
   async updateLog(milestone:Milestone){

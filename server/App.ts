@@ -9,12 +9,11 @@ import { Catalogo } from '@shared-types/Pieza.js';
 import { Reporter } from './Reporter.js';
 import { writePDF } from './PDF_reader/PDF_Writer.js';
 import moment from 'moment';
-import {exec} from 'child_process';
-import { promisify } from 'util';
 import { Proveedor } from '@shared-types/Proveedor.js';
+import winston from 'winston';
 const app = express();
-import cron from 'node-cron';
-import { printToException, printToLog } from './Printer.js';
+import cron from 'node-cron'; 
+import { backup } from './routes/backupRoutes.js';
 export const UPLOADS_PATH = path.join(process.cwd(), 'uploads')
 app.use(express.json({ limit: '100mb' }))
 app.use(cors())
@@ -25,10 +24,12 @@ app.use('/static',express.static(path.join(process.cwd(), 'pdf-ordenes')));
 app.use('/static',express.static(UPLOADS_PATH));
 const browserDist = path.join(process.cwd(), 'dist/enicem/browser');
 export const ip = GET_IP.GET_IP
-const execPromise = promisify(exec);
-app.use(express.static(browserDist));
+let logger: winston.Logger
+export function getLogger(){
+    return logger
+}
 
-// tus rutas API (asegúrate de que apiRouter tenga prefijo correcto)
+app.use(express.static(browserDist));
 app.use('/', apiRouter);
 
 app.get(/^((?!\/api).)*$/, (_req: Request, res: Response) => {
@@ -55,16 +56,23 @@ app.listen(port, async() => {
     if(!fs.existsSync(backupDir)){
         mkdirSync(backupDir)
     }
-    cron.schedule('0 19 * * *', async () => {
-        try {
-            const backupDir = path.join(process.cwd(), 'mongodump')
-            const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
-            printToLog("BACKUP Realizado")
+    
+    logger = winston.createLogger({
+        level: 'info',
+        format: winston.format.json(),
+        defaultMeta: { time: new Date().toLocaleString() },
+        transports: [
+            new winston.transports.File({ filename: 'icem.log' }),
+        ],
         
-        } catch (error) {
-            console.error(`exec error: ${error}`);
-        }
-        });
+    });
+    logger.log({
+        level: 'info',
+        message: 'Server restarted',
+    });
+    cron.schedule('0 19 * * *', async () => {
+        await backup()
+    });
 });
 
 app.get("/api/projectData",async(req,res)=>{
@@ -156,17 +164,6 @@ app.get("/api/report/proveedor",async(req,res)=>{
             path:`${ip}/static/proveedor_${id}.xlsx`
         }
     })
-})
-app.get("/api/backup",async(req,res)=>{
-    try {
-        const backupDir = path.join(process.cwd(), 'mongodump')
-        const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
-        
-        res.status(200).send({data:"EXITO CON EL BACKUP"})
-    } catch (error) {
-        console.error(`exec error: ${error}`);
-        res.status(200).send({data:error})
-    }
 })
 
 app.post("/api/pdf/orden",async(req,res)=>{
