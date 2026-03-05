@@ -13,6 +13,12 @@ salidaRouter.get("/",async(req,res)=>{
     const p = await mongo.salida.getSalidas(req.query.projectId as string)
     res.status(200).send({data:p})
 })
+salidaRouter.get("/outview/proyecto",async(req,res)=>{
+    let p = await mongo.salida.getSalidas(req.query.projectId as string)
+    p = p.filter(s=>{return s.status == "ABIERTA"})
+    res.status(200).send({data:p})
+})
+
 salidaRouter.get("/outview",async(req,res)=>{
     const p = await mongo.salida.getAllSalidas(req.query)
     const proyectos = await mongo.projects.getAll("ABIERTO")

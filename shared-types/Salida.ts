@@ -1,3 +1,5 @@
+import { Pieza } from "./Pieza";
+
 export interface Salida{
     pieza:string,
     folio:string,
@@ -9,5 +11,10 @@ export interface Salida{
     idUsuario:string,
     usuario:string,
     material:string,
-    acabado:string
+    acabado:string,
+    status:string,
+    salidas:Salida[];
+    placeholder?:string
+    max?:number
+    inSalida?:number
 }

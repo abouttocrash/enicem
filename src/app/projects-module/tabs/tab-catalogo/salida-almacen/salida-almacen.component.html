@@ -18,7 +18,11 @@
                         <p>{{plano.material}}</p>
                     </div>
                 </div>
-                <div class="center-ver"></div>
+                <div class="center-ver">
+                    @if(plano.inSalida){
+                        <mat-icon [matTooltip]="getTooltip(plano)" style="color:var(--red)">content_paste_off</mat-icon>
+                    }
+                </div>
             </div>
                 
             </div>

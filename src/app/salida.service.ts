@@ -29,6 +29,12 @@ export class SalidaService {
      return await this.api.GET2<ICEMDR<Salida>>(`${this.route}/outview`,filter)
   }
 
+  async getSalidasAbiertasParaProyecto(idProyecto:string){
+    const httpParams = new HttpParams()
+      .set("projectId", idProyecto)
+    return await this.api.GET2<ICEMDR<Salida>>(`${this.route}/outview/proyecto`,httpParams)
+  }
+
   async updateSalida(salida:any){
     await this.api.PUT<ICEMDR<Salida>>(`${this.route}/outview`,{salida:salida})
   }

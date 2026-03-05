@@ -70,7 +70,7 @@ app.listen(port, async() => {
         level: 'info',
         message: 'Server restarted',
     });
-    cron.schedule('0 19 * * *', async () => {
+    cron.schedule('0 19,20,21 * * *', async () => {
         await backup()
     });
 });

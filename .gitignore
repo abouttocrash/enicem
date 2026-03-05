@@ -51,3 +51,4 @@ server/uploads/*
 server/mongodump/mongodump.exe
 server/mongodump.exe
 server/backups/*
+server/icem.log

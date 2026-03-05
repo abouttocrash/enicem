@@ -6,7 +6,10 @@
             <div class="list">
                 <div class="item">
                     <div class="center-ver">
-                        <input [(ngModel)]="plano.piezas" [placeholder]="plano.piezas" type="text">
+                        <input 
+                        [placeholder]="plano.placeholder"
+                        (keydown)="checkAmount($event,plano)"
+                         type="text">
                     </div>
                 <div class="center-ver">
                     <div>
@@ -14,7 +17,12 @@
                         <p>{{plano.material}}</p>
                     </div>
                 </div>
-                <div class="center-ver"></div>
+                <div class="center-ver">
+                     @if(plano.inSalida){
+                        <mat-icon [matTooltip]="getTooltipSalida(plano)" style="color:var(--red)">content_paste_off</mat-icon>
+                     }
+                     <mat-icon [matTooltip]="getTooltip(plano)" fontSet="material-symbols-outlined" style="color:#936639">note_alt</mat-icon>
+                </div>
             </div>
                 
             </div>
@@ -25,7 +33,7 @@
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button class="main-cta" (click)="actualizar(true)">Guardar</button>
+            <button class="main-cta" [disabled]="!allPiezasAreFilled()" (click)="actualizar(true)">Guardar</button>
         </div>
     </div>
 </div>

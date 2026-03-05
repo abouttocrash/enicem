@@ -15,10 +15,11 @@ import { APIService } from '../../api.service';
 import { ProyectoService } from '../../proyecto.service';
 import { DialogEditarSalidaComponent } from '../../dialog-editar-salida/dialog-editar-salida.component';
 import { Salida } from '@shared-types/Salida';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'tabla-salidas',
-  imports: [MatTableModule, CdkDropList, CdkDrag, MatSortModule,CommonModule,MatIconModule],
+  imports: [MatTableModule, CdkDropList, CdkDrag, MatSortModule,CommonModule,MatIconModule,MatTooltipModule],
   templateUrl: './tabla-salidas.component.html',
   styleUrl: './tabla-salidas.component.scss'
 })
@@ -38,7 +39,7 @@ export class TablaSalidasComponent {
   }
 
   async revisarSalida(salida:any){
-    if(salida.tipo == "Integración" && salida.status == "ABIERTA"){
+    if(salida.tipo == "Integración"){
       const dialog = this.dialog.open(DialogSalidaComponent,{
         ...longDialog,
         data: JSON.parse(JSON.stringify(salida))

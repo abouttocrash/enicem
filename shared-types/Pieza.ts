@@ -23,6 +23,7 @@ export interface Pieza{
     max?:number
     stock:Array<{c:number,t:string}>
     stockNumber?:number
+    inSalida:number
     
 }
 

@@ -19,6 +19,7 @@
                 
             </div>
         }
+        @if(!isClosed()){
         <mat-form-field appearance="outline">
             <mat-label>Acción</mat-label>
             <mat-select [(ngModel)]="revision">
@@ -26,6 +27,7 @@
                 <mat-option value="RECHAZADA">Rechazar</mat-option>
             </mat-select>
         </mat-form-field>
+        }
         @if(revision == "RECHAZADA"){
             <mat-form-field appearance="outline">
             <mat-label>Razón de rechazo</mat-label>
@@ -37,7 +39,9 @@
     <div class="dialog-bottom">
         <div>
             <button class="secondary-cta" (click)="actualizar(false)">Cancelar</button>
-            <button [disabled]="(revision == 'RECHAZADA' && razon == '') || revision == '' " class="main-cta" (click)="actualizar(true)">Guardar</button>
+            @if(!isClosed()){
+                <button [disabled]="(revision == 'RECHAZADA' && razon == '') || revision == '' " class="main-cta" (click)="actualizar(true)">Guardar</button>
+            }
         </div>
     </div>
 </div>

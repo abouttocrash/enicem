@@ -23,4 +23,8 @@ export class DialogSalidaComponent {
     this.data.razon = this.razon || "APROBADA"
     this.dialog.close({data:this.data,bool:bool})
   }
+
+  isClosed(){
+    return this.data.status == 'APROBADA' || this.data.status == 'RECHAZADA'
+  }
 }

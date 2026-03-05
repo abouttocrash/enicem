@@ -4,7 +4,7 @@ import path from 'path'
 import { printToLog } from '../Printer.js';
 import { getLogger } from '../App.js';
 const backupRouter = Router();
-import {exec} from 'child_process';
+import {exec, spawn} from 'child_process';
 import { promisify } from 'util';
 const execPromise = promisify(exec);
 //logs
@@ -32,13 +32,34 @@ export async function backup(){
     try {
         const backupDir = path.join(process.cwd(), 'mongodump')
         const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
-        printToLog("BACKUP Realizado")
-        if(logger != undefined){
+
+        const bat = spawn('cmd.exe', ['/c', `${backupDir}/backup.bat`]);
+
+        bat.stdout.on('data', (data) => {
+            printToLog(`[backup stdout] ${data.toString()}`)
+            if(logger != undefined){
             logger.log({
                 level: 'info',
-                message: 'Backup realizado',
+                message: `[backup stdout] ${data.toString()}`,
             });
         }
+        });
+
+        bat.stderr.on('data', (data) => {
+            printToLog(`[backup stderr] ${data.toString()}`)
+            logger.log({
+                level: 'info',
+                message: `[backup stderr] ${data.toString()}`,
+            });
+        });
+
+        bat.on('exit', (code) => {
+            printToLog(`[backup exit] ${code}`)
+            logger.log({
+                level: 'info',
+                message: `[backup exit] ${code}`,
+            });
+        });
     
     } catch (error) {
         if(logger != undefined){
