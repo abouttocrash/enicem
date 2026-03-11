@@ -5,8 +5,7 @@ import { printToLog } from '../Printer.js';
 import { getLogger } from '../App.js';
 const backupRouter = Router();
 import {exec, spawn} from 'child_process';
-import { promisify } from 'util';
-const execPromise = promisify(exec);
+import moment from 'moment';
 //logs
 backupRouter.post('/', async(req, res) => {
     await backup()
@@ -30,10 +29,10 @@ backupRouter.get("/",async(req,res)=>{
 export async function backup(){
     const logger = getLogger()
     try {
+        const param =  moment().format("DD-MM-YY_hh-mm-ss")
         const backupDir = path.join(process.cwd(), 'mongodump')
-        const { stdout, stderr } = await execPromise(`start cmd /c ${backupDir}/backup.bat`);
 
-        const bat = spawn('cmd.exe', ['/c', `${backupDir}/backup.bat`]);
+        const bat = spawn('cmd.exe', ['/c', `${backupDir}/backup.bat ${param}`]);
 
         bat.stdout.on('data', (data) => {
             printToLog(`[backup stdout] ${data.toString()}`)
