@@ -5,6 +5,12 @@
     grid-template-columns: 64px 1fr;
     background-color: var(--bg);
 }
+.app-ios{
+    display: grid;
+    height:100%;
+    width: 100%;
+    background-color: var(--bg);
+}
 
 .app-holder{
     display: grid;

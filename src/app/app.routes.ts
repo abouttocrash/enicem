@@ -7,6 +7,7 @@ import { VistaOrdenesComponent } from './vistas/vista-ordenes/vista-ordenes.comp
 import { VistaProveedoresComponent } from './config/proveedores/vista-proveedores/vista-proveedores.component';
 import { VistaSalidasComponent } from './vistas/vista-salidas/vista-salidas.component';
 import { VistaUsuariosComponent } from './config/vista-usuarios/vista-usuarios.component';
+import { VistaBackupsComponent } from './vistas/vista-backups/vista-backups.component';
 
 export const routes: Routes = [
     {component:ProjectsComponent,path:""},
@@ -17,4 +18,5 @@ export const routes: Routes = [
     {component:VistaProveedoresComponent,path:"proveedores"},
     {component:VistaUsuariosComponent,path:"usuarios"},
     {component:RechazosComponent,path:"rechazos"},
+    {component:VistaBackupsComponent,path:"backups"},
 ];

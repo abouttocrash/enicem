@@ -91,7 +91,7 @@ export class APIService {
      const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/catalog/stock`,body))
   }
   async backup(){
-     const r = await firstValueFrom<any>(this.http.get(`${this.BASE}/backup`))
+     const r = await firstValueFrom<ICEMR<any>>(this.http.get<ICEMR<any>>(`${this.BASE}/backup`))
      return r
   }
   async postbackup(){

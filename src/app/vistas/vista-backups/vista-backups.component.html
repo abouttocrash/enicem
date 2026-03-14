@@ -1,0 +1,23 @@
+<div class="should-overflow backups">
+    <div style="position: relative;">
+         <button (click)="backup()" class="main-cta" style="position:absolute;top:20px;right:16px">
+            <mat-icon >settings_backup_restore</mat-icon>
+            Backup
+        </button>
+    </div>
+    <div>
+        @for(b of arr;track b){
+        <div class="item">
+            <div class="center">
+                <mat-icon>backup</mat-icon>
+            </div>
+            <div class="center-ver">
+                <p style="font-weight: 600;">{{b.name}}</p>
+                <span>{{b.time}}</span>
+            </div>
+            <div></div>
+        </div>
+    }
+    </div>
+    
+</div>

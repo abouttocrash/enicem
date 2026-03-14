@@ -18,11 +18,12 @@ backupRouter.put("/",async(req,res)=>{
 backupRouter.get("/",async(req,res)=>{
     const p = path.join(process.cwd(), 'backups')
     const folder = fs.readdirSync(p)
-    const stats:{name:string,time:string}[] = []
+    const stats:{name:string,time:string,numDate:number}[] = []
     folder.forEach(f=>{
         const stat = fs.statSync(`${p}/${f}`)
-        stats.push({name:f,time:stat.mtime.toLocaleString()})
+        stats.push({name:f,time:stat.mtime.toLocaleString(),numDate:stat.mtimeMs})
     })
+    stats.sort((a,b) => b.numDate - a.numDate );
     res.status(200).send({data:stats})
 })
 

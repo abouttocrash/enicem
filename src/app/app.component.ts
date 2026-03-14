@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { StylesService } from './styles.service';
 import { APIService } from './api.service';
@@ -12,10 +12,13 @@ import { APIService } from './api.service';
 })
 export class AppComponent {
   title = 'APP Trazabilidad';
-  constructor(private s:StylesService,public API:APIService){
+  constructor(public s:StylesService,public API:APIService,private router:Router){
     this.s.setMode();
-   
-    
+  }
+  ngAfterViewInit(){
+    if(this.s.iOS()){
+      this.router.navigate(["backups"])
+    }
   }
   
 }
