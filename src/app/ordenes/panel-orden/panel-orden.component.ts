@@ -88,6 +88,7 @@ export class PanelOrdenComponent {
     })
     d.afterClosed().subscribe(async(result:any)=>{
       if(result.bool){
+        await this.p.getProjects("ABIERTO")
         const p = this.api.projects.find(pr=>{return pr._id == this.o.currentOrden?.idProject!})!
         await this.o.aprobar(result,p.catalogId!)
         this.snack.open("Piezas recibidas","OK",{duration:2000})
@@ -97,7 +98,7 @@ export class PanelOrdenComponent {
           suma += sum(pieza.cantidadRecibida || [])
        })
         if(this.o.currentOrden!.totalPiezas! == suma ){
-          this.actualizarStatus("CERRADA")
+          await this.actualizarStatus("CERRADA")
           this.snack.open("Orden cerrada","OK",{duration:2000})
         }
       }
