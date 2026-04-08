@@ -79,6 +79,7 @@ export class OrdenesService {
   }
 
   async getImages(){
+    this.images = []
     const params = new HttpParams()
     .set('projectId', this.currentOrden?.idProject!)
     .set('ordenId', this.currentOrden!._id);
@@ -88,6 +89,17 @@ export class OrdenesService {
 
   async uploadImagenes(formData: FormData) {
     await firstValueFrom(this.http.post(`${this.api.BASE}/${this.route}/images`,formData));
+  }
+
+  async deleteImagenes(image:string,ordenId:string,projectId:string){
+    let httpParams = new HttpParams()
+    .set("ordenId",ordenId)
+    .set("projectId",projectId!)
+    .set("image",image)
+    
+    const r = await this.api.DELETE<ICEMDR<boolean>>(`${this.route}/images`,httpParams)
+    return r
+    
   }
   
 

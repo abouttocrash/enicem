@@ -81,8 +81,8 @@ export class SalidaAlmacenComponent {
       return s2.salidas
     })
     .flat()
-    .filter(p2=>{return p2.pieza == plano.title})
-    const suma = sum(piezasEnSalida.map(p=>{return p.piezas}))
+    .filter(p2=>{return p2!.pieza == plano.title})
+    const suma = sum(piezasEnSalida.map(p=>{return p!.piezas}))
     if(suma > 0)
        plano.inSalida = suma
     return suma

@@ -46,7 +46,6 @@ export class PanelOrdenComponent {
   ){}
 
   ngOnInit() {
-  // Crea el input solo una vez
     this.imageInput = document.createElement('input');
     this.imageInput.type = 'file';
     this.imageInput.accept = 'image/*';
@@ -172,6 +171,25 @@ openNativeImageDialog() {
   openImageTab(imgUrl: string) {
     window.open(imgUrl, '_blank');
   }
+
+  async deleteImage(img:string){
+    const d = this.dialog.open(DialogConfirmComponent,{
+      width:"340px",
+      height:"260px",
+      disableClose:false,
+      data:{accion:"Eliminar imagen"}
+    })
+    const r = await firstValueFrom(d.afterClosed())
+    if(r){
+      const r = await this.o.deleteImagenes(img,this.p.o.currentOrden!._id, this.o.currentOrden!.idProject)
+      await this.o.getImages()
+      this.snack.open("Imagen eliminada con éxito","OK",{duration:3000})
+    }
+    else{
+      this.snack.open("Ha ocurrido un error","OK",{duration:3000})
+    }
+  }
+
   removeImage(img: IMG_OBJ, event: MouseEvent) {
     event.preventDefault();
     this.selectedImages = this.selectedImages.filter(i => i.name !== img.name);
@@ -187,7 +205,7 @@ openNativeImageDialog() {
     if(r){
       
       const formData = new FormData();
-     this.selectedImages.forEach(file => formData.append('imagenes', file.obj, file.name));
+      this.selectedImages.forEach(file => formData.append('imagenes', file.obj, file.name));
       formData.append('projectId', this.p.api.currentProject._id!);
       formData.append('ordenId',this.p.o.currentOrden!._id)
       await this.p.o.uploadImagenes(formData)

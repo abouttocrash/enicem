@@ -12,8 +12,8 @@ export interface Salida{
     usuario:string,
     material:string,
     acabado:string,
-    status:string,
-    salidas:Salida[];
+    status?:string,
+    salidas?:Salida[];
     placeholder?:string
     max?:number
     inSalida?:number

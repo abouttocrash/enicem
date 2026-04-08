@@ -53,6 +53,24 @@ orderRouter.get("/images",async(req,res)=>{
     res.status(200).send({data:images})
 })
 
+orderRouter.delete("/images",async(req,res)=>{
+    const {projectId, ordenId,image } = req.query
+    const projectDir = path.join(process.cwd(), 'imagenes', `${projectId}/${ordenId}`);
+    if(fs.existsSync(projectDir)){
+        const img = image as string
+        const split = (img.split("/").at(-1))
+        const imagen = fs.readdirSync(projectDir).find(i=>{return i == split})
+        if(imagen != undefined){
+            fs.unlinkSync(`${projectDir}/${imagen}`)
+            res.status(200).send({data:true})
+        }
+        else{
+            res.status(200).send({data:false})
+        }
+    }
+    
+})
+
 orderRouter.post("/images", upload.array('imagenes'), async (req, res) => {
     try {
         const {projectId, ordenId } = req.body
