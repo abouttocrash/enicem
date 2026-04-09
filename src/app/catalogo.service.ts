@@ -135,7 +135,7 @@ export class CatalogoService {
     await this.api.updateStock(bodyStock)
     const r = await this.api.POST<ICEMR<any>>(this.route+"/almacen",body) as any
     const desc = `(${total}) Piezas a scrap - ${piezas[0].razonRechazo}`
-    await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what})
+    await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what},this.api.currentProject._id!)
   }
   async createAlmacen(piezas:Pieza[]){
     const body = {
@@ -153,7 +153,7 @@ export class CatalogoService {
     })
     const r = await this.api.POST<ICEMR<any>>(this.route+"/almacen",body) as any
     const desc = `(${total}) Piezas solicitadas a almacen #${r.inserted.prevFolio}`
-    await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what})
+    await this.api.updateLog({description:desc ,generalId:r.inserted.insertedId,createdBy:this.api.currentUser._id,expand:true,what},this.api.currentProject._id!)
     
   }
   async reporteCatalogo(){

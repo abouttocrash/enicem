@@ -52,7 +52,7 @@ export class TablaSalidasComponent {
         await this.s.updateSalida(r.data)
         const desc = `Salida con Folio #${r.data.folio} ${r.data.status} por ${this.api.currentUser.name} Razón: ${r.data.razon}`
         const what = createWhat(r.data.salidas,"piezas")
-        await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
+        await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""),this.api.currentProject._id!)
         
         if(r.data.status == "APROBADA"){
           const bodyStock = {
@@ -80,7 +80,7 @@ export class TablaSalidasComponent {
       await this.s.updateCantidadSalida(r.data)
       const desc = `(Nuevas cantidades) Salida con Folio ${r.data.folio} Modificada por ${this.api.currentUser.name}`
       const what = createWhat(r.data.salidas,"piezas")
-      await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""))
+      await this.api.updateLog(createMilestone(desc,r.data._id,this.api.currentUser._id!,what,""),this.api.currentProject._id!)
       await this.p.getAll()
     }
   }

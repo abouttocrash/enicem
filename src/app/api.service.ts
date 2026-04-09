@@ -99,10 +99,11 @@ export class APIService {
      return r
   }
   
-  async updateLog(milestone:Milestone){
+  async updateLog(milestone:Milestone,id:string){
+    const auxId = this.currentProject == undefined? id:this.currentProject._id
     const body = {
       milestone:milestone,
-      projectId:this.currentProject._id
+      projectId:auxId
     }
     const r = await firstValueFrom<any>(this.http.put(`${this.BASE}/logs`,body))
   }

@@ -116,7 +116,7 @@ export class ProjectDetailComponent {
       if(result){
         await this.api.updateProjectStatus(status)
         this.api.currentProject.status = status
-        await this.api.updateLog({description:"Proyecto "+status ,generalId:this.api.currentProject._id!,createdBy:this.api.currentUser._id,expand:false})
+        await this.api.updateLog({description:"Proyecto "+status ,generalId:this.api.currentProject._id!,createdBy:this.api.currentUser._id,expand:false},this.api.currentProject._id!)
         await this.p.getAll()
         this.router.navigate([""])
         this.snackBar.open(`Proyecto ${status}`,"OK",{duration:5000})

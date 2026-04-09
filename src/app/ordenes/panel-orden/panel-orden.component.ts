@@ -73,7 +73,8 @@ export class PanelOrdenComponent {
       const desc = `Orden con Folio #${pad(this.o.currentOrden?.folio!,this.o.currentOrden?.tipo!)} - Cambio de fecha de ${moment(this.o.currentOrden?.dateEntrega!).locale("es").format("DD MMM YYYY")} a ${moment(r.body.date).locale("es").format("DD MMM YYYY")} Razón: ${r.body.razon}`
       this.o.currentOrden!.dateEntrega = r.body.date!
       this.o.currentOrden!.proveedor = r.body.proveedor.name
-      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,[],"",false))
+      console.log(this.o.currentOrden?.idProject!)
+      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,[],"",false), this.o.currentOrden?.idProject!)
       this.snack.open("Orden editada","OK",{duration:2000})
       await this.p.getAll()
     }
@@ -146,7 +147,7 @@ export class PanelOrdenComponent {
     return this.o.piezasEnPanel.find(p=>{return p.checked && !this.isMax(p)}) ?false:true
   }
   toggle(row:Pieza){
-    const idProyecto = this.p.api.currentProject._id!
+    const idProyecto = this.o.currentOrden?.idProject
     const actualTitle = row.title.replace("(ESPEJO)","").trim()
     const url = `${this.api.BASE_NO_API}/static/${idProyecto}/${actualTitle}.pdf`;
     window.open(url, '_blank');
@@ -181,13 +182,15 @@ openNativeImageDialog() {
     })
     const r = await firstValueFrom(d.afterClosed())
     if(r){
-      const r = await this.o.deleteImagenes(img,this.p.o.currentOrden!._id, this.o.currentOrden!.idProject)
+      const r2 = await this.o.deleteImagenes(img,this.p.o.currentOrden!._id, this.o.currentOrden!.idProject)
       await this.o.getImages()
-      this.snack.open("Imagen eliminada con éxito","OK",{duration:3000})
+      if(r2.data)
+        this.snack.open("Imagen eliminada con éxito","OK",{duration:3000})
+      else{
+        this.snack.open("Ha ocurrido un error","OK",{duration:3000})
+      }
     }
-    else{
-      this.snack.open("Ha ocurrido un error","OK",{duration:3000})
-    }
+    
   }
 
   removeImage(img: IMG_OBJ, event: MouseEvent) {
@@ -206,7 +209,7 @@ openNativeImageDialog() {
       
       const formData = new FormData();
       this.selectedImages.forEach(file => formData.append('imagenes', file.obj, file.name));
-      formData.append('projectId', this.p.api.currentProject._id!);
+      formData.append('projectId', this.o.currentOrden?.idProject!);
       formData.append('ordenId',this.p.o.currentOrden!._id)
       await this.p.o.uploadImagenes(formData)
       const what:What[] = []
@@ -220,9 +223,8 @@ openNativeImageDialog() {
         what.push(w)
       })
       const desc = `${this.selectedImages.length} Imágenes agregadas a la orden ${this.p.o.currentOrden!.tipo} con folio ${this.p.o.currentOrden!.folio}`
-      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,what,"",false))
+      await this.p.api.updateLog(createMilestone(desc,this.p.o.currentOrden!._id!,this.p.api.currentUser._id!,what,"",false), this.o.currentOrden?.idProject!)
       await this.o.getImages()
-      await this.p.getAll()
       // Opcional: limpiar imágenes seleccionadas
       this.selectedImages = [];
     }

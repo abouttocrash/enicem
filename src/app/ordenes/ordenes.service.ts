@@ -97,7 +97,7 @@ export class OrdenesService {
     .set("projectId",projectId!)
     .set("image",image)
     
-    const r = await this.api.DELETE<ICEMDR<boolean>>(`${this.route}/images`,httpParams)
+    const r = await this.api.DELETE<ICEMR<boolean>>(`${this.route}/images`,httpParams)
     return r
     
   }
@@ -145,7 +145,7 @@ export class OrdenesService {
     if(!r.todoBien) return r.todoBien
 
     const what = createWhat(list,"piezas")
-    await this.api.updateLog(createMilestone(desc,r.insert.insertedId,this.api.currentUser._id!,what,proveedor._id))
+    await this.api.updateLog(createMilestone(desc,r.insert.insertedId,this.api.currentUser._id!,what,proveedor._id),this.api.currentProject._id!)
     
     return r.todoBien
     
@@ -201,7 +201,7 @@ export class OrdenesService {
     await this.api.updateStock(body)
     
     const desc =  `(${recibidas}) Piezas recibidas para orden de ${this.currentOrden!.tipo} #${this.currentOrden!.folio}`
-    await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor))
+    await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor),this.api.currentProject._id!)
     const r = await this.getOrder(this.currentOrden!._id)
     this.currentOrden! = r
     this.piezasEnPanel = JSON.parse(JSON.stringify(this.currentOrden!.piezas))
@@ -231,7 +231,7 @@ export class OrdenesService {
     await this.updateOrder(this.currentOrden!,"RECHAZADA")
     const desc =  `(${recibidas}) Piezas rechazadas para orden de ${this.currentOrden!.tipo} #${this.currentOrden!.folio} Razón: ${result.razon}`
     await this.api.updateCatalogo("cantidadRechazada",toUpload,idCatalogo)
-    await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor))
+    await this.api.updateLog(createMilestone(desc,this.currentOrden!._id,this.api.currentUser._id!,what,this.currentOrden!.idProveedor),this.api.currentProject._id!)
     const r = await this.getOrder(this.currentOrden!._id)
     this.currentOrden! = r
     this.piezasEnPanel = JSON.parse(JSON.stringify(this.currentOrden!.piezas))
@@ -240,7 +240,7 @@ export class OrdenesService {
   async actualizarStatus(status:StatusOrden){
     await this.api.PUT<ICEMR<OrdenTrabajo>>("order/status",{status:status,id:this.currentOrden!._id})
     const desc = this.currentOrden!.tipo == "Detalle" ? "ORDEN DETALLE "+status : "ORDEN MAQUINADO "+status
-    await this.api.updateLog({description:desc,generalId:this.currentOrden!._id,createdBy:this.api.currentUser._id,expand:true})
+    await this.api.updateLog({description:desc,generalId:this.currentOrden!._id,createdBy:this.api.currentUser._id,expand:true},this.api.currentProject._id!)
     this.currentOrden!.status = status
     if(status == "CANCELADA" && this.currentOrden!.tipo == "Detalle"){
       let what:What[] = []
