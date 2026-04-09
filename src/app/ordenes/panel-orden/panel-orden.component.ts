@@ -177,7 +177,7 @@ openNativeImageDialog() {
       width:"340px",
       height:"260px",
       disableClose:false,
-      data:{accion:"Eliminar imagen"}
+      data:{accion:"Eliminar imagen, ESTA ACCIÓN ES PERMANENTE Y LA IMAGEN NO SE PODRÁ RECUPERAR"}
     })
     const r = await firstValueFrom(d.afterClosed())
     if(r){
